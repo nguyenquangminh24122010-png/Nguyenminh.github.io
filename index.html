@@ -525,7 +525,6 @@
                     <div class="grid1"><div><div class="albl">Nghệ sĩ</div>
                         <input type="text" id="mArtist" class="ainp" placeholder="vd: Tên nghệ sĩ"></div></div>
                     <div class="grid1"><div>
-                        <!-- ✅ ĐÃ SỬA: Label và placeholder cập nhật hỗ trợ SoundCloud -->
                         <div class="albl">Link .mp3 trực tiếp hoặc SoundCloud 🎵</div>
                         <input type="text" id="mUrl" class="ainp" placeholder="https://soundcloud.com/... hoặc https://...song.mp3">
                         <div style="font-size:10.5px;color:var(--dim);margin-top:4px;">✅ Hỗ trợ: link SoundCloud, link .mp3 trực tiếp</div>
@@ -593,6 +592,9 @@
    ✅ FIX 4: Firebase đồng bộ key/nhạc/password mọi máy
    ✅ FIX 5: Fallback localStorage khi offline / chưa cấu hình Firebase
    ✅ FIX 6: Hỗ trợ SoundCloud Widget API — phát link SoundCloud trực tiếp
+   ✅ FIX 7: Làm sạch URL SoundCloud khi thêm/sửa bài hát
+   ✅ FIX 8: Sửa widget SoundCloud autoplay + xử lý play/pause đúng
+   ✅ FIX 9: Cập nhật initMusicPlayer khi quay lại trang chủ
    ================================================================ */
 
 const FIREBASE_CONFIG = {
@@ -1001,6 +1003,10 @@ function goTo(id) {
     el.classList.add('active');
     if (id === 'page2') setTimeout(() => document.getElementById('keyInput').focus(), 60);
     if (id === 'pageAdmin') { loadKeyList(); loadAdminTrackList(); }
+    // Cập nhật lại widget nhạc khi về trang chủ / dashboard
+    if (id === 'page1' || id === 'page3') {
+        initMusicPlayer();
+    }
 }
 
 function switchTab(tabId, btn) {
@@ -1206,13 +1212,27 @@ async function getTracks() {
 }
 async function setTracks(t) { await fbSet('tracks', t); }
 
+function cleanSoundCloudUrl(inputUrl) {
+    if (inputUrl.includes('soundcloud.com/')) {
+        try {
+            const u = new URL(inputUrl);
+            u.search = '';                        // xoá hết ?ref=...&si=...
+            u.hostname = 'soundcloud.com';        // bỏ subdomain 'm.'
+            return u.toString();
+        } catch(e) {}
+    }
+    return inputUrl;
+}
+
 async function adminAddTrack() {
     const name = document.getElementById('mTrackName').value.trim();
     const artist = document.getElementById('mArtist').value.trim();
-    const url = document.getElementById('mUrl').value.trim();
+    let url = document.getElementById('mUrl').value.trim();
     const cover = document.getElementById('mCover').value.trim();
     const msg = document.getElementById('mMsg');
     if (!name || !url) { showAdmMsg(msg,'❌ Nhập tên bài và link nhạc!',false); return; }
+    // Làm sạch URL SoundCloud
+    url = cleanSoundCloudUrl(url);
     try {
         const tracks = await getTracks();
         const isSC = isSoundCloudUrl(url);
@@ -1299,7 +1319,8 @@ async function saveEditTrack(i) {
     try {
         const t = tracks[i];
         if (!t.isLocal) {
-            const url = document.getElementById('etUrl').value.trim();
+            let url = document.getElementById('etUrl').value.trim();
+            url = cleanSoundCloudUrl(url);
             const cover = document.getElementById('etCover').value.trim();
             tracks[i] = { ...t, name, artist:artist||'Unknown', url, cover, isSoundCloud: isSoundCloudUrl(url) };
         } else {
@@ -1509,7 +1530,6 @@ async function adminAddFileTrack() {
 
 /* ================================================================
    MUSIC PLAYER — MP3 trực tiếp + SoundCloud Widget
-   ✅ FIX: Thêm hỗ trợ đầy đủ cho link SoundCloud qua Widget API
    ================================================================ */
 let muIdx = 0, muPlaying = false;
 let _localAudio = null, _currentBlobUrl = null;
@@ -1518,12 +1538,10 @@ let _userGestured = false;
 /* ── SoundCloud Widget Support ── */
 let _scWidget = null, _scIframe = null, _scDuration = 0, _scProgTimer = null;
 
-/** Kiểm tra URL có phải SoundCloud không */
 function isSoundCloudUrl(url) {
     return typeof url === 'string' && url.includes('soundcloud.com/');
 }
 
-/** Tải SoundCloud Widget API script */
 function _loadSCApi() {
     if (window.SC) return Promise.resolve();
     return new Promise((res, rej) => {
@@ -1535,19 +1553,16 @@ function _loadSCApi() {
     });
 }
 
-/** Dọn dẹp SoundCloud widget cũ */
 function _destroySCWidget() {
     if (_scProgTimer) { clearInterval(_scProgTimer); _scProgTimer = null; }
     _scWidget = null;
     _scDuration = 0;
-    // Xoá iframe khỏi DOM để giải phóng tài nguyên
     if (_scIframe && _scIframe.parentNode) {
         _scIframe.parentNode.removeChild(_scIframe);
         _scIframe = null;
     }
 }
 
-/** Phát nhạc từ SoundCloud Widget */
 async function _playSoundCloud(url, autoplay) {
     _destroySCWidget();
 
@@ -1558,7 +1573,6 @@ async function _playSoundCloud(url, autoplay) {
         return;
     }
 
-    // Container ẩn ngoài màn hình (phải có trong DOM để postMessage hoạt động)
     let cont = document.getElementById('_scCont');
     if (!cont) {
         cont = document.createElement('div');
@@ -1567,7 +1581,6 @@ async function _playSoundCloud(url, autoplay) {
         document.body.appendChild(cont);
     }
 
-    // Tạo iframe player ẩn
     const iframeSrc =
         'https://w.soundcloud.com/player/?url=' + encodeURIComponent(url) +
         '&auto_play=false&hide_related=true&show_comments=false' +
@@ -1588,14 +1601,11 @@ async function _playSoundCloud(url, autoplay) {
             }
 
             _scWidget.bind(SC.Widget.Events.READY, function() {
-                // Lấy tổng thời gian
                 _scWidget.getDuration(function(d) { _scDuration = d || 0; });
 
-                // Khi bắt đầu phát
                 _scWidget.bind(SC.Widget.Events.PLAY, function() {
                     muPlaying = true;
                     _setPlayBtns('⏸');
-                    // Cập nhật thanh tiến trình mỗi 500ms
                     if (_scProgTimer) clearInterval(_scProgTimer);
                     _scProgTimer = setInterval(function() {
                         if (!_scWidget) { clearInterval(_scProgTimer); return; }
@@ -1611,14 +1621,12 @@ async function _playSoundCloud(url, autoplay) {
                     }, 500);
                 });
 
-                // Khi tạm dừng
                 _scWidget.bind(SC.Widget.Events.PAUSE, function() {
                     muPlaying = false;
                     _setPlayBtns('▶');
                     if (_scProgTimer) { clearInterval(_scProgTimer); _scProgTimer = null; }
                 });
 
-                // Khi phát xong → chuyển bài tiếp theo
                 _scWidget.bind(SC.Widget.Events.FINISH, function() {
                     muPlaying = false;
                     _setPlayBtns('▶');
@@ -1626,7 +1634,6 @@ async function _playSoundCloud(url, autoplay) {
                     setTimeout(function() { muNext(); }, 300);
                 });
 
-                // Xử lý lỗi
                 _scWidget.bind(SC.Widget.Events.ERROR, function() {
                     muPlaying = false;
                     _setPlayBtns('▶');
@@ -1634,19 +1641,16 @@ async function _playSoundCloud(url, autoplay) {
                     console.error('[SC] Lỗi phát nhạc SoundCloud');
                 });
 
-                resolve();
-
-                // Tự động phát nếu được yêu cầu và người dùng đã tương tác
                 if (autoplay && _userGestured) {
                     setTimeout(function() {
                         try { _scWidget.play(); } catch(e) { console.warn('[SC] Không thể tự phát:', e); }
-                    }, 300);
+                    }, 500);
                 }
+                resolve();
             });
         };
     });
 }
-/* ── end SoundCloud ── */
 
 function _setPlayBtns(icon) {
     ['muPlayBtn', 'muPlayBtn3'].forEach(id => {
@@ -1682,7 +1686,6 @@ async function muSyncUI(tracks) {
     ['muArtWrap', 'muArtWrap3'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
-        // SoundCloud tracks hiển thị icon đặc biệt
         if (isSoundCloudUrl(t.url)) {
             el.innerHTML = t.cover ? `<img src="${esc(t.cover)}" onerror="this.parentElement.innerHTML='🎵'">` : '<span title="SoundCloud">🎵</span>';
         } else {
@@ -1793,34 +1796,30 @@ function _loadLocalAudio(url, autoplay) {
     }
 }
 
-/** Load và phát track theo index — ✅ hỗ trợ cả SoundCloud và MP3 */
 async function muLoadTrack(i, autoplay = true) {
     const tracks = await getTracks();
     if (!tracks.length) return;
     muIdx = i;
     muSyncUI(tracks);
     const t = tracks[i];
-
-    // Dừng tất cả audio đang phát
     _stopLocal();
     _destroySCWidget();
 
     if (isSoundCloudUrl(t.url)) {
-        // ✅ Phát qua SoundCloud Widget API
         _playSoundCloud(t.url, autoplay);
     } else {
-        // Phát MP3 trực tiếp hoặc từ IDB
         _loadLocalAudio(t.url, autoplay);
     }
 }
 
-/** Toggle play/pause — ✅ xử lý cả SoundCloud lẫn MP3 */
 function muToggle() {
     _userGestured = true;
     getTracks().then(tracks => {
         if (!tracks.length) return;
-
-        // ✅ Nếu đang dùng SoundCloud widget
+        if (!_scWidget && !_localAudio) {
+            muLoadTrack(muIdx, true);
+            return;
+        }
         if (_scWidget) {
             if (muPlaying) {
                 try { _scWidget.pause(); } catch(e) {}
@@ -1829,19 +1828,13 @@ function muToggle() {
             }
             return;
         }
-
-        // Nếu chưa có audio nào đang load
-        if (!_localAudio) {
-            muLoadTrack(muIdx, true);
-            return;
-        }
-
-        // Audio HTML thông thường
-        if (muPlaying) {
-            _localAudio.pause();
-        } else {
-            const p = _localAudio.play();
-            if (p && p.catch) p.catch(() => muLoadTrack(muIdx, true));
+        if (_localAudio) {
+            if (muPlaying) {
+                _localAudio.pause();
+            } else {
+                const p = _localAudio.play();
+                if (p && p.catch) p.catch(() => muLoadTrack(muIdx, true));
+            }
         }
     });
 }
@@ -1856,19 +1849,15 @@ function muNext() {
     getTracks().then(t => { if (t.length) muLoadTrack((muIdx + 1) % t.length); });
 }
 
-/** Điều chỉnh âm lượng — ✅ áp dụng cho cả SoundCloud lẫn MP3 */
 function muVol(v) {
     const vol = parseFloat(v);
-    // SoundCloud dùng thang 0–100
     if (_scWidget) { try { _scWidget.setVolume(Math.round(vol * 100)); } catch(e) {} }
     if (_localAudio) { _localAudio.volume = vol; }
 }
 
-/** Tua nhạc — ✅ hỗ trợ cả SoundCloud lẫn MP3 */
 function muSeek(e) {
     const rect = e.currentTarget.getBoundingClientRect();
     const ratio = (e.clientX - rect.left) / rect.width;
-
     if (_scWidget && _scDuration > 0) {
         try { _scWidget.seekTo(Math.round(ratio * _scDuration)); } catch(e) {}
         return;
