@@ -26,7 +26,6 @@
         .ss { position: fixed; z-index: 0; pointer-events: none; width: 2px; height: 2px; background: #fff; border-radius: 50%; box-shadow: 0 0 4px #fff, 0 0 10px rgba(57,230,230,0.6); animation: shoot linear infinite; opacity: 0; }
         @keyframes shoot { 0% { opacity:0; transform:translate(0,0) rotate(-45deg) scaleX(1); } 5% { opacity:1; } 15% { opacity:0; transform:translate(200px,200px) rotate(-45deg) scaleX(80); } 100% { opacity:0; } }
         #snow, #petals { position: fixed; inset: 0; pointer-events: none; z-index: 1; }
-        /* INTRO */
         #intro { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(ellipse at 50% 40%, #060a14 0%, #020408 65%, #000102 100%); transition: opacity .9s ease, filter .9s ease; }
         #intro.hide { opacity: 0; filter: blur(6px); pointer-events: none; }
         .iro { position: absolute; width: 260px; height: 260px; border-radius: 50%; }
@@ -58,10 +57,8 @@
         .ibw { width: 176px; height: 2px; background: rgba(57,230,230,.13); border-radius: 2px; overflow: hidden; margin-top: 14px; opacity: 0; animation: fadeUp .4s ease 2.2s forwards; }
         .ib { height: 100%; width: 0; border-radius: 2px; background: linear-gradient(90deg, rgba(57,230,230,.4), var(--cyan)); box-shadow: 0 0 10px var(--cyan); animation: loadBar 1.9s cubic-bezier(.4,0,.2,1) 2.35s forwards; }
         @keyframes loadBar { from { width:0; } to { width:100%; } }
-        /* APP */
         #app { position: relative; z-index: 2; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; opacity: 0; transition: opacity .6s ease; }
         #app.show { opacity: 1; }
-        /* PAGES */
         .page { display: none; width: 345px; background: rgba(13,18,32,0.85); border: 1px solid var(--pb); border-radius: 18px; padding: 0; text-align: center; position: relative; box-shadow: 0 0 40px rgba(57,230,230,.08), 0 0 80px rgba(80,20,160,.15), inset 0 0 30px rgba(57,230,230,.03); backdrop-filter: blur(16px); animation: pgFade .45s cubic-bezier(.34,1.56,.64,1) forwards; max-height: 95vh; overflow: visible; }
         .page-inner { padding: 46px 22px 28px; max-height: 93vh; overflow-y: auto; border-radius: 18px; }
         .page.active { display: block; }
@@ -222,9 +219,6 @@
         .offline-badge.online { background: rgba(77,255,145,.12); color: var(--green); border-color: rgba(77,255,145,.2); }
         .fb-notice { background: rgba(255,153,0,.08); border: 1px solid rgba(255,153,0,.3); border-radius: 10px; padding: 10px 14px; margin-bottom: 12px; font-size: 11.5px; color: var(--vip); line-height: 1.7; text-align: left; }
         .fb-notice code { background: rgba(57,230,230,.1); color: var(--cyan); padding: 1px 5px; border-radius: 4px; font-size: 11px; }
-        /* SoundCloud embed container */
-        .sc-embed-wrap { width: 100%; margin: 6px 0; border-radius: 8px; overflow: hidden; background: rgba(0,0,0,.3); }
-        .sc-embed-wrap iframe { width: 100%; height: 120px; border: none; }
     </style>
 </head>
 <body>
@@ -434,10 +428,7 @@
         <div class="brand">Quản trị viên</div>
         <h1 style="font-size:18px;">Admin Panel</h1>
         <div class="admhdr">🔑 Nminh Lock Pro — Toàn quyền quản lý</div>
-
-        <div id="fbGuide" class="fb-notice" style="display:none;">
-        </div>
-
+        <div id="fbGuide" class="fb-notice" style="display:none;"></div>
         <div class="tabs">
             <button class="tab active" onclick="switchTab('tabKeys',this)">🗝 Keys</button>
             <button class="tab" onclick="switchTab('tabMusic',this)">🎵 Nhạc</button>
@@ -478,8 +469,8 @@
         <div id="tabMusic" class="tabp">
             <div class="admsec">
                 <div style="background:rgba(57,230,230,.06);border:1px solid rgba(57,230,230,.15);border-radius:8px;padding:9px 12px;margin-bottom:12px;font-size:11px;color:var(--dim);line-height:1.6;">
-                    ℹ️ <strong style="color:var(--cyan)">Upload File</strong>: Lưu trong trình duyệt của máy bạn (offline, không chia sẻ qua mạng).<br>
-                    ℹ️ <strong style="color:var(--cyan)">Dán Link</strong>: Lưu trên Firebase, tất cả máy nghe được (cần cấu hình Firebase).
+                    ℹ️ <strong style="color:var(--cyan)">Upload File</strong>: Lưu trong trình duyệt (offline).<br>
+                    ℹ️ <strong style="color:var(--cyan)">Dán Link</strong>: Hỗ trợ link .mp3 trực tiếp <strong style="color:var(--vip)">hoặc link SoundCloud</strong>.
                 </div>
                 <div style="display:flex;gap:6px;margin-bottom:12px;">
                     <button id="mTabFile" onclick="switchMusicTab('file')" style="flex:1;padding:7px;border-radius:8px;background:rgba(57,230,230,.18);color:var(--cyan);border:1.5px solid var(--cyan);font-size:12px;font-weight:700;cursor:pointer;">📁 Upload File</button>
@@ -533,8 +524,12 @@
                         <input type="text" id="mTrackName" class="ainp" placeholder="vd: Tên bài hát"></div></div>
                     <div class="grid1"><div><div class="albl">Nghệ sĩ</div>
                         <input type="text" id="mArtist" class="ainp" placeholder="vd: Tên nghệ sĩ"></div></div>
-                    <div class="grid1"><div><div class="albl">Link nhạc (.mp3 trực tiếp hoặc SoundCloud)</div>
-                        <input type="text" id="mUrl" class="ainp" placeholder="https://soundcloud.com/... hoặc https://...mp3"></div></div>
+                    <div class="grid1"><div>
+                        <!-- ✅ ĐÃ SỬA: Label và placeholder cập nhật hỗ trợ SoundCloud -->
+                        <div class="albl">Link .mp3 trực tiếp hoặc SoundCloud 🎵</div>
+                        <input type="text" id="mUrl" class="ainp" placeholder="https://soundcloud.com/... hoặc https://...song.mp3">
+                        <div style="font-size:10.5px;color:var(--dim);margin-top:4px;">✅ Hỗ trợ: link SoundCloud, link .mp3 trực tiếp</div>
+                    </div></div>
                     <div class="grid1"><div><div class="albl">Link ảnh bìa (tuỳ chọn)</div>
                         <input type="text" id="mCover" class="ainp" placeholder="https://...cover.jpg"></div></div>
                     <div id="mMsg" class="ok" style="display:none;"></div>
@@ -591,12 +586,15 @@
 
 <script>
 /* ================================================================
-   NMINH LOCK PRO — FIX SOUNDCLOUD + TREO INTRO
+   NMINH LOCK PRO — Fixed + SoundCloud Support
+   ✅ FIX 1: Upload nhạc — phát đúng từ IndexedDB bằng Blob URL
+   ✅ FIX 2: Slot đếm đúng — 1 UID chỉ được claim 1 slot duy nhất
+   ✅ FIX 3: 1 máy chỉ dùng được 1 key tại 1 thời điểm
+   ✅ FIX 4: Firebase đồng bộ key/nhạc/password mọi máy
+   ✅ FIX 5: Fallback localStorage khi offline / chưa cấu hình Firebase
+   ✅ FIX 6: Hỗ trợ SoundCloud Widget API — phát link SoundCloud trực tiếp
    ================================================================ */
 
-/* ════════════════════════════════════════════════════════
-   🔥 FIREBASE CONFIG — Điền thông tin project của bạn
-   ════════════════════════════════════════════════════════ */
 const FIREBASE_CONFIG = {
     apiKey:            "AIzaSyAHqNEdDLet-ker_B7n4s5OhZnRyIv8SD8",
     authDomain:        "aimhead-3548c.firebaseapp.com",
@@ -606,18 +604,15 @@ const FIREBASE_CONFIG = {
     messagingSenderId: "205987052158",
     appId:             "1:205987052158:web:cf3c908d43a29cdd05f62f",
 };
-/* ════════════════════════════════════════════════════════ */
 
 const DEF_PW = "1";
 
-/* ── DEVICE UID ── */
 function myUid() {
     let u = localStorage.getItem('nm_uid');
     if (!u) { u = 'u' + Date.now() + Math.random().toString(36).slice(2, 7); localStorage.setItem('nm_uid', u); }
     return u;
 }
 
-/* ── HELPERS ── */
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function pad(n) { return String(n).padStart(2,'0'); }
 function fmtMs(ms) {
@@ -634,7 +629,6 @@ function fmtShort(ms) {
     return `${m}m`;
 }
 
-/* ── localStorage helpers ── */
 function _lsGet(key, def) { try { const v=localStorage.getItem(key); return v!=null?JSON.parse(v):def; } catch(e) { return def; } }
 function _lsSet(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {} }
 function _lsDel(key) { try { localStorage.removeItem(key); } catch(e) {} }
@@ -1221,9 +1215,10 @@ async function adminAddTrack() {
     if (!name || !url) { showAdmMsg(msg,'❌ Nhập tên bài và link nhạc!',false); return; }
     try {
         const tracks = await getTracks();
-        tracks.push({ id:Date.now(), name, artist:artist||'Unknown', url, cover, isLocal:false });
+        const isSC = isSoundCloudUrl(url);
+        tracks.push({ id:Date.now(), name, artist:artist||'Unknown', url, cover, isLocal:false, isSoundCloud:isSC });
         await setTracks(tracks);
-        showAdmMsg(msg,'✅ Đã thêm bài "'+name+'"!',true);
+        showAdmMsg(msg, `✅ Đã thêm "${name}"! ${isSC?'(SoundCloud)':'(MP3)'}`, true);
         document.getElementById('mTrackName').value='';
         document.getElementById('mArtist').value='';
         document.getElementById('mUrl').value='';
@@ -1243,11 +1238,16 @@ async function loadAdminTrackList() {
         tracks.forEach((t, i) => {
             const d = document.createElement('div');
             d.className = 'ki';
+            const badge = t.isLocal
+                ? '<span style="color:var(--vip)">📁local</span>'
+                : isSoundCloudUrl(t.url)
+                    ? '<span style="color:#ff5500">☁️SC</span>'
+                    : '<span style="color:var(--cyan)">🔗mp3</span>';
             d.innerHTML = `<div class="kil">
                 <span style="color:var(--dim);font-size:11px;width:16px;">${i+1}</span>
                 <div>
                     <div class="kic" style="font-family:inherit;">${esc(t.name)}</div>
-                    <div class="kim">${esc(t.artist)} ${t.isLocal?'<span style="color:var(--vip)">📁local</span>':'<span style="color:var(--cyan)">☁️cloud</span>'}</div>
+                    <div class="kim">${esc(t.artist)} ${badge}</div>
                 </div>
             </div>
             <div style="display:flex;gap:4px;">
@@ -1267,6 +1267,7 @@ async function editTrack(i) {
     if (!t) return;
     const ov = document.createElement('div');
     ov.className = 'moverlay'; ov.style.zIndex = '1000';
+    const isSC = isSoundCloudUrl(t.url);
     ov.innerHTML = `<div class="mbox" style="width:320px;max-width:94vw;">
         <div class="mhdr"><span class="mtic">✏️</span><span class="mtxt">Sửa bài hát #${i+1}</span></div>
         <div style="padding:14px 18px;">
@@ -1274,7 +1275,7 @@ async function editTrack(i) {
             <input type="text" id="etName" class="ainp" value="${esc(t.name)}" style="margin-bottom:8px;">
             <div class="albl">Nghệ sĩ</div>
             <input type="text" id="etArtist" class="ainp" value="${esc(t.artist)}" style="margin-bottom:8px;">
-            ${!t.isLocal ? `<div class="albl">Link .mp3</div>
+            ${!t.isLocal ? `<div class="albl">Link ${isSC?'SoundCloud':'MP3'}</div>
             <input type="text" id="etUrl" class="ainp" value="${esc(t.url)}" style="margin-bottom:8px;">
             <div class="albl">Link ảnh bìa</div>
             <input type="text" id="etCover" class="ainp" value="${esc(t.cover||'')}" style="margin-bottom:12px;">` :
@@ -1300,7 +1301,7 @@ async function saveEditTrack(i) {
         if (!t.isLocal) {
             const url = document.getElementById('etUrl').value.trim();
             const cover = document.getElementById('etCover').value.trim();
-            tracks[i] = { ...t, name, artist:artist||'Unknown', url, cover };
+            tracks[i] = { ...t, name, artist:artist||'Unknown', url, cover, isSoundCloud: isSoundCloudUrl(url) };
         } else {
             tracks[i] = { ...t, name, artist:artist||'Unknown' };
         }
@@ -1492,7 +1493,7 @@ async function adminAddFileTrack() {
         document.getElementById('mFileStatus').textContent='✅ Đã lưu!';
 
         const tracks = await getTracks();
-        tracks.push({ id:Date.now(), name, artist:artist||'Unknown', url:'idb:'+idbId, cover:'', isLocal:true });
+        tracks.push({ id:Date.now(), name, artist:artist||'Unknown', url:'idb:'+idbId, cover:'', isLocal:true, isSoundCloud:false });
         await setTracks(tracks);
 
         showAdmMsg(msg,'✅ Đã thêm bài "'+name+'"!',true);
@@ -1507,13 +1508,145 @@ async function adminAddFileTrack() {
 }
 
 /* ================================================================
-   ═══════════════════════════════════════════════════════════════
-   MUSIC PLAYER — FIX TREO INTRO, HỖ TRỢ SOUNDCLOUD & MP3
-   ═══════════════════════════════════════════════════════════════
+   MUSIC PLAYER — MP3 trực tiếp + SoundCloud Widget
+   ✅ FIX: Thêm hỗ trợ đầy đủ cho link SoundCloud qua Widget API
    ================================================================ */
 let muIdx = 0, muPlaying = false;
 let _localAudio = null, _currentBlobUrl = null;
 let _userGestured = false;
+
+/* ── SoundCloud Widget Support ── */
+let _scWidget = null, _scIframe = null, _scDuration = 0, _scProgTimer = null;
+
+/** Kiểm tra URL có phải SoundCloud không */
+function isSoundCloudUrl(url) {
+    return typeof url === 'string' && url.includes('soundcloud.com/');
+}
+
+/** Tải SoundCloud Widget API script */
+function _loadSCApi() {
+    if (window.SC) return Promise.resolve();
+    return new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = 'https://w.soundcloud.com/player/api.js';
+        s.onload = () => res();
+        s.onerror = () => rej(new Error('Không tải được SoundCloud API'));
+        document.head.appendChild(s);
+    });
+}
+
+/** Dọn dẹp SoundCloud widget cũ */
+function _destroySCWidget() {
+    if (_scProgTimer) { clearInterval(_scProgTimer); _scProgTimer = null; }
+    _scWidget = null;
+    _scDuration = 0;
+    // Xoá iframe khỏi DOM để giải phóng tài nguyên
+    if (_scIframe && _scIframe.parentNode) {
+        _scIframe.parentNode.removeChild(_scIframe);
+        _scIframe = null;
+    }
+}
+
+/** Phát nhạc từ SoundCloud Widget */
+async function _playSoundCloud(url, autoplay) {
+    _destroySCWidget();
+
+    try {
+        await _loadSCApi();
+    } catch(e) {
+        console.error('[SC] Không tải được API:', e);
+        return;
+    }
+
+    // Container ẩn ngoài màn hình (phải có trong DOM để postMessage hoạt động)
+    let cont = document.getElementById('_scCont');
+    if (!cont) {
+        cont = document.createElement('div');
+        cont.id = '_scCont';
+        cont.style.cssText = 'position:fixed;left:-9999px;bottom:0;width:200px;height:100px;opacity:0;pointer-events:none;z-index:-999;overflow:hidden;';
+        document.body.appendChild(cont);
+    }
+
+    // Tạo iframe player ẩn
+    const iframeSrc =
+        'https://w.soundcloud.com/player/?url=' + encodeURIComponent(url) +
+        '&auto_play=false&hide_related=true&show_comments=false' +
+        '&buying=false&sharing=false&download=false' +
+        '&show_artwork=false&color=%2339e6e6&single_active=true';
+
+    cont.innerHTML = '<iframe id="_scFrame" allow="autoplay" style="width:100%;height:100%;border:none;" src="' + iframeSrc + '"></iframe>';
+    _scIframe = document.getElementById('_scFrame');
+
+    return new Promise(function(resolve) {
+        _scIframe.onload = function() {
+            try {
+                _scWidget = SC.Widget(_scIframe);
+            } catch(e) {
+                console.error('[SC] Widget init lỗi:', e);
+                resolve();
+                return;
+            }
+
+            _scWidget.bind(SC.Widget.Events.READY, function() {
+                // Lấy tổng thời gian
+                _scWidget.getDuration(function(d) { _scDuration = d || 0; });
+
+                // Khi bắt đầu phát
+                _scWidget.bind(SC.Widget.Events.PLAY, function() {
+                    muPlaying = true;
+                    _setPlayBtns('⏸');
+                    // Cập nhật thanh tiến trình mỗi 500ms
+                    if (_scProgTimer) clearInterval(_scProgTimer);
+                    _scProgTimer = setInterval(function() {
+                        if (!_scWidget) { clearInterval(_scProgTimer); return; }
+                        _scWidget.getPosition(function(pos) {
+                            if (_scDuration > 0) {
+                                const pct = (pos / _scDuration * 100).toFixed(1) + '%';
+                                ['muProg','muProg3'].forEach(function(id) {
+                                    const el = document.getElementById(id);
+                                    if (el) el.style.width = pct;
+                                });
+                            }
+                        });
+                    }, 500);
+                });
+
+                // Khi tạm dừng
+                _scWidget.bind(SC.Widget.Events.PAUSE, function() {
+                    muPlaying = false;
+                    _setPlayBtns('▶');
+                    if (_scProgTimer) { clearInterval(_scProgTimer); _scProgTimer = null; }
+                });
+
+                // Khi phát xong → chuyển bài tiếp theo
+                _scWidget.bind(SC.Widget.Events.FINISH, function() {
+                    muPlaying = false;
+                    _setPlayBtns('▶');
+                    if (_scProgTimer) { clearInterval(_scProgTimer); _scProgTimer = null; }
+                    setTimeout(function() { muNext(); }, 300);
+                });
+
+                // Xử lý lỗi
+                _scWidget.bind(SC.Widget.Events.ERROR, function() {
+                    muPlaying = false;
+                    _setPlayBtns('▶');
+                    if (_scProgTimer) { clearInterval(_scProgTimer); _scProgTimer = null; }
+                    console.error('[SC] Lỗi phát nhạc SoundCloud');
+                });
+
+                resolve();
+
+                // Tự động phát nếu được yêu cầu và người dùng đã tương tác
+                if (autoplay && _userGestured) {
+                    setTimeout(function() {
+                        try { _scWidget.play(); } catch(e) { console.warn('[SC] Không thể tự phát:', e); }
+                    }, 300);
+                }
+            });
+        };
+    });
+}
+/* ── end SoundCloud ── */
 
 function _setPlayBtns(icon) {
     ['muPlayBtn', 'muPlayBtn3'].forEach(id => {
@@ -1522,72 +1655,44 @@ function _setPlayBtns(icon) {
     });
 }
 
-/* Kiểm tra link SoundCloud */
-function _isSoundCloudUrl(url) {
-    return url && /soundcloud\.com|snd\.sc|on\.soundcloud/i.test(url);
-}
-
-/* Lấy ID bài SoundCloud từ URL (rút gọn) */
-function _extractSCId(url) {
-    try {
-        const u = new URL(url);
-        const path = u.pathname.replace(/\/$/,'');
-        const parts = path.split('/').filter(Boolean);
-        if (parts.length >= 2) {
-            return parts[parts.length-1];
-        }
-        return null;
-    } catch(e) { return null; }
-}
-
-/* Tạo iframe SoundCloud */
-function _createSCIframe(url, autoplay) {
-    const wrap = document.createElement('div');
-    wrap.className = 'sc-embed-wrap';
-    const iframe = document.createElement('iframe');
-    // Lấy track ID
-    const match = url.match(/soundcloud\.com\/([^\/]+\/[^\/?#]+)/);
-    const path = match ? match[1] : '';
-    iframe.src = `https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/${path}&auto_play=${autoplay?'true':'false'}&hide_related=true&show_comments=false&show_user=true&show_reposts=false&visual=false&buying=false&liking=false&download=false&sharing=false&show_playcount=false&show_artwork=false&color=39e6e6&show_teaser=false`;
-    iframe.width = '100%';
-    iframe.height = '120';
-    iframe.frameBorder = '0';
-    iframe.allow = 'autoplay';
-    iframe.title = 'SoundCloud player';
-    wrap.appendChild(iframe);
-    return wrap;
-}
-
-/* Load nhạc SoundCloud (dùng iframe thuần, không widget API) */
-function _loadSoundCloudTrack(track, autoplay) {
-    try {
-        // Ẩn các container cũ
-        document.querySelectorAll('.sc-embed-wrap').forEach(el => el.remove());
-
-        const w1 = document.getElementById('musicWidget');
-        const w3 = document.getElementById('musicWidget3');
-        if (w1) {
-            const wrap1 = _createSCIframe(track.url, autoplay);
-            w1.parentNode.insertBefore(wrap1, w1.nextSibling);
-        }
-        if (w3) {
-            const wrap3 = _createSCIframe(track.url, autoplay);
-            w3.parentNode.insertBefore(wrap3, w3.nextSibling);
-        }
-
-        // Đánh dấu đang phát (nếu autoplay)
-        if (autoplay) {
-            muPlaying = true;
-            _setPlayBtns('⏸');
-            // Sau 2s, nếu không có sự kiện gì, cho phép người dùng bấm lại
-            setTimeout(() => {
-                if (!_userGestured) _userGestured = true;
-            }, 2000);
-        }
-    } catch(e) {
-        console.warn('SoundCloud embed error:', e);
-        // Fallback: không làm gì, vẫn hiển thị tên bài
+async function initMusicPlayer() {
+    const tracks = await getTracks();
+    const w1 = document.getElementById('musicWidget'), w3 = document.getElementById('musicWidget3');
+    if (!tracks.length) {
+        if (w1) w1.style.display = 'none';
+        if (w3) w3.style.display = 'none';
+        muPlaying = false;
+        _setPlayBtns('▶');
+        return;
     }
+    if (w1) w1.style.display = 'block';
+    if (w3) w3.style.display = 'block';
+    if (muIdx >= tracks.length) muIdx = 0;
+    muSyncUI(tracks);
+}
+
+async function muSyncUI(tracks) {
+    if (!tracks) tracks = await getTracks();
+    if (!tracks.length) return;
+    const t = tracks[muIdx];
+    document.getElementById('muTrackName').textContent = t.name;
+    document.getElementById('muTrackName3').textContent = t.name;
+    document.getElementById('muArtist').textContent = t.artist || '—';
+    document.getElementById('muArtist3').textContent = t.artist || '—';
+    ['muArtWrap', 'muArtWrap3'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        // SoundCloud tracks hiển thị icon đặc biệt
+        if (isSoundCloudUrl(t.url)) {
+            el.innerHTML = t.cover ? `<img src="${esc(t.cover)}" onerror="this.parentElement.innerHTML='🎵'">` : '<span title="SoundCloud">🎵</span>';
+        } else {
+            el.innerHTML = t.cover ? `<img src="${esc(t.cover)}" onerror="this.parentElement.innerHTML='🎵'">` : '🎵';
+        }
+    });
+    ['muProg', 'muProg3'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.width = '0%';
+    });
 }
 
 function _stopLocal() {
@@ -1600,10 +1705,9 @@ function _stopLocal() {
         _localAudio = null;
     }
     if (_currentBlobUrl) {
-        try { URL.revokeObjectURL(_currentBlobUrl); } catch(e) {}
+        try { URL.revokeObjectURL(_currentBlobUrl); } catch (e) {}
         _currentBlobUrl = null;
     }
-    // Không xóa SoundCloud iframe, vì nó tự quản lý
 }
 
 function _getCurrentVol() {
@@ -1624,8 +1728,7 @@ function _playBlob(blob, autoplay) {
     a.onended = () => { muPlaying = false; _setPlayBtns('▶'); muNext(); };
     a.onerror = (e) => {
         console.error('Audio error:', a.error ? a.error.code : '?', e);
-        muPlaying = false;
-        _setPlayBtns('▶');
+        muPlaying = false; _setPlayBtns('▶');
     };
     a.ontimeupdate = () => {
         if (!a.duration) return;
@@ -1661,7 +1764,6 @@ function _loadLocalAudio(url, autoplay) {
             a.volume = _getCurrentVol();
             a.preload = 'auto';
             a.oncanplay = function() {
-                console.log('Nhạc đã sẵn sàng');
                 if (autoplay && _userGestured) {
                     const p = a.play();
                     if (p && p.catch) p.catch(err => console.warn('Play error:', err));
@@ -1672,9 +1774,7 @@ function _loadLocalAudio(url, autoplay) {
             a.onended = function() { muPlaying = false; _setPlayBtns('▶'); muNext(); };
             a.onerror = function(e) {
                 console.error('Lỗi phát nhạc:', a.error ? a.error.code : '?', e);
-                muPlaying = false;
-                _setPlayBtns('▶');
-                setTimeout(() => { if (!muPlaying && _localAudio) { _localAudio.load(); } }, 3000);
+                muPlaying = false; _setPlayBtns('▶');
             };
             a.ontimeupdate = function() {
                 if (!a.duration) return;
@@ -1693,81 +1793,50 @@ function _loadLocalAudio(url, autoplay) {
     }
 }
 
+/** Load và phát track theo index — ✅ hỗ trợ cả SoundCloud và MP3 */
 async function muLoadTrack(i, autoplay = true) {
-    try {
-        const tracks = await getTracks();
-        if (!tracks.length) return;
-        muIdx = i;
-        muSyncUI(tracks);
-        const t = tracks[i];
-        _stopLocal();
-        // Xóa các SoundCloud iframe cũ
-        document.querySelectorAll('.sc-embed-wrap').forEach(el => el.remove());
-
-        if (_isSoundCloudUrl(t.url)) {
-            _loadSoundCloudTrack(t, autoplay);
-            return;
-        }
-        _loadLocalAudio(t.url, autoplay);
-    } catch(e) {
-        console.warn('muLoadTrack error:', e);
-    }
-}
-
-async function initMusicPlayer() {
-    try {
-        const tracks = await getTracks();
-        const w1 = document.getElementById('musicWidget'), w3 = document.getElementById('musicWidget3');
-        if (!tracks.length) {
-            if (w1) w1.style.display = 'none';
-            if (w3) w3.style.display = 'none';
-            muPlaying = false;
-            _setPlayBtns('▶');
-            return;
-        }
-        if (w1) w1.style.display = 'block';
-        if (w3) w3.style.display = 'block';
-        if (muIdx >= tracks.length) muIdx = 0;
-        muSyncUI(tracks);
-    } catch(e) {
-        console.warn('initMusicPlayer error:', e);
-    }
-}
-
-async function muSyncUI(tracks) {
-    if (!tracks) tracks = await getTracks();
+    const tracks = await getTracks();
     if (!tracks.length) return;
-    const t = tracks[muIdx];
-    document.getElementById('muTrackName').textContent = t.name;
-    document.getElementById('muTrackName3').textContent = t.name;
-    document.getElementById('muArtist').textContent = t.artist || '—';
-    document.getElementById('muArtist3').textContent = t.artist || '—';
-    ['muArtWrap', 'muArtWrap3'].forEach(id => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.innerHTML = t.cover ? `<img src="${esc(t.cover)}" onerror="this.parentElement.innerHTML='🎵'">` : '🎵';
-    });
-    ['muProg', 'muProg3'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.style.width = '0%';
-    });
+    muIdx = i;
+    muSyncUI(tracks);
+    const t = tracks[i];
+
+    // Dừng tất cả audio đang phát
+    _stopLocal();
+    _destroySCWidget();
+
+    if (isSoundCloudUrl(t.url)) {
+        // ✅ Phát qua SoundCloud Widget API
+        _playSoundCloud(t.url, autoplay);
+    } else {
+        // Phát MP3 trực tiếp hoặc từ IDB
+        _loadLocalAudio(t.url, autoplay);
+    }
 }
 
+/** Toggle play/pause — ✅ xử lý cả SoundCloud lẫn MP3 */
 function muToggle() {
     _userGestured = true;
     getTracks().then(tracks => {
         if (!tracks.length) return;
-        const t = tracks[muIdx];
-        // Nếu là SoundCloud, ta không thể điều khiển iframe dễ dàng, nên load lại với autoplay toggle
-        if (_isSoundCloudUrl(t.url)) {
-            // Toggle bằng cách load lại bài với autoplay = !muPlaying
-            muLoadTrack(muIdx, !muPlaying);
+
+        // ✅ Nếu đang dùng SoundCloud widget
+        if (_scWidget) {
+            if (muPlaying) {
+                try { _scWidget.pause(); } catch(e) {}
+            } else {
+                try { _scWidget.play(); } catch(e) {}
+            }
             return;
         }
+
+        // Nếu chưa có audio nào đang load
         if (!_localAudio) {
             muLoadTrack(muIdx, true);
             return;
         }
+
+        // Audio HTML thông thường
         if (muPlaying) {
             _localAudio.pause();
         } else {
@@ -1779,27 +1848,34 @@ function muToggle() {
 
 function muPrev() {
     _userGestured = true;
-    getTracks().then(t => { if (t.length) muLoadTrack((muIdx - 1 + t.length) % t.length, true); });
+    getTracks().then(t => { if (t.length) muLoadTrack((muIdx - 1 + t.length) % t.length); });
 }
 
 function muNext() {
     _userGestured = true;
-    getTracks().then(t => { if (t.length) muLoadTrack((muIdx + 1) % t.length, true); });
+    getTracks().then(t => { if (t.length) muLoadTrack((muIdx + 1) % t.length); });
 }
 
+/** Điều chỉnh âm lượng — ✅ áp dụng cho cả SoundCloud lẫn MP3 */
 function muVol(v) {
     const vol = parseFloat(v);
-    if (_localAudio) { _localAudio.volume = vol; return; }
-    // SoundCloud iframe không điều chỉnh volume qua JS được, bỏ qua
+    // SoundCloud dùng thang 0–100
+    if (_scWidget) { try { _scWidget.setVolume(Math.round(vol * 100)); } catch(e) {} }
+    if (_localAudio) { _localAudio.volume = vol; }
 }
 
+/** Tua nhạc — ✅ hỗ trợ cả SoundCloud lẫn MP3 */
 function muSeek(e) {
     const rect = e.currentTarget.getBoundingClientRect();
     const ratio = (e.clientX - rect.left) / rect.width;
+
+    if (_scWidget && _scDuration > 0) {
+        try { _scWidget.seekTo(Math.round(ratio * _scDuration)); } catch(e) {}
+        return;
+    }
     if (_localAudio && _localAudio.duration) {
         _localAudio.currentTime = ratio * _localAudio.duration;
     }
-    // SoundCloud iframe không hỗ trợ seek qua JS, bỏ qua
 }
 
 initMusicPlayer();
@@ -2033,15 +2109,13 @@ function drawPetals(){
 resizeAll(); mkStars(220); mkSnow(); initPetals(18);
 drawGalaxy(); drawSnow(); drawPetals();
 
-/* INTRO — đảm bảo luôn ẩn sau 3.4s */
+/* INTRO */
 window.addEventListener('load', ()=>{
-    try {
-        setTimeout(()=>{
-            const intro=document.getElementById('intro'), app=document.getElementById('app');
-            intro.classList.add('hide'); app.classList.add('show');
-            setTimeout(()=>{intro.style.display='none';},900);
-        },3400);
-    } catch(e) { console.warn('Intro transition error:', e); }
+    setTimeout(()=>{
+        const intro=document.getElementById('intro'), app=document.getElementById('app');
+        intro.classList.add('hide'); app.classList.add('show');
+        setTimeout(()=>{intro.style.display='none';},900);
+    },3400);
 });
 
 (function buildFx(){
@@ -2063,6 +2137,7 @@ window.addEventListener('load', ()=>{
     }
 })();
 
+/* KEYBOARD */
 document.addEventListener('keypress', e=>{
     if(e.key!=='Enter')return;
     if(document.getElementById('adminLoginModal').style.display==='flex'){verifyAdmin();return;}
