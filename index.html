@@ -1618,33 +1618,43 @@ function _bindWidget(fr, autoplay) {
 function _setPlayBtns(icon) {
     ['muPlayBtn','muPlayBtn3'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=icon;});
 }
-
-// ===== HÀM KHỞI TẠO TRÌNH PHÁT NHẠC MỚI =====
+// ===== HÀM KHỞI TẠO TRÌNH PHÁT NHẠC (ĐÃ SỬA) =====
 async function initMusicPlayer() {
     let tracks = await getTracks();
-    const w1 = document.getElementById('musicWidget'), w3 = document.getElementById('musicWidget3');
+    const w1 = document.getElementById('musicWidget');
+    const w3 = document.getElementById('musicWidget3');
+
+    // Đảm bảo tracks luôn là mảng
+    if (!tracks || !Array.isArray(tracks)) {
+        tracks = [];
+    }
 
     // Nếu chưa có bài nào, thêm bài mặc định
-    if (!tracks || tracks.length === 0) {
-        const existing = tracks.find(t => t.url === DEFAULT_TRACKS[0].url);
-        if (!existing) {
-            tracks = DEFAULT_TRACKS;
-            await setTracks(tracks);
+    if (tracks.length === 0) {
+        // Kiểm tra DEFAULT_TRACKS có tồn tại không
+        if (DEFAULT_TRACKS && DEFAULT_TRACKS.length > 0) {
+            const existing = tracks.find(t => t.url === DEFAULT_TRACKS[0].url);
+            if (!existing) {
+                tracks = DEFAULT_TRACKS;
+                await setTracks(tracks);
+            }
         }
     }
 
     if (!tracks.length) {
-        if(w1) w1.style.display='none';
-        if(w3) w3.style.display='none';
-        if(scWidget && scReady) {
-            try{scWidget.pause();}catch(e){}
+        if (w1) w1.style.display = 'none';
+        if (w3) w3.style.display = 'none';
+        if (scWidget && scReady) {
+            try { scWidget.pause(); } catch (e) {}
         }
-        muPlaying=false; _setPlayBtns('▶');
+        muPlaying = false;
+        _setPlayBtns('▶');
         return;
     }
-    if(w1) w1.style.display='block';
-    if(w3) w3.style.display='block';
-    if(muIdx >= tracks.length) muIdx = 0;
+
+    if (w1) w1.style.display = 'block';
+    if (w3) w3.style.display = 'block';
+    if (muIdx >= tracks.length) muIdx = 0;
     muSyncUI(tracks);
 
     // Tự động phát sau khi khởi tạo
@@ -1652,7 +1662,6 @@ async function initMusicPlayer() {
         muLoadTrack(muIdx, true);
     }, 1000);
 }
-
 async function muSyncUI(tracks) {
     if (!tracks) tracks=await getTracks();
     if (!tracks.length) return;
