@@ -28,8 +28,6 @@
             background: #020408;
             overflow: hidden;
         }
-
-        /* GALAXY */
         #galaxy {
             position: fixed;
             inset: 0;
@@ -2330,7 +2328,9 @@
                                                                             btn.disabled = true;
 
                                                                             try {
-                                                                                const keys = await getKeys();
+                                                                                // Luôn lấy dữ liệu mới nhất từ Firebase, không dùng cache local
+                                                                                const keys = await fbGet('keys');
+                                                                                if (!keys) { showErr('❌ Không thể tải dữ liệu key!'); return; }
                                                                                 const kd = keys[val];
 
                                                                                 if (!kd) { showErr('❌ Key không hợp lệ. Thử lại!'); return; }
@@ -2382,8 +2382,8 @@
                                                                                 });
 
                                                                                 // Đọc lại data mới nhất
-                                                                                const freshKeys = await getKeys();
-                                                                                const freshKd = freshKeys[val];
+                                                                                const freshKeys = await fbGet('keys');
+                                                                                const freshKd = freshKeys ? freshKeys[val] : null;
                                                                                 if (!freshKd) { showErr('❌ Lỗi: Key không tồn tại sau khi claim!'); return; }
                                                                                 setLocalUsedKey(val);
                                                                                 document.getElementById('keyInput').value = '';
@@ -2539,7 +2539,7 @@
                                                                             if (durMs <= 0) { showAdmMsg(msg, '❌ Thời hạn phải > 0!', false); return; }
 
                                                                             try {
-                                                                                const keys = await getKeys();
+                                                                                const keys = await fbGet('keys') || {};
                                                                                 const now = Date.now();
                                                                                 const existSlots = keys[code] ? keys[code].slots || [] : [];
                                                                                 keys[code] = {
@@ -2551,7 +2551,7 @@
                                                                                     expiresAt: now + durMs,
                                                                                     slots: existSlots
                                                                                 };
-                                                                                await setKeys(keys);
+                                                                                await fbSet('keys', keys);
                                                                                 showAdmMsg(msg, `✅ Đã lưu key "${code}"!`, true);
                                                                                 document.getElementById('aKeyCode').value = '';
                                                                                 loadKeyList();
@@ -2562,7 +2562,7 @@
                                                                             const list = document.getElementById('adminKeyList');
                                                                             list.innerHTML = '<div class="emp">Đang tải<span class="ldot"></span></div>';
                                                                             try {
-                                                                                const keys = await getKeys();
+                                                                                const keys = await fbGet('keys') || {};
                                                                                 list.innerHTML = '';
                                                                                 const arr = Object.values(keys);
                                                                                 if (!arr.length) { list.innerHTML =
@@ -2593,7 +2593,7 @@
                                                                         }
 
                                                                         async function editKey(code) {
-                                                                            const keys = await getKeys();
+                                                                            const keys = await fbGet('keys') || {};
                                                                             const k = keys[code];
                                                                             if (!k) return;
                                                                             const ov = document.createElement('div');
@@ -2650,7 +2650,7 @@
                                                                                     msg.style.color = 'var(--danger)';
                                                                                     msg.style.display = 'block'; } return; }
                                                                             try {
-                                                                                const keys = await getKeys();
+                                                                                const keys = await fbGet('keys') || {};
                                                                                 const k = keys[oldCode];
                                                                                 if (!k) return;
                                                                                 const addMs = (addDays * 86400 + addHours * 3600) * 1000;
@@ -2659,7 +2659,7 @@
                                                                                     durationMs: k.durationMs + addMs };
                                                                                 if (newCode !== oldCode) { delete keys[oldCode]; }
                                                                                 keys[newCode] = updated;
-                                                                                await setKeys(keys);
+                                                                                await fbSet('keys', keys);
                                                                                 if (msg) { msg.textContent = '✅ Đã lưu!';
                                                                                     msg.style.color = 'var(--green)';
                                                                                     msg.style.display = 'block'; }
@@ -2674,9 +2674,9 @@
                                                                         async function delKey(code) {
                                                                             if (!confirm(`Xoá key "${code}"?`)) return;
                                                                             try {
-                                                                                const keys = await getKeys();
+                                                                                const keys = await fbGet('keys') || {};
                                                                                 delete keys[code];
-                                                                                await setKeys(keys);
+                                                                                await fbSet('keys', keys);
                                                                                 loadKeyList();
                                                                             } catch (e) { alert('Lỗi xoá key: ' + e.message); }
                                                                         }
@@ -3504,7 +3504,7 @@
                                                                             const hintTxt = document.getElementById('keyInfoText');
                                                                             if (!val.trim()) { hint.style.display = 'none'; return; }
                                                                             try {
-                                                                                const keys = await getKeys();
+                                                                                const keys = await fbGet('keys') || {};
                                                                                 const kd = keys[val.trim()];
                                                                                 if (!kd) { hint.style.display = 'none'; return; }
                                                                                 const now = Date.now();
@@ -3524,7 +3524,7 @@
                                                                         async function showKeyInfo() {
                                                                             const val = document.getElementById('keyInput').value.trim();
                                                                             try {
-                                                                                const keys = await getKeys();
+                                                                                const keys = await fbGet('keys') || {};
                                                                                 const kd = keys[val];
                                                                                 if (!kd) return;
                                                                                 const now = Date.now();
