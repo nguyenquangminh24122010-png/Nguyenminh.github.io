@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -616,18 +617,6 @@ const FIREBASE_CONFIG = {
 /* ════════════════════════════════════════════════════════ */
 
 const DEF_PW = "1";
-
-// ===== DANH SÁCH NHẠC MẶC ĐỊNH =====
-const DEFAULT_TRACKS = [
-    {
-        id: Date.now(),
-        name: "Nonstop Trend 2026 - Nhạc Remix TikTok",
-        artist: "Quang minh Nguyễn",
-        url: "https://soundcloud.com/quang-minh-nguy-n-851529041/nonstop-trend-2026-nha-c-remix",
-        cover: "",
-        isLocal: false
-    }
-];
 
 /* ── DEVICE UID ── */
 function myUid() {
@@ -1282,8 +1271,7 @@ async function adminAddTrack() {
         document.getElementById('mUrl').value='';
         document.getElementById('mCover').value='';
         loadAdminTrackList();
-        // Gọi initMusicPlayer để cập nhật trình phát
-        await initMusicPlayer();
+        initMusicPlayer();
     } catch(e) { showAdmMsg(msg,'❌ Lỗi: '+e.message,false); }
 }
 
@@ -1360,7 +1348,7 @@ async function saveEditTrack(i) {
         }
         await setTracks(tracks);
         if(msg){msg.textContent='✅ Đã lưu!';msg.style.color='var(--green)';msg.style.display='block';}
-        setTimeout(() => { document.querySelector('.moverlay')&&document.querySelector('.moverlay').remove(); loadAdminTrackList(); await initMusicPlayer(); }, 900);
+        setTimeout(() => { document.querySelector('.moverlay')&&document.querySelector('.moverlay').remove(); loadAdminTrackList(); initMusicPlayer(); }, 900);
     } catch(e) { if(msg){msg.textContent='❌ Lỗi: '+e.message;msg.style.color='var(--danger)';msg.style.display='block';} }
 }
 
@@ -1372,7 +1360,7 @@ async function delTrack(i) {
         tracks.splice(i, 1);
         await setTracks(tracks);
         loadAdminTrackList();
-        await initMusicPlayer();
+        initMusicPlayer();
     } catch(e) { alert('Lỗi xoá: '+e.message); }
 }
 
@@ -1384,7 +1372,7 @@ async function moveTrack(i, dir) {
         [tracks[i],tracks[j]] = [tracks[j],tracks[i]];
         await setTracks(tracks);
         loadAdminTrackList();
-        await initMusicPlayer();
+        initMusicPlayer();
     } catch(e) {}
 }
 
@@ -1556,7 +1544,7 @@ async function adminAddFileTrack() {
         showAdmMsg(msg,'✅ Đã thêm bài "'+name+'"!',true);
         clearMusicFile();
         loadAdminTrackList();
-        await initMusicPlayer();
+        initMusicPlayer();
     } catch(e) {
         showAdmMsg(msg,'❌ Lỗi lưu file: '+e.message,false);
         document.getElementById('mFileStatus').textContent='❌ Lỗi!';
@@ -1618,50 +1606,7 @@ function _bindWidget(fr, autoplay) {
 function _setPlayBtns(icon) {
     ['muPlayBtn','muPlayBtn3'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=icon;});
 }
-// ===== HÀM KHỞI TẠO TRÌNH PHÁT NHẠC (ĐÃ SỬA) =====
-async function initMusicPlayer() {
-    let tracks = await getTracks();
-    const w1 = document.getElementById('musicWidget');
-    const w3 = document.getElementById('musicWidget3');
 
-    // Đảm bảo tracks luôn là mảng
-    if (!tracks || !Array.isArray(tracks)) {
-        tracks = [];
-    }
-
-    // Nếu chưa có bài nào, thêm bài mặc định
-    if (tracks.length === 0) {
-        // Kiểm tra DEFAULT_TRACKS có tồn tại không
-        if (DEFAULT_TRACKS && DEFAULT_TRACKS.length > 0) {
-            const existing = tracks.find(t => t.url === DEFAULT_TRACKS[0].url);
-            if (!existing) {
-                tracks = DEFAULT_TRACKS;
-                await setTracks(tracks);
-            }
-        }
-    }
-
-    if (!tracks.length) {
-        if (w1) w1.style.display = 'none';
-        if (w3) w3.style.display = 'none';
-        if (scWidget && scReady) {
-            try { scWidget.pause(); } catch (e) {}
-        }
-        muPlaying = false;
-        _setPlayBtns('▶');
-        return;
-    }
-
-    if (w1) w1.style.display = 'block';
-    if (w3) w3.style.display = 'block';
-    if (muIdx >= tracks.length) muIdx = 0;
-    muSyncUI(tracks);
-
-    // Tự động phát sau khi khởi tạo
-    setTimeout(() => {
-        muLoadTrack(muIdx, true);
-    }, 1000);
-}
 async function muSyncUI(tracks) {
     if (!tracks) tracks=await getTracks();
     if (!tracks.length) return;
@@ -1798,7 +1743,6 @@ function muSeek(e) {
     scWidget.getDuration(dur=>scWidget.seekTo(Math.round(ratio*dur)));
 }
 
-// Gọi hàm khởi tạo khi trang tải
 initMusicPlayer();
 
 /* ================================================================
