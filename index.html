@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -597,7 +598,6 @@
    ✅ FIX 3: 1 máy chỉ dùng được 1 key tại 1 thời điểm
    ✅ FIX 4: Firebase đồng bộ key/nhạc/password mọi máy
    ✅ FIX 5: Fallback localStorage khi offline / chưa cấu hình Firebase
-   ✅ FIX 6: Sửa lỗi trình phát nhạc — loại bỏ SoundCloud API lỗi
    ================================================================ */
 
 /* ════════════════════════════════════════════════════════
@@ -1553,218 +1553,210 @@ async function adminAddFileTrack() {
 }
 
 /* ================================================================
-   MUSIC PLAYER — Chỉ phát MP3 (bỏ SoundCloud)
+   MUSIC PLAYER — FIX: dùng Blob URL thay vì data URL để phát âm thanh
    ================================================================ */
-let muIdx = 0, muPlaying = false;
-let _localAudio = null, _currentBlobUrl = null;
-let _userGestured = false;
+let scWidget=null, scReady=false;
+let muIdx=0, muPlaying=false;
+let _localAudio=null, _currentBlobUrl=null;
+let _userGestured=false;
+
+// Load SoundCloud API
+(function() {
+    const s=document.createElement('script');
+    s.src='https://w.soundcloud.com/player/api.js';
+    document.head.appendChild(s);
+})();
+
+function _getOrCreateFrame() {
+    let fr=document.getElementById('scFrame');
+    if (!fr) {
+        fr=document.createElement('iframe');
+        fr.id='scFrame'; fr.allow='autoplay';
+        fr.style.cssText='position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;border:0;';
+        document.body.appendChild(fr);
+    }
+    return fr;
+}
+
+function _loadSCWidget(url, autoplay) {
+    scReady=false; scWidget=null; muPlaying=false; _setPlayBtns('▶');
+    const embedUrl='https://w.soundcloud.com/player/?url='+encodeURIComponent(url)+'&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false';
+    const fr=_getOrCreateFrame();
+    fr.src=embedUrl;
+    let attempts=0;
+    const tryBind=setInterval(() => {
+        attempts++;
+        if (typeof SC!=='undefined') { clearInterval(tryBind); _bindWidget(fr,autoplay); }
+        if (attempts>40) clearInterval(tryBind);
+    },100);
+}
+
+function _bindWidget(fr, autoplay) {
+    try { scWidget=SC.Widget(fr); } catch(e) { return; }
+    scWidget.bind(SC.Widget.Events.READY, () => { scReady=true; if(autoplay)scWidget.play(); });
+    scWidget.bind(SC.Widget.Events.PLAY, () => { muPlaying=true; _setPlayBtns('⏸'); });
+    scWidget.bind(SC.Widget.Events.PAUSE, () => { muPlaying=false; _setPlayBtns('▶'); });
+    scWidget.bind(SC.Widget.Events.FINISH, () => { muPlaying=false; _setPlayBtns('▶'); muNext(); });
+    scWidget.bind(SC.Widget.Events.PLAY_PROGRESS, (e) => {
+        const pct=(e.relativePosition*100).toFixed(1)+'%';
+        ['muProg','muProg3'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.width=pct;});
+    });
+}
 
 function _setPlayBtns(icon) {
-    ['muPlayBtn', 'muPlayBtn3'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = icon;
-    });
+    ['muPlayBtn','muPlayBtn3'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=icon;});
 }
 
 async function initMusicPlayer() {
     const tracks = await getTracks();
-    const w1 = document.getElementById('musicWidget'), w3 = document.getElementById('musicWidget3');
+    const w1=document.getElementById('musicWidget'), w3=document.getElementById('musicWidget3');
     if (!tracks.length) {
-        if (w1) w1.style.display = 'none';
-        if (w3) w3.style.display = 'none';
-        muPlaying = false;
-        _setPlayBtns('▶');
+        if(w1)w1.style.display='none';
+        if(w3)w3.style.display='none';
+        if(scWidget&&scReady){try{scWidget.pause();}catch(e){}}
+        muPlaying=false; _setPlayBtns('▶');
         return;
     }
-    if (w1) w1.style.display = 'block';
-    if (w3) w3.style.display = 'block';
-    if (muIdx >= tracks.length) muIdx = 0;
+    if(w1)w1.style.display='block';
+    if(w3)w3.style.display='block';
+    if(muIdx>=tracks.length)muIdx=0;
     muSyncUI(tracks);
 }
 
 async function muSyncUI(tracks) {
-    if (!tracks) tracks = await getTracks();
+    if (!tracks) tracks=await getTracks();
     if (!tracks.length) return;
-    const t = tracks[muIdx];
-    document.getElementById('muTrackName').textContent = t.name;
-    document.getElementById('muTrackName3').textContent = t.name;
-    document.getElementById('muArtist').textContent = t.artist || '—';
-    document.getElementById('muArtist3').textContent = t.artist || '—';
-    ['muArtWrap', 'muArtWrap3'].forEach(id => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.innerHTML = t.cover ? `<img src="${esc(t.cover)}" onerror="this.parentElement.innerHTML='🎵'">` : '🎵';
+    const t=tracks[muIdx];
+    document.getElementById('muTrackName').textContent=t.name;
+    document.getElementById('muTrackName3').textContent=t.name;
+    document.getElementById('muArtist').textContent=t.artist;
+    document.getElementById('muArtist3').textContent=t.artist;
+    ['muArtWrap','muArtWrap3'].forEach(id=>{
+        const el=document.getElementById(id);
+        if(!el)return;
+        el.innerHTML=t.cover?`<img src="${esc(t.cover)}" onerror="this.parentElement.innerHTML='🎵'">`:'🎵';
     });
-    ['muProg', 'muProg3'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.style.width = '0%';
-    });
+    ['muProg','muProg3'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.width='0%';});
 }
 
-function _isLocalTrack(track) {
-    return track && (track.isLocal || (track.url && track.url.startsWith('idb:')));
-}
+function _isLocalTrack(track) { return track&&(track.isLocal||(track.url&&track.url.startsWith('idb:'))); }
 
 function _stopLocal() {
     if (_localAudio) {
         _localAudio.pause();
-        _localAudio.src = '';
-        _localAudio.onended = null;
-        _localAudio.ontimeupdate = null;
-        _localAudio.onerror = null;
-        _localAudio = null;
+        _localAudio.src='';
+        _localAudio.onended=null;
+        _localAudio.ontimeupdate=null;
+        _localAudio.onerror=null;
+        _localAudio=null;
     }
-    if (_currentBlobUrl) {
-        try { URL.revokeObjectURL(_currentBlobUrl); } catch (e) {}
-        _currentBlobUrl = null;
-    }
+    // FIX: Thu hồi Blob URL để tránh memory leak
+    if (_currentBlobUrl) { try{URL.revokeObjectURL(_currentBlobUrl);}catch(e){} _currentBlobUrl=null; }
 }
 
 function _getCurrentVol() {
-    const sliders = document.querySelectorAll('.muvol input[type=range]');
-    return sliders.length ? parseFloat(sliders[0].value) : 0.7;
+    const sliders=document.querySelectorAll('.muvol input[type=range]');
+    return sliders.length?parseFloat(sliders[0].value):0.7;
 }
 
+/* FIX QUAN TRỌNG: Phát nhạc từ Blob (IndexedDB) bằng Blob URL
+   Tránh dùng FileReader/base64 vì gây lỗi với file lớn */
 function _playBlob(blob, autoplay) {
     _stopLocal();
+    if(scWidget&&scReady){try{scWidget.pause();}catch(e){}}
+
     const blobUrl = URL.createObjectURL(blob);
     _currentBlobUrl = blobUrl;
+
     const a = new Audio();
     a.src = blobUrl;
     a.volume = _getCurrentVol();
     _localAudio = a;
-    a.onplay = () => { muPlaying = true;
-        _setPlayBtns('⏸'); };
-    a.onpause = () => { muPlaying = false;
-        _setPlayBtns('▶'); };
-    a.onended = () => { muPlaying = false;
-        _setPlayBtns('▶');
-        muNext(); };
-    a.onerror = (e) => {
-        console.error('Audio error:', a.error ? a.error.code : '?', e);
-        muPlaying = false;
-        _setPlayBtns('▶');
+
+    a.onplay = ()=>{ muPlaying=true; _setPlayBtns('⏸'); };
+    a.onpause = ()=>{ muPlaying=false; _setPlayBtns('▶'); };
+    a.onended = ()=>{ muPlaying=false; _setPlayBtns('▶'); muNext(); };
+    a.onerror = (e)=>{
+        console.error('Audio error:', a.error?a.error.code:'?', e);
+        muPlaying=false; _setPlayBtns('▶');
     };
-    a.ontimeupdate = () => {
-        if (!a.duration) return;
-        const pct = (a.currentTime / a.duration * 100).toFixed(1) + '%';
-        ['muProg', 'muProg3'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.style.width = pct;
-        });
+    a.ontimeupdate = ()=>{
+        if(!a.duration)return;
+        const pct=(a.currentTime/a.duration*100).toFixed(1)+'%';
+        ['muProg','muProg3'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.width=pct;});
     };
+
     if (autoplay) {
-        const p = a.play();
-        if (p && p.catch) p.catch(err => console.warn('Play error:', err));
+        const p=a.play();
+        if(p&&p.catch)p.catch(err=>console.warn('Play error:',err));
     }
 }
 
 function _loadLocalAudio(url, autoplay) {
     if (url.startsWith('idb:')) {
-        const idbId = url.slice(4);
+        const idbId=url.slice(4);
         idbGetFile(idbId).then(blob => {
             if (!blob) { console.error('Không tìm thấy file trong IndexedDB:', idbId); return; }
             _playBlob(blob, autoplay);
-        }).catch(e => console.error('IDB load error', e));
+        }).catch(e=>console.error('IDB load error',e));
     } else {
+        // URL trực tiếp (data: hoặc http)
         _stopLocal();
-        if (!url || !url.startsWith('http')) {
-            console.error('URL không hợp lệ:', url);
-            return;
-        }
-        try {
-            const a = new Audio();
-            a.crossOrigin = 'anonymous';
-            a.src = url;
-            a.volume = _getCurrentVol();
-            a.preload = 'auto';
-            a.oncanplay = function() {
-                console.log('Nhạc đã sẵn sàng');
-                if (autoplay && _userGestured) {
-                    const p = a.play();
-                    if (p && p.catch) p.catch(err => console.warn('Play error:', err));
-                }
-            };
-            a.onplay = function() { muPlaying = true;
-                _setPlayBtns('⏸'); };
-            a.onpause = function() { muPlaying = false;
-                _setPlayBtns('▶'); };
-            a.onended = function() { muPlaying = false;
-                _setPlayBtns('▶');
-                muNext(); };
-            a.onerror = function(e) {
-                console.error('Lỗi phát nhạc:', a.error ? a.error.code : '?', e);
-                muPlaying = false;
-                _setPlayBtns('▶');
-                setTimeout(() => { if (!muPlaying && _localAudio) { _localAudio.load(); } }, 3000);
-            };
-            a.ontimeupdate = function() {
-                if (!a.duration) return;
-                const pct = (a.currentTime / a.duration * 100).toFixed(1) + '%';
-                ['muProg', 'muProg3'].forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) el.style.width = pct;
-                });
-            };
-            _localAudio = a;
-            if (autoplay && _userGestured) {
-                const p = a.play();
-                if (p && p.catch) p.catch(err => console.warn('Autoplay error:', err));
-            }
-        } catch (e) { console.error('Lỗi tạo Audio:', e); }
+        if (_currentBlobUrl) return; // đã revoke
+        const a=new Audio();
+        a.preload='none'; a.src=url; a.volume=_getCurrentVol();
+        _localAudio=a;
+        a.onplay=()=>{muPlaying=true;_setPlayBtns('⏸');};
+        a.onpause=()=>{muPlaying=false;_setPlayBtns('▶');};
+        a.onended=()=>{muPlaying=false;_setPlayBtns('▶');muNext();};
+        a.onerror=()=>{muPlaying=false;_setPlayBtns('▶');};
+        a.ontimeupdate=()=>{
+            if(!a.duration)return;
+            const pct=(a.currentTime/a.duration*100).toFixed(1)+'%';
+            ['muProg','muProg3'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.width=pct;});
+        };
+        if (autoplay&&_userGestured) { const p=a.play(); if(p&&p.catch)p.catch(e=>console.warn('Play error:',e)); }
     }
 }
 
-async function muLoadTrack(i, autoplay = true) {
-    const tracks = await getTracks();
-    if (!tracks.length) return;
-    muIdx = i;
+async function muLoadTrack(i, autoplay=true) {
+    const tracks=await getTracks();
+    if(!tracks.length)return;
+    muIdx=i;
     muSyncUI(tracks);
-    const t = tracks[i];
-    _stopLocal();
-    _loadLocalAudio(t.url, autoplay);
+    const t=tracks[i];
+    if(_isLocalTrack(t)) { _stopLocal(); _loadLocalAudio(t.url,autoplay); }
+    else { _stopLocal(); _loadSCWidget(t.url,autoplay); }
 }
 
 function muToggle() {
-    _userGestured = true;
-    getTracks().then(tracks => {
-        if (!tracks.length) return;
-        if (!_localAudio) {
-            muLoadTrack(muIdx, true);
+    _userGestured=true;
+    getTracks().then(tracks=>{
+        if(!tracks.length)return;
+        if(!_localAudio&&!scWidget) { muLoadTrack(muIdx,true); return; }
+        if(_localAudio) {
+            if(muPlaying){_localAudio.pause();}
+            else{const p=_localAudio.play();if(p&&p.catch)p.catch(()=>muLoadTrack(muIdx,true));}
             return;
         }
-        if (_localAudio) {
-            if (muPlaying) {
-                _localAudio.pause();
-            } else {
-                const p = _localAudio.play();
-                if (p && p.catch) p.catch(() => muLoadTrack(muIdx, true));
-            }
-        }
+        if(!scWidget||!scReady)return;
+        if(muPlaying){scWidget.pause();}else{scWidget.play();}
     });
 }
 
-function muPrev() {
-    _userGestured = true;
-    getTracks().then(t => { if (t.length) muLoadTrack((muIdx - 1 + t.length) % t.length); });
-}
-
-function muNext() {
-    _userGestured = true;
-    getTracks().then(t => { if (t.length) muLoadTrack((muIdx + 1) % t.length); });
-}
-
+function muPrev() { _userGestured=true; getTracks().then(t=>{if(t.length)muLoadTrack((muIdx-1+t.length)%t.length);}); }
+function muNext() { _userGestured=true; getTracks().then(t=>{if(t.length)muLoadTrack((muIdx+1)%t.length);}); }
 function muVol(v) {
-    const vol = parseFloat(v);
-    if (_localAudio) { _localAudio.volume = vol; return; }
+    const vol=parseFloat(v);
+    if(_localAudio){_localAudio.volume=vol;return;}
+    if(scWidget&&scReady){try{scWidget.setVolume(Math.round(vol*100));}catch(e){}}
 }
-
 function muSeek(e) {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const ratio = (e.clientX - rect.left) / rect.width;
-    if (_localAudio && _localAudio.duration) {
-        _localAudio.currentTime = ratio * _localAudio.duration;
-    }
+    const rect=e.currentTarget.getBoundingClientRect();
+    const ratio=(e.clientX-rect.left)/rect.width;
+    if(_localAudio&&_localAudio.duration){_localAudio.currentTime=ratio*_localAudio.duration;return;}
+    if(!scWidget||!scReady)return;
+    scWidget.getDuration(dur=>scWidget.seekTo(Math.round(ratio*dur)));
 }
 
 initMusicPlayer();
