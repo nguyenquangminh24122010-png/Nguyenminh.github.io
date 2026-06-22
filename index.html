@@ -591,19 +591,11 @@
 
 <script>
 /* ================================================================
-   NMINH LOCK PRO — Fixed Version
-   ✅ FIX: Hỗ trợ SoundCloud qua Widget API
-   ✅ FIX: Upload nhạc — phát đúng từ IndexedDB bằng Blob URL
-   ✅ FIX: Slot đếm đúng — 1 UID chỉ được claim 1 slot duy nhất
-   ✅ FIX: 1 máy chỉ dùng được 1 key tại 1 thời điểm
-   ✅ FIX: Firebase đồng bộ key/nhạc/password mọi máy
-   ✅ FIX: Fallback localStorage khi offline / chưa cấu hình Firebase
+   NMINH LOCK PRO — FIX SOUNDCLOUD + TREO INTRO
    ================================================================ */
 
 /* ════════════════════════════════════════════════════════
    🔥 FIREBASE CONFIG — Điền thông tin project của bạn
-   Lấy tại: console.firebase.google.com
-   → Project Settings → General → Your apps → Web app → Config
    ════════════════════════════════════════════════════════ */
 const FIREBASE_CONFIG = {
     apiKey:            "AIzaSyAHqNEdDLet-ker_B7n4s5OhZnRyIv8SD8",
@@ -1516,194 +1508,12 @@ async function adminAddFileTrack() {
 
 /* ================================================================
    ═══════════════════════════════════════════════════════════════
-   MUSIC PLAYER — HỖ TRỢ SOUNDCLOUD + MP3 + LOCAL
+   MUSIC PLAYER — FIX TREO INTRO, HỖ TRỢ SOUNDCLOUD & MP3
    ═══════════════════════════════════════════════════════════════
    ================================================================ */
 let muIdx = 0, muPlaying = false;
 let _localAudio = null, _currentBlobUrl = null;
 let _userGestured = false;
-
-/* SoundCloud Widget */
-let _scWidget = null;
-let _scReady = false;
-let _scInterval = null;
-
-function _isSoundCloudUrl(url) {
-    if (!url) return false;
-    return /(soundcloud\.com|snd\.sc|on\.soundcloud)/i.test(url);
-}
-
-function _loadSCWidgetAPI() {
-    if (typeof SC === 'object' && SC.Widget) return Promise.resolve();
-    return new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = 'https://w.soundcloud.com/player/api.js';
-        script.onload = () => resolve();
-        script.onerror = () => reject(new Error('Không tải được SoundCloud API'));
-        document.head.appendChild(script);
-    });
-}
-
-function _createSCEmbed(track) {
-    // Tạo container embed nếu chưa có
-    let wrap = document.querySelector('.sc-embed-wrap');
-    if (!wrap) {
-        wrap = document.createElement('div');
-        wrap.className = 'sc-embed-wrap';
-        // Chèn sau widget nhạc
-        const w = document.getElementById('musicWidget') || document.body;
-        w.parentNode.insertBefore(wrap, w.nextSibling);
-        // Cũng thêm vào widget3
-        const w3 = document.getElementById('musicWidget3');
-        if (w3) {
-            const w3p = w3.querySelector('.muplayer');
-            if (w3p) {
-                const w3wrap = document.createElement('div');
-                w3wrap.className = 'sc-embed-wrap';
-                w3p.parentNode.insertBefore(w3wrap, w3p.nextSibling);
-                w3wrap.id = 'sc-embed-wrap-3';
-            }
-        }
-        wrap.id = 'sc-embed-wrap-1';
-    }
-    // Tạo iframe
-    const iframe = document.createElement('iframe');
-    const url = track.url;
-    // Lấy track ID từ URL nếu có
-    const match = url.match(/soundcloud\.com\/([^\/]+\/[^\/?#]+)/);
-    const path = match ? match[1] : '';
-    iframe.src = `https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/${path}&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&visual=false&buying=false&liking=false&download=false&sharing=false&show_playcount=false&show_artwork=false&color=39e6e6&show_teaser=false`;
-    iframe.width = '100%';
-    iframe.height = '120';
-    iframe.frameBorder = '0';
-    iframe.allow = 'autoplay';
-    iframe.title = track.name;
-    wrap.innerHTML = '';
-    wrap.appendChild(iframe);
-
-    // Widget cho phiên bản 3
-    const wrap3 = document.getElementById('sc-embed-wrap-3');
-    if (wrap3) {
-        const iframe3 = iframe.cloneNode(true);
-        wrap3.innerHTML = '';
-        wrap3.appendChild(iframe3);
-    }
-
-    // Khởi tạo widget
-    _scWidget = SC.Widget(iframe);
-    _scReady = true;
-    _scWidget.bind(SC.Widget.Events.READY, () => {
-        _scWidget.getDuration(() => {});
-        if (_userGestured) {
-            _scWidget.play();
-        }
-    });
-    _scWidget.bind(SC.Widget.Events.PLAY, () => {
-        muPlaying = true;
-        _setPlayBtns('⏸');
-    });
-    _scWidget.bind(SC.Widget.Events.PAUSE, () => {
-        muPlaying = false;
-        _setPlayBtns('▶');
-    });
-    _scWidget.bind(SC.Widget.Events.FINISH, () => {
-        muPlaying = false;
-        _setPlayBtns('▶');
-        muNext();
-    });
-    _scWidget.bind(SC.Widget.Events.PLAY_PROGRESS, (data) => {
-        const pct = data.relativePosition * 100;
-        ['muProg', 'muProg3'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.style.width = pct + '%';
-        });
-    });
-    // Đồng bộ volume
-    const vol = _getCurrentVol();
-    _scWidget.setVolume(vol * 100);
-
-    // Cập nhật tiến trình
-    if (_scInterval) clearInterval(_scInterval);
-    _scInterval = setInterval(() => {
-        if (_scWidget && muPlaying) {
-            _scWidget.getPosition((pos) => {
-                _scWidget.getDuration((dur) => {
-                    if (dur > 0) {
-                        const pct = (pos / dur * 100);
-                        ['muProg', 'muProg3'].forEach(id => {
-                            const el = document.getElementById(id);
-                            if (el) el.style.width = Math.min(100, pct) + '%';
-                        });
-                    }
-                });
-            });
-        }
-    }, 500);
-
-    return iframe;
-}
-
-function _loadSoundCloudTrack(track, autoplay) {
-    _stopLocal();
-    // Ẩn container cũ
-    const oldWrap = document.querySelector('.sc-embed-wrap');
-    if (oldWrap) oldWrap.style.display = 'none';
-    const oldWrap3 = document.getElementById('sc-embed-wrap-3');
-    if (oldWrap3) oldWrap3.style.display = 'none';
-
-    if (!_scReady) {
-        // Tải API và tạo embed
-        _loadSCWidgetAPI().then(() => {
-            _createSCEmbed(track);
-            if (autoplay && _userGestured) {
-                setTimeout(() => { if (_scWidget) _scWidget.play(); }, 500);
-            }
-        }).catch(err => {
-            console.error('SC API error:', err);
-            // Fallback: thử dùng iframe trực tiếp không cần API
-            _createSCEmbed(track);
-            if (autoplay && _userGestured) {
-                setTimeout(() => { if (_scWidget) _scWidget.play(); }, 800);
-            }
-        });
-    } else {
-        // Widget đã sẵn sàng, cập nhật URL
-        const match = track.url.match(/soundcloud\.com\/([^\/]+\/[^\/?#]+)/);
-        const path = match ? match[1] : '';
-        const newSrc = `https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/${path}&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&visual=false&buying=false&liking=false&download=false&sharing=false&show_playcount=false&show_artwork=false&color=39e6e6&show_teaser=false`;
-        // Cập nhật iframe
-        const iframes = document.querySelectorAll('.sc-embed-wrap iframe');
-        iframes.forEach(ifr => { ifr.src = newSrc; });
-        // Cập nhật widget
-        _scWidget = SC.Widget(iframes[0]);
-        _scReady = true;
-        _scWidget.bind(SC.Widget.Events.READY, () => {
-            if (autoplay && _userGestured) {
-                _scWidget.play();
-            }
-        });
-        _scWidget.bind(SC.Widget.Events.PLAY, () => { muPlaying = true; _setPlayBtns('⏸'); });
-        _scWidget.bind(SC.Widget.Events.PAUSE, () => { muPlaying = false; _setPlayBtns('▶'); });
-        _scWidget.bind(SC.Widget.Events.FINISH, () => { muPlaying = false; _setPlayBtns('▶'); muNext(); });
-        _scWidget.bind(SC.Widget.Events.PLAY_PROGRESS, (data) => {
-            const pct = data.relativePosition * 100;
-            ['muProg', 'muProg3'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.style.width = pct + '%';
-            });
-        });
-        const vol = _getCurrentVol();
-        _scWidget.setVolume(vol * 100);
-        if (autoplay && _userGestured) {
-            setTimeout(() => { if (_scWidget) _scWidget.play(); }, 500);
-        }
-    }
-
-    // Hiện container
-    setTimeout(() => {
-        document.querySelectorAll('.sc-embed-wrap').forEach(el => el.style.display = 'block');
-    }, 100);
-}
 
 function _setPlayBtns(icon) {
     ['muPlayBtn', 'muPlayBtn3'].forEach(id => {
@@ -1712,43 +1522,72 @@ function _setPlayBtns(icon) {
     });
 }
 
-async function initMusicPlayer() {
-    const tracks = await getTracks();
-    const w1 = document.getElementById('musicWidget'), w3 = document.getElementById('musicWidget3');
-    if (!tracks.length) {
-        if (w1) w1.style.display = 'none';
-        if (w3) w3.style.display = 'none';
-        muPlaying = false;
-        _setPlayBtns('▶');
-        return;
+/* Kiểm tra link SoundCloud */
+function _isSoundCloudUrl(url) {
+    return url && /soundcloud\.com|snd\.sc|on\.soundcloud/i.test(url);
+}
+
+/* Lấy ID bài SoundCloud từ URL (rút gọn) */
+function _extractSCId(url) {
+    try {
+        const u = new URL(url);
+        const path = u.pathname.replace(/\/$/,'');
+        const parts = path.split('/').filter(Boolean);
+        if (parts.length >= 2) {
+            return parts[parts.length-1];
+        }
+        return null;
+    } catch(e) { return null; }
+}
+
+/* Tạo iframe SoundCloud */
+function _createSCIframe(url, autoplay) {
+    const wrap = document.createElement('div');
+    wrap.className = 'sc-embed-wrap';
+    const iframe = document.createElement('iframe');
+    // Lấy track ID
+    const match = url.match(/soundcloud\.com\/([^\/]+\/[^\/?#]+)/);
+    const path = match ? match[1] : '';
+    iframe.src = `https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/${path}&auto_play=${autoplay?'true':'false'}&hide_related=true&show_comments=false&show_user=true&show_reposts=false&visual=false&buying=false&liking=false&download=false&sharing=false&show_playcount=false&show_artwork=false&color=39e6e6&show_teaser=false`;
+    iframe.width = '100%';
+    iframe.height = '120';
+    iframe.frameBorder = '0';
+    iframe.allow = 'autoplay';
+    iframe.title = 'SoundCloud player';
+    wrap.appendChild(iframe);
+    return wrap;
+}
+
+/* Load nhạc SoundCloud (dùng iframe thuần, không widget API) */
+function _loadSoundCloudTrack(track, autoplay) {
+    try {
+        // Ẩn các container cũ
+        document.querySelectorAll('.sc-embed-wrap').forEach(el => el.remove());
+
+        const w1 = document.getElementById('musicWidget');
+        const w3 = document.getElementById('musicWidget3');
+        if (w1) {
+            const wrap1 = _createSCIframe(track.url, autoplay);
+            w1.parentNode.insertBefore(wrap1, w1.nextSibling);
+        }
+        if (w3) {
+            const wrap3 = _createSCIframe(track.url, autoplay);
+            w3.parentNode.insertBefore(wrap3, w3.nextSibling);
+        }
+
+        // Đánh dấu đang phát (nếu autoplay)
+        if (autoplay) {
+            muPlaying = true;
+            _setPlayBtns('⏸');
+            // Sau 2s, nếu không có sự kiện gì, cho phép người dùng bấm lại
+            setTimeout(() => {
+                if (!_userGestured) _userGestured = true;
+            }, 2000);
+        }
+    } catch(e) {
+        console.warn('SoundCloud embed error:', e);
+        // Fallback: không làm gì, vẫn hiển thị tên bài
     }
-    if (w1) w1.style.display = 'block';
-    if (w3) w3.style.display = 'block';
-    if (muIdx >= tracks.length) muIdx = 0;
-    muSyncUI(tracks);
-}
-
-async function muSyncUI(tracks) {
-    if (!tracks) tracks = await getTracks();
-    if (!tracks.length) return;
-    const t = tracks[muIdx];
-    document.getElementById('muTrackName').textContent = t.name;
-    document.getElementById('muTrackName3').textContent = t.name;
-    document.getElementById('muArtist').textContent = t.artist || '—';
-    document.getElementById('muArtist3').textContent = t.artist || '—';
-    ['muArtWrap', 'muArtWrap3'].forEach(id => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.innerHTML = t.cover ? `<img src="${esc(t.cover)}" onerror="this.parentElement.innerHTML='🎵'">` : '🎵';
-    });
-    ['muProg', 'muProg3'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.style.width = '0%';
-    });
-}
-
-function _isLocalTrack(track) {
-    return track && (track.isLocal || (track.url && track.url.startsWith('idb:')));
 }
 
 function _stopLocal() {
@@ -1761,14 +1600,10 @@ function _stopLocal() {
         _localAudio = null;
     }
     if (_currentBlobUrl) {
-        try { URL.revokeObjectURL(_currentBlobUrl); } catch (e) {}
+        try { URL.revokeObjectURL(_currentBlobUrl); } catch(e) {}
         _currentBlobUrl = null;
     }
-    // Dừng SoundCloud nếu đang chạy
-    if (_scWidget) {
-        try { _scWidget.pause(); } catch (e) {}
-    }
-    if (_scInterval) { clearInterval(_scInterval); _scInterval = null; }
+    // Không xóa SoundCloud iframe, vì nó tự quản lý
 }
 
 function _getCurrentVol() {
@@ -1859,21 +1694,63 @@ function _loadLocalAudio(url, autoplay) {
 }
 
 async function muLoadTrack(i, autoplay = true) {
-    const tracks = await getTracks();
-    if (!tracks.length) return;
-    muIdx = i;
-    muSyncUI(tracks);
-    const t = tracks[i];
-    _stopLocal();
-    // Ẩn SoundCloud container
-    document.querySelectorAll('.sc-embed-wrap').forEach(el => el.style.display = 'none');
-    // Nếu là SoundCloud
-    if (_isSoundCloudUrl(t.url)) {
-        _loadSoundCloudTrack(t, autoplay);
-        return;
+    try {
+        const tracks = await getTracks();
+        if (!tracks.length) return;
+        muIdx = i;
+        muSyncUI(tracks);
+        const t = tracks[i];
+        _stopLocal();
+        // Xóa các SoundCloud iframe cũ
+        document.querySelectorAll('.sc-embed-wrap').forEach(el => el.remove());
+
+        if (_isSoundCloudUrl(t.url)) {
+            _loadSoundCloudTrack(t, autoplay);
+            return;
+        }
+        _loadLocalAudio(t.url, autoplay);
+    } catch(e) {
+        console.warn('muLoadTrack error:', e);
     }
-    // Còn lại: local hoặc mp3
-    _loadLocalAudio(t.url, autoplay);
+}
+
+async function initMusicPlayer() {
+    try {
+        const tracks = await getTracks();
+        const w1 = document.getElementById('musicWidget'), w3 = document.getElementById('musicWidget3');
+        if (!tracks.length) {
+            if (w1) w1.style.display = 'none';
+            if (w3) w3.style.display = 'none';
+            muPlaying = false;
+            _setPlayBtns('▶');
+            return;
+        }
+        if (w1) w1.style.display = 'block';
+        if (w3) w3.style.display = 'block';
+        if (muIdx >= tracks.length) muIdx = 0;
+        muSyncUI(tracks);
+    } catch(e) {
+        console.warn('initMusicPlayer error:', e);
+    }
+}
+
+async function muSyncUI(tracks) {
+    if (!tracks) tracks = await getTracks();
+    if (!tracks.length) return;
+    const t = tracks[muIdx];
+    document.getElementById('muTrackName').textContent = t.name;
+    document.getElementById('muTrackName3').textContent = t.name;
+    document.getElementById('muArtist').textContent = t.artist || '—';
+    document.getElementById('muArtist3').textContent = t.artist || '—';
+    ['muArtWrap', 'muArtWrap3'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.innerHTML = t.cover ? `<img src="${esc(t.cover)}" onerror="this.parentElement.innerHTML='🎵'">` : '🎵';
+    });
+    ['muProg', 'muProg3'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.width = '0%';
+    });
 }
 
 function muToggle() {
@@ -1881,49 +1758,39 @@ function muToggle() {
     getTracks().then(tracks => {
         if (!tracks.length) return;
         const t = tracks[muIdx];
+        // Nếu là SoundCloud, ta không thể điều khiển iframe dễ dàng, nên load lại với autoplay toggle
         if (_isSoundCloudUrl(t.url)) {
-            if (_scWidget) {
-                _scWidget.getPlayState((state) => {
-                    if (state === SC.Widget.PlayerState.PLAYING) {
-                        _scWidget.pause();
-                    } else {
-                        _scWidget.play();
-                    }
-                });
-            } else {
-                muLoadTrack(muIdx, true);
-            }
+            // Toggle bằng cách load lại bài với autoplay = !muPlaying
+            muLoadTrack(muIdx, !muPlaying);
             return;
         }
         if (!_localAudio) {
             muLoadTrack(muIdx, true);
             return;
         }
-        if (_localAudio) {
-            if (muPlaying) {
-                _localAudio.pause();
-            } else {
-                const p = _localAudio.play();
-                if (p && p.catch) p.catch(() => muLoadTrack(muIdx, true));
-            }
+        if (muPlaying) {
+            _localAudio.pause();
+        } else {
+            const p = _localAudio.play();
+            if (p && p.catch) p.catch(() => muLoadTrack(muIdx, true));
         }
     });
 }
 
 function muPrev() {
     _userGestured = true;
-    getTracks().then(t => { if (t.length) muLoadTrack((muIdx - 1 + t.length) % t.length); });
+    getTracks().then(t => { if (t.length) muLoadTrack((muIdx - 1 + t.length) % t.length, true); });
 }
 
 function muNext() {
     _userGestured = true;
-    getTracks().then(t => { if (t.length) muLoadTrack((muIdx + 1) % t.length); });
+    getTracks().then(t => { if (t.length) muLoadTrack((muIdx + 1) % t.length, true); });
 }
 
 function muVol(v) {
     const vol = parseFloat(v);
     if (_localAudio) { _localAudio.volume = vol; return; }
-    if (_scWidget) { _scWidget.setVolume(vol * 100); }
+    // SoundCloud iframe không điều chỉnh volume qua JS được, bỏ qua
 }
 
 function muSeek(e) {
@@ -1932,13 +1799,7 @@ function muSeek(e) {
     if (_localAudio && _localAudio.duration) {
         _localAudio.currentTime = ratio * _localAudio.duration;
     }
-    if (_scWidget) {
-        _scWidget.getDuration((dur) => {
-            if (dur > 0) {
-                _scWidget.seekTo(ratio * dur);
-            }
-        });
-    }
+    // SoundCloud iframe không hỗ trợ seek qua JS, bỏ qua
 }
 
 initMusicPlayer();
@@ -2172,13 +2033,15 @@ function drawPetals(){
 resizeAll(); mkStars(220); mkSnow(); initPetals(18);
 drawGalaxy(); drawSnow(); drawPetals();
 
-/* INTRO */
+/* INTRO — đảm bảo luôn ẩn sau 3.4s */
 window.addEventListener('load', ()=>{
-    setTimeout(()=>{
-        const intro=document.getElementById('intro'), app=document.getElementById('app');
-        intro.classList.add('hide'); app.classList.add('show');
-        setTimeout(()=>{intro.style.display='none';},900);
-    },3400);
+    try {
+        setTimeout(()=>{
+            const intro=document.getElementById('intro'), app=document.getElementById('app');
+            intro.classList.add('hide'); app.classList.add('show');
+            setTimeout(()=>{intro.style.display='none';},900);
+        },3400);
+    } catch(e) { console.warn('Intro transition error:', e); }
 });
 
 (function buildFx(){
@@ -2191,7 +2054,7 @@ window.addEventListener('load', ()=>{
     }
     const cw=document.querySelector('.icw');
     for(let i=0;i<8;i++){
-        cf const s=document.createElement('div'); s.className='csp';
+        const s=document.createElement('div'); s.className='csp';
         const a=(i/8)*Math.PI*2;
         s.style.left='50%'; s.style.top='50%';
         s.style.setProperty('--dx',(Math.cos(a)*34)+'px'); s.style.setProperty('--dy',(Math.sin(a)*34)+'px');
