@@ -658,16 +658,16 @@ select.ainp option{background:#0d1220;}
 
 <script>
 /* ================================================================
-   NMINH LOCK PRO — FIREBASE REALTIME DATABASE
-   ✅ Đồng bộ mọi máy, mọi trình duyệt
-   - Keys, mật khẩu admin, nhạc, config → Firebase (global)
-   - UID thiết bị → localStorage (local fingerprint)
+   NMINH LOCK PRO — Firebase Realtime DB + localStorage fallback
+   ✅ Đồng bộ realtime mọi máy qua Firebase
+   ✅ Tự fallback localStorage nếu chưa điền config / mất mạng
    ================================================================ */
 
-/* ════════════════════════════════════════════════════════════════
-   🔥 FIREBASE CONFIG — Thay bằng config của bạn!
-   Hướng dẫn: console.firebase.google.com → Project Settings → Web app
-   ════════════════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════
+   🔥 FIREBASE CONFIG — Điền thông tin project của bạn vào đây
+   Lấy tại: console.firebase.google.com
+   → Project Settings → General → Your apps → Web app → Config
+   ════════════════════════════════════════════════════════ */
 const FIREBASE_CONFIG = {
   apiKey:            "PASTE_YOUR_apiKey_HERE",
   authDomain:        "PASTE_YOUR_authDomain_HERE",
@@ -677,11 +677,11 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "PASTE_YOUR_messagingSenderId_HERE",
   appId:             "PASTE_YOUR_appId_HERE",
 };
-/* ════════════════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════ */
 
 const DEF_PW = "nminh@admin2025";
 
-/* ---- LOCAL ONLY (fingerprint thiết bị) ---- */
+/* ---- DEVICE FINGERPRINT (luôn local) ---- */
 function myUid(){
   let u=localStorage.getItem('nm_uid');
   if(!u){u='u'+Date.now()+Math.random().toString(36).slice(2,7);localStorage.setItem('nm_uid',u);}
@@ -706,120 +706,196 @@ function fmtShort(ms){
 }
 
 /* ================================================================
-   FIREBASE INIT
+   localStorage CACHE — backup khi offline / Firebase chưa ready
    ================================================================ */
-let _db = null;       // Firebase database instance
-let _fbReady = false; // True khi Firebase đã init xong
-let _fbQueue = [];    // Hàng chờ các hàm cần gọi sau khi FB sẵn sàng
-
-function _loadFirebase(){
-  return new Promise((resolve, reject)=>{
-    if(_db){resolve(_db);return;}
-    // Load Firebase SDK từ CDN
-    const s1=document.createElement('script');
-    s1.src='https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js';
-    s1.onload=()=>{
-      const s2=document.createElement('script');
-      s2.src='https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js';
-      s2.onload=()=>{
-        try{
-          const app=firebase.initializeApp(FIREBASE_CONFIG);
-          _db=firebase.database();
-          _fbReady=true;
-          _fbQueue.forEach(fn=>fn(_db));
-          _fbQueue=[];
-          resolve(_db);
-        }catch(e){reject(e);}
-      };
-      s2.onerror=reject;
-      document.head.appendChild(s2);
-    };
-    s1.onerror=reject;
-    document.head.appendChild(s1);
-  });
+function _lsGet(key,def){
+  try{const v=localStorage.getItem(key);return v!=null?JSON.parse(v):def;}catch(e){return def;}
+}
+function _lsSet(key,val){
+  try{localStorage.setItem(key,JSON.stringify(val));}catch(e){}
 }
 
-function withDB(fn){
-  if(_fbReady){fn(_db);return;}
-  if(_db===null && !_fbReady){
-    _fbQueue.push(fn);
-    if(_fbQueue.length===1) _loadFirebase().catch(e=>{
-      console.error('Firebase load error:',e);
-      showFbError();
-    });
-  } else {
-    _fbQueue.push(fn);
+/* ================================================================
+   FIREBASE INIT — load SDK động, tự detect nếu config chưa điền
+   ================================================================ */
+const _FB_CONFIGURED = !Object.values(FIREBASE_CONFIG).some(v=>v.startsWith('PASTE_'));
+let _db = null;
+let _fbReady = false;
+let _fbLoadPromise = null;
+
+function _loadFirebase(){
+  if(!_FB_CONFIGURED) return Promise.reject(new Error('Firebase chưa được cấu hình'));
+  if(_fbReady && _db) return Promise.resolve(_db);
+  if(_fbLoadPromise) return _fbLoadPromise;
+  _fbLoadPromise = new Promise((resolve, reject)=>{
+    const s1 = document.createElement('script');
+    s1.src = 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js';
+    s1.onload = ()=>{
+      const s2 = document.createElement('script');
+      s2.src = 'https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js';
+      s2.onload = ()=>{
+        try{
+          // Tránh init lại nếu đã có app
+          const existing = firebase.apps && firebase.apps.length ? firebase.apps[0] : null;
+          const app = existing || firebase.initializeApp(FIREBASE_CONFIG);
+          _db = firebase.database(app);
+          _fbReady = true;
+          resolve(_db);
+        }catch(e){ reject(e); }
+      };
+      s2.onerror = ()=>reject(new Error('Không tải được Firebase Database SDK'));
+      document.head.appendChild(s2);
+    };
+    s1.onerror = ()=>reject(new Error('Không tải được Firebase App SDK'));
+    document.head.appendChild(s1);
+  });
+  return _fbLoadPromise;
+}
+
+/* ================================================================
+   FIREBASE HELPERS — tự fallback localStorage nếu FB lỗi
+   Mỗi hàm: thử Firebase trước → cache localStorage → fallback
+   ================================================================ */
+async function fbGet(path){
+  try{
+    const db = await Promise.race([_loadFirebase(), new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),5000))]);
+    const snap = await db.ref(path).get();
+    const val = snap.exists() ? snap.val() : null;
+    // Cập nhật cache local
+    const root = path.split('/')[0];
+    if(path === root) _lsSet('nm_fb_'+root, val);
+    return val;
+  }catch(e){
+    // Fallback: đọc cache localStorage
+    const root = path.split('/')[0];
+    const cached = _lsGet('nm_fb_'+root, null);
+    if(path !== root && cached){ return cached[path.split('/')[1]] ?? null; }
+    return cached;
   }
 }
 
-function showFbError(){
-  const el=document.getElementById('fbStatus');
-  if(el){el.style.display='block';el.textContent='⚠️ Không kết nối được Firebase. Kiểm tra config!';}
+async function fbSet(path, val){
+  // Luôn cập nhật cache local ngay lập tức
+  const parts = path.split('/');
+  const root = parts[0];
+  if(parts.length === 1){
+    _lsSet('nm_fb_'+root, val);
+  } else {
+    const cached = _lsGet('nm_fb_'+root, {})||{};
+    cached[parts[1]] = val;
+    _lsSet('nm_fb_'+root, cached);
+  }
+  // Ghi lên Firebase (không chặn UI)
+  try{
+    const db = await Promise.race([_loadFirebase(), new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),5000))]);
+    await db.ref(path).set(val);
+  }catch(e){ console.warn('fbSet offline, đã lưu cache:',e.message); }
 }
 
-// Ref helper
-function ref(path){return _db.ref(path);}
+async function fbUpdate(path, val){
+  const parts = path.split('/');
+  const root = parts[0];
+  const cached = _lsGet('nm_fb_'+root, {})||{};
+  if(parts.length===1){ Object.assign(cached, val); }
+  else { cached[parts[1]] = Object.assign(cached[parts[1]]||{}, val); }
+  _lsSet('nm_fb_'+root, cached);
+  try{
+    const db = await Promise.race([_loadFirebase(), new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),5000))]);
+    await db.ref(path).update(val);
+  }catch(e){ console.warn('fbUpdate offline:',e.message); }
+}
 
-/* ================================================================
-   FIREBASE DATA HELPERS — async/await style
-   ================================================================ */
-async function fbGet(path){
-  const db=await _loadFirebase();
-  const snap=await db.ref(path).get();
-  return snap.exists()?snap.val():null;
-}
-async function fbSet(path,val){
-  const db=await _loadFirebase();
-  await db.ref(path).set(val);
-}
-async function fbUpdate(path,val){
-  const db=await _loadFirebase();
-  await db.ref(path).update(val);
-}
 async function fbRemove(path){
-  const db=await _loadFirebase();
-  await db.ref(path).remove();
+  const parts = path.split('/');
+  const root = parts[0];
+  const cached = _lsGet('nm_fb_'+root, {})||{};
+  if(parts.length===1){ localStorage.removeItem('nm_fb_'+root); }
+  else { delete cached[parts[1]]; _lsSet('nm_fb_'+root, cached); }
+  try{
+    const db = await Promise.race([_loadFirebase(), new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),5000))]);
+    await db.ref(path).remove();
+  }catch(e){ console.warn('fbRemove offline:',e.message); }
 }
+
 async function fbTransaction(path, updateFn){
-  const db=await _loadFirebase();
-  return db.ref(path).transaction(updateFn);
+  // Với localStorage: thực thi trực tiếp
+  const parts = path.split('/');
+  const root = parts[0];
+  const all = _lsGet('nm_fb_'+root, {})||{};
+  const key = parts[1];
+  const current = key ? (all[key]??null) : all;
+  const result = updateFn(current===null?null:JSON.parse(JSON.stringify(current)));
+  if(result === undefined) return {committed:false};
+  if(key){ all[key]=result; _lsSet('nm_fb_'+root, all); }
+  else { _lsSet('nm_fb_'+root, result); }
+  // Đồng bộ lên Firebase
+  try{
+    const db = await Promise.race([_loadFirebase(), new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),5000))]);
+    await db.ref(path).set(result);
+  }catch(e){ console.warn('fbTransaction offline:',e.message); }
+  return {committed:true};
+}
+
+function showFbError(){
+  const el = document.getElementById('fbStatus');
+  if(el && _FB_CONFIGURED){
+    el.style.display='block';
+    el.textContent='⚠️ Đang dùng bộ nhớ cục bộ — chưa kết nối Firebase!';
+  }
 }
 
 /* ================================================================
-   KEY STORE — Firebase
+   KEY STORE — Firebase + cache
    ================================================================ */
 async function getKeys(){
-  const v=await fbGet('keys');
+  const v = await fbGet('keys');
   return v||{};
 }
 async function setKeys(k){
-  await fbSet('keys',k);
+  await fbSet('keys', k);
 }
 
 /* ================================================================
-   APP CONFIG — Firebase
+   APP CONFIG — Firebase + cache
    ================================================================ */
 const DEF_CFG={title:'NMINH LOCK',sub:'Hệ thống bảo mật',tagline:'Khóa truy cập an toàn cho thiết bị của bạn',brand:'App by Nminh'};
 
 async function getCfg(){
-  const v=await fbGet('app_cfg');
-  return v||DEF_CFG;
+  const v = await fbGet('app_cfg');
+  return v || DEF_CFG;
 }
 async function applyCfg(){
-  const c=await getCfg();
-  document.getElementById('introTitle').textContent=c.title||'NMINH LOCK';
-  document.getElementById('introSub').textContent=c.sub||'Hệ thống bảo mật';
-  document.getElementById('appTitle').textContent=c.title||'Nminh Lock';
-  document.getElementById('dashTitle').textContent=c.title||'Nminh Lock';
-  document.getElementById('brandText').textContent=c.brand||'App by Nminh';
-  document.getElementById('appTagline').textContent=c.tagline||'';
+  let c = DEF_CFG;
+  try{ const v = await getCfg(); if(v) c = v; }catch(e){}
+  document.getElementById('introTitle').textContent = c.title||'NMINH LOCK';
+  document.getElementById('introSub').textContent   = c.sub||'Hệ thống bảo mật';
+  document.getElementById('appTitle').textContent   = c.title||'Nminh Lock';
+  document.getElementById('dashTitle').textContent  = c.title||'Nminh Lock';
+  document.getElementById('brandText').textContent  = c.brand||'App by Nminh';
+  document.getElementById('appTagline').textContent = c.tagline||'';
 }
-_loadFirebase().then(()=>applyCfg()).catch(()=>{});
+// Khởi động: áp dụng config (từ cache ngay, Firebase sau)
+(async()=>{
+  // Áp cache trước để UI không trống
+  const cached = _lsGet('nm_fb_app_cfg', null)||DEF_CFG;
+  document.getElementById('introTitle').textContent = cached.title||'NMINH LOCK';
+  document.getElementById('introSub').textContent   = cached.sub||'Hệ thống bảo mật';
+  document.getElementById('appTitle').textContent   = cached.title||'Nminh Lock';
+  document.getElementById('dashTitle').textContent  = cached.title||'Nminh Lock';
+  document.getElementById('brandText').textContent  = cached.brand||'App by Nminh';
+  document.getElementById('appTagline').textContent = cached.tagline||'';
+  // Rồi mới gọi Firebase (cập nhật lại nếu có thay đổi)
+  applyCfg();
+})();
 
-/* ---- ADMIN PASSWORD — Firebase ---- */
+/* ---- ADMIN PASSWORD — Firebase + cache ---- */
 async function getAdmPw(){
-  const v=await fbGet('adm_pw');
-  return v||DEF_PW;
+  try{
+    const v = await fbGet('adm_pw');
+    return v || _lsGet('nm_fb_adm_pw', null) || DEF_PW;
+  }catch(e){
+    return _lsGet('nm_fb_adm_pw', null) || DEF_PW;
+  }
 }
 
 /* ================================================================
@@ -876,25 +952,25 @@ async function checkKey(){
       goTo('pageFull');return;
     }
 
-    // Claim slot — dùng transaction để tránh race condition
+    // Claim slot — transaction để tránh race condition
     await fbTransaction('keys/'+val, (current)=>{
-      if(!current)return current;
-      const sl=current.slots||[];
-      if(sl.includes(uid))return current; // đã có rồi
-      if(sl.length>=current.maxSlots)return; // abort → slot full
-      current.slots=[...sl,uid];
+      if(!current) return current;
+      const sl = current.slots||[];
+      if(sl.includes(uid)) return current;
+      if(sl.length >= current.maxSlots) return undefined; // abort
+      current.slots = [...sl, uid];
       return current;
     });
-
-    // Đọc lại data mới nhất sau transaction
-    const freshKd=await fbGet('keys/'+val);
+    // Đọc lại data mới nhất
+    const freshKeys = await getKeys();
+    const freshKd = freshKeys[val];
     setLocalUsedKey(val);
     document.getElementById('keyInput').value='';
     enterDashboard(val,freshKd);
 
   }catch(e){
     console.error(e);
-    showErr('❌ Lỗi kết nối. Thử lại!');
+    showErr('❌ '+(e.message||'Lỗi kết nối. Thử lại!'));
   }finally{
     btn.textContent=origTxt;
     btn.disabled=false;
@@ -968,16 +1044,33 @@ function openAdminLogin(){
 function closeAdminLogin(){
   document.getElementById('adminLoginModal').style.display='none';
   document.getElementById('adminPwInput').value='';
-  document.getElementById('adminPwErr').style.display='none';
+  const errEl=document.getElementById('adminPwErr');
+  errEl.style.display='none';
+  errEl.textContent='❌ Sai mật khẩu!';
 }
 async function verifyAdmin(){
   const input=document.getElementById('adminPwInput').value;
-  const correctPw=await getAdmPw();
-  if(input===correctPw){
-    closeAdminLogin();goTo('pageAdmin');
-  } else {
-    document.getElementById('adminPwErr').style.display='block';
-    document.getElementById('adminPwInput').value='';
+  const errEl=document.getElementById('adminPwErr');
+  const btn=document.querySelector('#adminLoginModal .btn');
+  errEl.style.display='none';
+  btn.textContent='⏳ Đang kiểm tra...';
+  btn.disabled=true;
+  try{
+    const correctPw=await getAdmPw();
+    if(input===correctPw){
+      closeAdminLogin();goTo('pageAdmin');
+    } else {
+      errEl.textContent='❌ Sai mật khẩu!';
+      errEl.style.display='block';
+      document.getElementById('adminPwInput').value='';
+      document.getElementById('adminPwInput').focus();
+    }
+  }catch(e){
+    errEl.textContent='❌ Lỗi hệ thống. Thử lại!';
+    errEl.style.display='block';
+  }finally{
+    btn.textContent='Xác nhận';
+    btn.disabled=false;
   }
 }
 
@@ -1079,10 +1172,6 @@ async function editKey(code){
     </div>
   </div>`;
   document.body.appendChild(ov);
-  document.querySelectorAll('.tabp').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('tabKeys').classList.add('active');
-  document.querySelectorAll('.tab')[0].classList.add('active');
 }
 
 async function saveEditKey(oldCode){
@@ -1118,15 +1207,14 @@ async function delKey(code){
 }
 
 /* ================================================================
-   ADMIN: MUSIC MANAGEMENT — Firebase
+   ADMIN: MUSIC MANAGEMENT — Firebase + cache
    ================================================================ */
 async function getTracks(){
-  const v=await fbGet('tracks');
-  if(!v)return[];
-  // Firebase lưu object với numeric keys khi dùng push, convert sang array
-  return Array.isArray(v)?v:Object.values(v);
+  const v = await fbGet('tracks');
+  if(!v) return [];
+  return Array.isArray(v) ? v : Object.values(v);
 }
-async function setTracks(t){await fbSet('tracks',t);}
+async function setTracks(t){ await fbSet('tracks', t); }
 
 async function adminAddTrack(){
   const name=document.getElementById('mTrackName').value.trim();
@@ -1221,6 +1309,11 @@ async function saveEditTrack(i){
 async function delTrack(i){
   try{
     const tracks=await getTracks();
+    const t=tracks[i];
+    // Xoá file trong IndexedDB nếu là local
+    if(t && t.url && t.url.startsWith('idb:')){
+      idbDeleteFile(t.url.slice(4)).catch(()=>{});
+    }
     tracks.splice(i,1);
     await setTracks(tracks);
     loadAdminTrackList();initMusicPlayer();
@@ -1236,35 +1329,36 @@ async function moveTrack(i,dir){
 }
 
 /* ================================================================
-   ADMIN: APP CONFIG — Firebase
+   ADMIN: APP CONFIG — Firebase + cache
    ================================================================ */
 async function loadAppCfgForm(){
-  const c=await getCfg();
-  document.getElementById('cfgTitle').value=c.title||'';
-  document.getElementById('cfgSub').value=c.sub||'';
-  document.getElementById('cfgTagline').value=c.tagline||'';
-  document.getElementById('cfgBrand').value=c.brand||'';
+  const c = await getCfg();
+  document.getElementById('cfgTitle').value    = c.title||'';
+  document.getElementById('cfgSub').value      = c.sub||'';
+  document.getElementById('cfgTagline').value  = c.tagline||'';
+  document.getElementById('cfgBrand').value    = c.brand||'';
 }
 async function saveAppConfig(){
-  const msg=document.getElementById('cfgMsg');
-  const newPw=document.getElementById('cfgNewPw').value;
-  const pw2=document.getElementById('cfgPw2').value;
+  const msg = document.getElementById('cfgMsg');
+  const newPw = document.getElementById('cfgNewPw').value;
+  const pw2   = document.getElementById('cfgPw2').value;
 
   if(newPw){
-    if(newPw!==pw2){showAdmMsg(msg,'❌ Mật khẩu xác nhận không khớp!',false);return;}
-    if(newPw.length<6){showAdmMsg(msg,'❌ Mật khẩu tối thiểu 6 ký tự!',false);return;}
-    await fbSet('adm_pw',newPw);
-    document.getElementById('cfgNewPw').value='';
-    document.getElementById('cfgPw2').value='';
+    if(newPw !== pw2){ showAdmMsg(msg,'❌ Mật khẩu xác nhận không khớp!',false); return; }
+    if(newPw.length < 6){ showAdmMsg(msg,'❌ Mật khẩu tối thiểu 6 ký tự!',false); return; }
+    await fbSet('adm_pw', newPw);
+    _lsSet('nm_fb_adm_pw', newPw); // cache local luôn
+    document.getElementById('cfgNewPw').value = '';
+    document.getElementById('cfgPw2').value   = '';
   }
 
-  const cfg={
-    title:document.getElementById('cfgTitle').value.trim()||'NMINH LOCK',
-    sub:document.getElementById('cfgSub').value.trim()||'Hệ thống bảo mật',
-    tagline:document.getElementById('cfgTagline').value.trim(),
-    brand:document.getElementById('cfgBrand').value.trim()||'App by Nminh',
+  const cfg = {
+    title:   document.getElementById('cfgTitle').value.trim()  || 'NMINH LOCK',
+    sub:     document.getElementById('cfgSub').value.trim()    || 'Hệ thống bảo mật',
+    tagline: document.getElementById('cfgTagline').value.trim(),
+    brand:   document.getElementById('cfgBrand').value.trim()  || 'App by Nminh',
   };
-  await fbSet('app_cfg',cfg);
+  await fbSet('app_cfg', cfg);
   applyCfg();
   showAdmMsg(msg,'✅ Đã lưu cài đặt!'+(newPw?' Mật khẩu đã đổi.':''),true);
 }
@@ -1292,34 +1386,126 @@ function switchMusicTab(tab){
 }
 
 /* ================================================================
-   INDEXEDDB — không dùng nữa (đã chuyển sang Firebase)
-   File nhạc upload local không đồng bộ được → dùng link URL
+   INDEXEDDB — lưu file nhạc local (hoạt động offline hoàn toàn)
    ================================================================ */
-function idbDeleteFile(){}
-function idbSaveFile(){return Promise.resolve();}
-function idbGetFile(){return Promise.resolve(null);}
-function openIDB(){return Promise.resolve(null);}
+const IDB_NAME = 'nminhMusicDB', IDB_STORE = 'files', IDB_VER = 1;
+let _idbInst = null;
+
+function openIDB(){
+  if(_idbInst) return Promise.resolve(_idbInst);
+  return new Promise((res,rej)=>{
+    const req = indexedDB.open(IDB_NAME, IDB_VER);
+    req.onupgradeneeded = e => e.target.result.createObjectStore(IDB_STORE);
+    req.onsuccess = e => { _idbInst = e.target.result; res(_idbInst); };
+    req.onerror = () => rej(req.error);
+  });
+}
+async function idbSaveFile(id, blob){
+  const db = await openIDB();
+  return new Promise((res,rej)=>{
+    const tx = db.transaction(IDB_STORE,'readwrite');
+    tx.objectStore(IDB_STORE).put(blob, id);
+    tx.oncomplete = ()=>res();
+    tx.onerror = ()=>rej(tx.error);
+  });
+}
+async function idbGetFile(id){
+  const db = await openIDB();
+  return new Promise((res,rej)=>{
+    const tx = db.transaction(IDB_STORE,'readonly');
+    const req = tx.objectStore(IDB_STORE).get(id);
+    req.onsuccess = ()=>res(req.result||null);
+    req.onerror = ()=>rej(req.error);
+  });
+}
+async function idbDeleteFile(id){
+  const db = await openIDB();
+  return new Promise((res,rej)=>{
+    const tx = db.transaction(IDB_STORE,'readwrite');
+    tx.objectStore(IDB_STORE).delete(id);
+    tx.oncomplete = ()=>res();
+    tx.onerror = ()=>rej(tx.error);
+  });
+}
 
 /* ================================================================
-   FILE UPLOAD MUSIC — disabled (Firebase không lưu file binary)
-   Admin dùng tab "Dán Link" để thêm nhạc từ URL
+   FILE UPLOAD MUSIC — đã bật lại, dùng IndexedDB
    ================================================================ */
 let _pendingFile = null;
+
 function handleMusicFileDrop(e){
-  alert('⚠️ Chế độ Firebase: Không hỗ trợ upload file.\nVui lòng dùng tab "Dán Link" để thêm link nhạc mp3 hoặc SoundCloud.');
+  const file = e.dataTransfer.files[0];
+  if(!file) return;
+  _loadFileToUI(file);
 }
 function handleMusicFileSelect(input){
-  alert('⚠️ Chế độ Firebase: Không hỗ trợ upload file.\nVui lòng dùng tab "Dán Link" để thêm link nhạc mp3 hoặc SoundCloud.');
-  input.value='';
+  const file = input.files[0];
+  if(!file) return;
+  _loadFileToUI(file);
 }
-function _readMusicFile(){}
+function _loadFileToUI(file){
+  const allowed = ['audio/mpeg','audio/mp3','audio/ogg','audio/wav','audio/x-wav'];
+  if(!allowed.includes(file.type) && !file.name.match(/\.(mp3|ogg|wav)$/i)){
+    alert('⚠️ Chỉ hỗ trợ file .mp3, .ogg, .wav!'); return;
+  }
+  _pendingFile = file;
+  // Hiển thị thông tin file
+  document.getElementById('mFileInfo').style.display = 'block';
+  document.getElementById('mFileName').textContent = file.name;
+  document.getElementById('mFileSize').textContent = (file.size/1024/1024).toFixed(2)+' MB';
+  document.getElementById('mFileProgress').style.display = 'none';
+  // Auto điền tên bài
+  const nameInp = document.getElementById('mFileTrackName');
+  if(!nameInp.value){
+    nameInp.value = file.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' ');
+  }
+}
 function clearMusicFile(){
-  _pendingFile=null;
-  document.getElementById('mFileInput').value='';
-  document.getElementById('mFileInfo').style.display='none';
+  _pendingFile = null;
+  document.getElementById('mFileInput').value = '';
+  document.getElementById('mFileInfo').style.display = 'none';
+  document.getElementById('mFileTrackName').value = '';
+  document.getElementById('mFileArtist').value = '';
 }
-function adminAddFileTrack(){
-  alert('⚠️ Chế độ Firebase: Không hỗ trợ upload file.\nVui lòng dùng tab "Dán Link" để thêm link nhạc.');
+async function adminAddFileTrack(){
+  const msg = document.getElementById('mFileMsg');
+  const name = document.getElementById('mFileTrackName').value.trim();
+  const artist = document.getElementById('mFileArtist').value.trim();
+  if(!name){ showAdmMsg(msg,'❌ Nhập tên bài hát!',false); return; }
+  if(!_pendingFile){ showAdmMsg(msg,'❌ Chọn file nhạc trước!',false); return; }
+
+  // Hiện progress
+  document.getElementById('mFileProgress').style.display = 'block';
+  document.getElementById('mFileBar').style.width = '0%';
+  document.getElementById('mFileStatus').textContent = 'Đang lưu file...';
+
+  try{
+    const idbId = 'track_' + Date.now();
+    // Fake progress animation
+    let prog = 0;
+    const progInt = setInterval(()=>{
+      prog = Math.min(prog+10, 85);
+      document.getElementById('mFileBar').style.width = prog+'%';
+    }, 80);
+
+    await idbSaveFile(idbId, _pendingFile);
+
+    clearInterval(progInt);
+    document.getElementById('mFileBar').style.width = '100%';
+    document.getElementById('mFileStatus').textContent = '✅ Đã lưu!';
+
+    const tracks = await getTracks();
+    tracks.push({ id: Date.now(), name, artist: artist||'Unknown', url:'idb:'+idbId, cover:'', isLocal:true });
+    await setTracks(tracks);
+
+    showAdmMsg(msg,'✅ Đã thêm bài "'+name+'"!',true);
+    clearMusicFile();
+    loadAdminTrackList();
+    initMusicPlayer();
+  }catch(e){
+    showAdmMsg(msg,'❌ Lỗi lưu file: '+e.message,false);
+    document.getElementById('mFileStatus').textContent = '❌ Lỗi!';
+  }
 }
 
 /* ================================================================
@@ -1601,8 +1787,8 @@ function muSeek(e){
   scWidget.getDuration(dur=>{ scWidget.seekTo(Math.round(ratio * dur)); });
 }
 
-// Khởi động music player sau khi Firebase sẵn sàng
-_loadFirebase().then(()=>initMusicPlayer()).catch(()=>{});
+// Khởi động music player (Firebase load async, không block)
+initMusicPlayer();
 
 /* ================================================================
    TOGGLE CONFIG
@@ -1652,7 +1838,8 @@ async function onKeyInputChange(val){
   const hintTxt=document.getElementById('keyInfoText');
   if(!val.trim()){hint.style.display='none';return;}
   try{
-    const kd=await fbGet('keys/'+val.trim());
+    const keys=await getKeys();
+    const kd=keys[val.trim()];
     if(!kd){hint.style.display='none';return;}
     const now=Date.now();
     const slots=(kd.slots||[]).length;
@@ -1668,7 +1855,8 @@ async function onKeyInputChange(val){
 async function showKeyInfo(){
   const val=document.getElementById('keyInput').value.trim();
   try{
-    const kd=await fbGet('keys/'+val);
+    const keys=await getKeys();
+    const kd=keys[val];
     if(!kd)return;
     const now=Date.now();
     const slots=(kd.slots||[]).length;
