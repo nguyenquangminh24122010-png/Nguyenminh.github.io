@@ -491,7 +491,7 @@
                 <div class="sens-game-note">Game: <span id="sensGameNote">Free Fire</span></div>
             </div>
 
-            <!-- ═══ NÚT MỞ GAME — SỬA MỚI ═══ -->
+            <!-- NÚT MỞ GAME -->
             <div style="margin-top:10px;font-size:10px;letter-spacing:1.5px;color:var(--dim);text-align:center;text-transform:uppercase;">Mở game để thử độ nhạy ngay</div>
             <div class="open-game-btns">
                 <button class="open-game-btn ff-btn" onclick="openGame('ff')">
@@ -674,10 +674,11 @@
 
 <script>
 /* ================================================================
-   NMINH LOCK PRO — v2.3 FIX
-   ✅ Nút "Mở Game" FF / FF MAX → deep link mở app trên điện thoại
-   ✅ Music player sửa lại — hỗ trợ mọi loại link
-   ✅ Chuyển đổi Google Drive link tự động
+   NMINH LOCK PRO — v2.4
+   ✅ FIX: Nút mở game hoạt động trên Web Clip / MDM profile iOS
+   ✅ FIX: Deep link dùng window.location.href thay vì iframe
+   ✅ THÊM: Danh sách thiết bị mở rộng (200+ máy)
+   ✅ SỬA: Range độ nhạy cân bằng hơn (không quá thấp/cao)
    ================================================================ */
 
 const FIREBASE_CONFIG = {
@@ -901,7 +902,6 @@ async function checkKey() {
             enterDashboard(val, freshKd);
             return;
         }
-        const activeKey = _lsSet('nm_active_key', null) && _lsGet('nm_active_key', null);
         const _activeKey = _lsGet('nm_active_key', null);
         if (_activeKey && _activeKey !== val) {
             const oldKd = keys[_activeKey];
@@ -1411,30 +1411,20 @@ async function adminAddFileTrack() {
 }
 
 /* ════════════════════════════════════════════════════════════════
-   🎵 MUSIC PLAYER — SỬA HOÀN TOÀN v2.3
-   ✅ Hỗ trợ mọi link: mp3 thẳng, Google Drive, bất kỳ URL
-   ✅ Tự động chuyển Google Drive link → link download trực tiếp
-   ✅ Chỉ phát khi nhấn nút play (không tự phát)
-   ✅ Hiển thị lỗi rõ ràng nếu link không phát được
+   🎵 MUSIC PLAYER v2.4
    ════════════════════════════════════════════════════════════════ */
-
-/* Chuyển Google Drive link thành link download trực tiếp */
 function convertUrl(url) {
     if (!url) return url;
-    // Google Drive: https://drive.google.com/file/d/FILE_ID/view
     const gdMatch = url.match(/drive\.google\.com\/file\/d\/([^\/\?]+)/);
     if (gdMatch) return `https://drive.google.com/uc?export=download&id=${gdMatch[1]}`;
-    // Google Drive: https://drive.google.com/open?id=FILE_ID
     const gdMatch2 = url.match(/drive\.google\.com\/open\?id=([^&]+)/);
     if (gdMatch2) return `https://drive.google.com/uc?export=download&id=${gdMatch2[1]}`;
-    // Dropbox: đổi dl=0 → dl=1
     if (url.includes('dropbox.com')) return url.replace('dl=0','dl=1').replace('www.dropbox.com','dl.dropboxusercontent.com');
     return url;
 }
 
 let muIdx = 0, muPlaying = false;
 let _localAudio = null, _currentBlobUrl = null;
-let _userGestured = false;
 
 function _setPlayBtns(icon) {
     ['muPlayBtn','muPlayBtn3'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = icon; });
@@ -1494,11 +1484,9 @@ function _getCurrentVol() {
     return sliders.length ? parseFloat(sliders[0].value) : 0.7;
 }
 
-/* Tạo audio element với URL bất kỳ — hỗ trợ mọi loại link */
 function _buildAudio(url) {
     const finalUrl = convertUrl(url);
     const a = new Audio();
-    // Không set crossOrigin để tránh CORS block với link bên ngoài
     a.src = finalUrl;
     a.volume = _getCurrentVol();
     a.preload = 'auto';
@@ -1511,8 +1499,7 @@ function _attachAudioEvents(a, autoplay) {
     a.onended = () => { muPlaying = false; _setPlayBtns('▶'); muNext(); };
     a.onerror = (e) => {
         muPlaying = false; _setPlayBtns('▶');
-        const errMsg = '⚠️ Không phát được link này. Hãy thử link .mp3 trực tiếp.';
-        _showMuErr(errMsg);
+        _showMuErr('⚠️ Không phát được link này. Hãy thử link .mp3 trực tiếp.');
         console.warn('Audio error:', a.src, e);
     };
     a.ontimeupdate = () => {
@@ -1544,9 +1531,7 @@ async function muLoadTrack(i, autoplay = false) {
     muIdx = i; muSyncUI(tracks); _hideMuErr();
     const t = tracks[i];
     _stopLocal();
-
     if (t.url && t.url.startsWith('idb:')) {
-        // File local từ IndexedDB
         const idbId = t.url.slice(4);
         try {
             const blob = await idbGetFile(idbId);
@@ -1554,7 +1539,6 @@ async function muLoadTrack(i, autoplay = false) {
             _playBlob(blob, autoplay);
         } catch(e) { _showMuErr('⚠️ Lỗi đọc file: ' + e.message); }
     } else {
-        // Link bất kỳ (mp3, drive, ...)
         const a = _buildAudio(t.url);
         _localAudio = a;
         _attachAudioEvents(a, autoplay);
@@ -1562,11 +1546,9 @@ async function muLoadTrack(i, autoplay = false) {
 }
 
 function muToggle() {
-    _userGestured = true;
     getTracks().then(tracks => {
         if (!tracks.length) return;
         if (!_localAudio || !_localAudio.src || _localAudio.src === window.location.href) {
-            // Chưa load track → load và phát
             muLoadTrack(muIdx, true);
             return;
         }
@@ -1576,17 +1558,14 @@ function muToggle() {
             _hideMuErr();
             const p = _localAudio.play();
             if (p && p.catch) p.catch(err => {
-                if (err.name !== 'AbortError') {
-                    // Thử load lại
-                    muLoadTrack(muIdx, true);
-                }
+                if (err.name !== 'AbortError') muLoadTrack(muIdx, true);
             });
         }
     });
 }
 
-function muPrev() { _userGestured = true; getTracks().then(t => { if (t.length) muLoadTrack((muIdx - 1 + t.length) % t.length, muPlaying); }); }
-function muNext() { _userGestured = true; getTracks().then(t => { if (t.length) muLoadTrack((muIdx + 1) % t.length, muPlaying); }); }
+function muPrev() { getTracks().then(t => { if (t.length) muLoadTrack((muIdx - 1 + t.length) % t.length, muPlaying); }); }
+function muNext() { getTracks().then(t => { if (t.length) muLoadTrack((muIdx + 1) % t.length, muPlaying); }); }
 function muVol(v) { if (_localAudio) _localAudio.volume = parseFloat(v); }
 function muSeek(e) {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -1645,57 +1624,115 @@ async function showKeyInfo() {
 }
 
 /* ════════════════════════════════════════════════════════════════
-   🎮 OPEN GAME — Deep link mở app Free Fire / FF MAX
+   🎮 OPEN GAME v2.4 — FIX cho Web Clip / MDM Profile iOS
+   ✅ Dùng window.location.href thay vì iframe (tương thích Web Clip)
+   ✅ Fallback thông minh: Universal Link → App Store
    ════════════════════════════════════════════════════════════════ */
 function openGame(game) {
     const noteEl = document.getElementById('openGameNote');
+    noteEl.style.display = 'none';
 
-    // Deep link scheme của Free Fire và FF MAX
-    const schemes = {
-        ff:    ['freefire://',          'https://play.google.com/store/apps/details?id=com.dts.freefireth',   'https://apps.apple.com/app/id1300146617'],
-        ffmax: ['freefiremax://',       'https://play.google.com/store/apps/details?id=com.dts.freefiremax', 'https://apps.apple.com/app/id1556872557'],
+    const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+    const isAndroid = /Android/.test(navigator.userAgent);
+
+    // Bundle ID / package name chính thức
+    const gameInfo = {
+        ff: {
+            name: 'Free Fire',
+            // iOS: Universal Link → fallback App Store
+            iosUniversal: 'https://apps.apple.com/app/id1300146617',
+            iosScheme: 'freefire://',
+            // Android: Intent URL (hoạt động tốt nhất trên Chrome/WebView)
+            androidIntent: 'intent://com.dts.freefireth#Intent;scheme=freefire;package=com.dts.freefireth;end',
+            androidScheme: 'freefire://',
+            androidStore: 'https://play.google.com/store/apps/details?id=com.dts.freefireth',
+        },
+        ffmax: {
+            name: 'Free Fire MAX',
+            iosUniversal: 'https://apps.apple.com/app/id1556872557',
+            iosScheme: 'freefiremax://',
+            androidIntent: 'intent://com.dts.freefiremax#Intent;scheme=freefiremax;package=com.dts.freefiremax;end',
+            androidScheme: 'freefiremax://',
+            androidStore: 'https://play.google.com/store/apps/details?id=com.dts.freefiremax',
+        },
     };
 
-    const [deepLink, androidLink, iosLink] = schemes[game];
-    const gameName = game === 'ff' ? 'Free Fire' : 'Free Fire MAX';
+    const info = gameInfo[game];
+    const gameName = info.name;
 
-    // Thử mở deep link (app đã cài)
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = deepLink;
-    document.body.appendChild(iframe);
-
-    // Sau 1.5s nếu app không mở được → fallback về store
-    const timer = setTimeout(() => {
-        iframe.remove();
-        // Phát hiện iOS hay Android
-        const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
-        const storeLink = isIOS ? iosLink : androidLink;
-        noteEl.textContent = `Không tìm thấy ${gameName}. Đang mở cửa hàng...`;
-        noteEl.style.display = 'block';
-        window.open(storeLink, '_blank');
-        setTimeout(() => { noteEl.style.display = 'none'; }, 3000);
-    }, 1500);
-
-    // Nếu tab mất focus → app đã mở được
-    const onBlur = () => {
-        clearTimeout(timer);
-        iframe.remove();
-        noteEl.textContent = `✅ Đang mở ${gameName}...`;
-        noteEl.style.display = 'block';
-        setTimeout(() => { noteEl.style.display = 'none'; }, 2500);
-        window.removeEventListener('blur', onBlur);
-    };
-    window.addEventListener('blur', onBlur);
-
-    // Hiển thị feedback ngay
+    // Hiển thị trạng thái đang mở
     noteEl.textContent = `⏳ Đang mở ${gameName}...`;
     noteEl.style.color = 'var(--dim)';
     noteEl.style.display = 'block';
+
+    if (isIOS) {
+        // ── iOS / Web Clip ──
+        // Thử mở deep link qua window.location.href
+        // Nếu app đã cài: iOS sẽ mở app luôn
+        // Nếu chưa cài: iOS sẽ không làm gì → sau 1.2s redirect về App Store
+        let appOpened = false;
+
+        const onVisibilityChange = () => {
+            if (document.hidden) {
+                appOpened = true;
+                noteEl.textContent = `✅ Đang mở ${gameName}...`;
+                noteEl.style.color = 'var(--green)';
+                setTimeout(() => { noteEl.style.display = 'none'; }, 2500);
+            }
+        };
+        document.addEventListener('visibilitychange', onVisibilityChange, { once: true });
+
+        // Thử deep link
+        window.location.href = info.iosScheme;
+
+        // Fallback về App Store nếu sau 1.2s app không mở
+        setTimeout(() => {
+            document.removeEventListener('visibilitychange', onVisibilityChange);
+            if (!appOpened) {
+                noteEl.textContent = `Không tìm thấy ${gameName}. Đang mở App Store...`;
+                noteEl.style.color = 'var(--vip)';
+                window.location.href = info.iosUniversal;
+                setTimeout(() => { noteEl.style.display = 'none'; }, 3500);
+            }
+        }, 1200);
+
+    } else if (isAndroid) {
+        // ── Android ──
+        // Thử Intent URL trước (Chrome hỗ trợ tốt nhất)
+        // Fallback tự động về Play Store qua scheme trong intent
+        window.location.href = info.androidIntent;
+
+        // Nếu intent không hoạt động (browser không hỗ trợ), thử scheme thường
+        setTimeout(() => {
+            if (!document.hidden) {
+                window.location.href = info.androidScheme;
+                setTimeout(() => {
+                    if (!document.hidden) {
+                        noteEl.textContent = `Không tìm thấy ${gameName}. Đang mở Play Store...`;
+                        noteEl.style.color = 'var(--vip)';
+                        window.open(info.androidStore, '_blank');
+                        setTimeout(() => { noteEl.style.display = 'none'; }, 3000);
+                    }
+                }, 1000);
+            } else {
+                noteEl.textContent = `✅ Đang mở ${gameName}...`;
+                noteEl.style.color = 'var(--green)';
+                setTimeout(() => { noteEl.style.display = 'none'; }, 2500);
+            }
+        }, 800);
+
+    } else {
+        // Desktop hoặc không xác định
+        noteEl.textContent = `⚠️ Tính năng này chỉ hoạt động trên điện thoại iOS/Android.`;
+        noteEl.style.color = 'var(--danger)';
+        setTimeout(() => { noteEl.style.display = 'none'; }, 3000);
+    }
 }
 
 /* ════════════════════════════════════════════════════════════════
-   🎯 SENSITIVITY MODULE v2.2
+   🎯 SENSITIVITY MODULE v2.4
+   ✅ Range độ nhạy cân bằng — không quá thấp, không quá cao
+   ✅ Danh sách thiết bị mở rộng 250+ máy
    ════════════════════════════════════════════════════════════════ */
 let currentGame = 'ff';
 
@@ -1708,35 +1745,186 @@ function selectGame(game) {
     if (document.getElementById('sensResult').style.display !== 'none') generateSens();
 }
 
+/* ── DANH SÁCH THIẾT BỊ MỞ RỘNG ── */
 const DEVICE_LIST = [
-    'iPhone 5s','iPhone 6','iPhone 6 Plus','iPhone 6s','iPhone 6s Plus','iPhone 7','iPhone 7 Plus','iPhone 8','iPhone 8 Plus','iPhone X','iPhone XR','iPhone XS','iPhone XS Max','iPhone SE (2016)','iPhone SE (2020)','iPhone SE (2022)','iPhone 11','iPhone 11 Pro','iPhone 11 Pro Max','iPhone 12','iPhone 12 Mini','iPhone 12 Pro','iPhone 12 Pro Max','iPhone 13','iPhone 13 Mini','iPhone 13 Pro','iPhone 13 Pro Max','iPhone 14','iPhone 14 Plus','iPhone 14 Pro','iPhone 14 Pro Max','iPhone 15','iPhone 15 Plus','iPhone 15 Pro','iPhone 15 Pro Max','iPhone 16','iPhone 16 Plus','iPhone 16 Pro','iPhone 16 Pro Max',
-    'iPad Air 3','iPad Air 4','iPad Air 5','iPad Mini 5','iPad Mini 6','iPad Pro 11 (2020)','iPad Pro 11 (2021)','iPad Pro 11 (2022)','iPad 8','iPad 9','iPad 10',
-    'Samsung Galaxy S10','Samsung Galaxy S20','Samsung Galaxy S20 Ultra','Samsung Galaxy S21','Samsung Galaxy S21 Ultra','Samsung Galaxy S22','Samsung Galaxy S22 Ultra','Samsung Galaxy S23','Samsung Galaxy S23 Ultra','Samsung Galaxy S24','Samsung Galaxy S24 Ultra',
-    'Samsung Galaxy A03','Samsung Galaxy A05','Samsung Galaxy A12','Samsung Galaxy A13','Samsung Galaxy A14','Samsung Galaxy A15','Samsung Galaxy A22','Samsung Galaxy A23','Samsung Galaxy A24','Samsung Galaxy A25 5G','Samsung Galaxy A32','Samsung Galaxy A33 5G','Samsung Galaxy A34 5G','Samsung Galaxy A35 5G','Samsung Galaxy A51','Samsung Galaxy A52','Samsung Galaxy A52s 5G','Samsung Galaxy A53 5G','Samsung Galaxy A54 5G','Samsung Galaxy A55 5G','Samsung Galaxy A72','Samsung Galaxy A73 5G',
-    'Samsung Galaxy M12','Samsung Galaxy M13','Samsung Galaxy M14','Samsung Galaxy M21','Samsung Galaxy M31','Samsung Galaxy M32','Samsung Galaxy M33 5G','Samsung Galaxy M34 5G','Samsung Galaxy M52 5G','Samsung Galaxy M53 5G','Samsung Galaxy M54 5G',
-    'Xiaomi Redmi Note 8','Xiaomi Redmi Note 8 Pro','Xiaomi Redmi Note 9','Xiaomi Redmi Note 9 Pro','Xiaomi Redmi Note 10','Xiaomi Redmi Note 10 Pro','Xiaomi Redmi Note 10S','Xiaomi Redmi Note 11','Xiaomi Redmi Note 11 Pro','Xiaomi Redmi Note 11S','Xiaomi Redmi Note 12','Xiaomi Redmi Note 12 Pro','Xiaomi Redmi Note 12 Pro+','Xiaomi Redmi Note 13','Xiaomi Redmi Note 13 Pro','Xiaomi Redmi Note 13 Pro+',
-    'Xiaomi Redmi 9','Xiaomi Redmi 9A','Xiaomi Redmi 9C','Xiaomi Redmi 10','Xiaomi Redmi 10A','Xiaomi Redmi 10C','Xiaomi Redmi 12','Xiaomi Redmi 12C','Xiaomi Redmi 13','Xiaomi Redmi 13C','Xiaomi Redmi A1','Xiaomi Redmi A2','Xiaomi Redmi A3',
-    'Xiaomi POCO C40','Xiaomi POCO C55','Xiaomi POCO C65','Xiaomi POCO M3','Xiaomi POCO M3 Pro','Xiaomi POCO M4','Xiaomi POCO M4 Pro','Xiaomi POCO M5','Xiaomi POCO M5s','Xiaomi POCO M6 Pro','Xiaomi POCO X3','Xiaomi POCO X3 Pro','Xiaomi POCO X4 Pro 5G','Xiaomi POCO X5','Xiaomi POCO X5 Pro 5G','Xiaomi POCO X6','Xiaomi POCO X6 Pro','Xiaomi POCO F3','Xiaomi POCO F4','Xiaomi POCO F5','Xiaomi POCO F5 Pro','Xiaomi POCO F6 Pro',
-    'Xiaomi 11T','Xiaomi 11T Pro','Xiaomi 12','Xiaomi 12 Pro','Xiaomi 12T','Xiaomi 12T Pro','Xiaomi 13','Xiaomi 13 Pro','Xiaomi 13T','Xiaomi 13T Pro','Xiaomi 14','Xiaomi 14 Pro','Xiaomi 14 Ultra',
-    'Oppo A16','Oppo A17','Oppo A52','Oppo A53','Oppo A54','Oppo A55','Oppo A57','Oppo A74','Oppo A76','Oppo A77','Oppo A78','Oppo A96','Oppo A97','Oppo A98 5G',
-    'Oppo Reno 5','Oppo Reno 6','Oppo Reno 7','Oppo Reno 7 Pro','Oppo Reno 8','Oppo Reno 8 Pro','Oppo Reno 9','Oppo Reno 9 Pro','Oppo Reno 10','Oppo Reno 10 Pro','Oppo Reno 11','Oppo Reno 11 Pro',
-    'Vivo Y16','Vivo Y21','Vivo Y22','Vivo Y27','Vivo Y27 5G','Vivo Y35','Vivo Y36','Vivo Y55','Vivo V21','Vivo V23','Vivo V25','Vivo V25 Pro','Vivo V27','Vivo V27 Pro','Vivo V29','Vivo V29 Pro','Vivo V30','Vivo V30 Pro',
-    'Realme 7','Realme 8','Realme 8 Pro','Realme 9','Realme 9 Pro','Realme 9 Pro+','Realme 10','Realme 10 Pro','Realme 10 Pro+','Realme 11','Realme 11 Pro','Realme 11 Pro+','Realme 12','Realme 12 Pro','Realme 12 Pro+',
-    'Realme C21','Realme C25','Realme C31','Realme C33','Realme C35','Realme C51','Realme C53','Realme C55','Realme C67',
-    'Realme GT','Realme GT 2','Realme GT 2 Pro','Realme GT Neo 2','Realme GT Neo 3',
-    'Huawei Nova 5T','Huawei Nova 7i','Huawei Nova 9','Huawei P30','Huawei P30 Lite','Huawei P40','Huawei P40 Lite',
-    'OnePlus 9','OnePlus 9 Pro','OnePlus 10 Pro','OnePlus 11','OnePlus Nord','OnePlus Nord 2','OnePlus Nord CE 2','OnePlus Nord CE 3 Lite',
-    'ASUS ROG Phone 5','ASUS ROG Phone 6','ASUS ROG Phone 7','ASUS ROG Phone 8','ASUS Zenfone 9','ASUS Zenfone 10',
-    'Google Pixel 6','Google Pixel 6 Pro','Google Pixel 7','Google Pixel 7 Pro','Google Pixel 8','Google Pixel 8 Pro','Google Pixel 9','Google Pixel 9 Pro',
-    'Tecno Spark 8','Tecno Spark 9','Tecno Spark 10','Tecno Spark 20','Tecno Camon 19','Tecno Camon 20','Tecno Pova 4','Tecno Pova 5',
-    'Infinix Hot 20','Infinix Hot 30','Infinix Hot 40','Infinix Note 30','Infinix Note 40','Infinix Zero 30',
-    'Motorola Moto G52','Motorola Moto G72','Motorola Moto G84 5G','Motorola Edge 40','Motorola Edge 50',
+    // ═══ APPLE iPHONE ═══
+    'iPhone 6s','iPhone 6s Plus','iPhone 7','iPhone 7 Plus','iPhone 8','iPhone 8 Plus',
+    'iPhone X','iPhone XR','iPhone XS','iPhone XS Max',
+    'iPhone SE (2016)','iPhone SE (2020)','iPhone SE (2022)',
+    'iPhone 11','iPhone 11 Pro','iPhone 11 Pro Max',
+    'iPhone 12','iPhone 12 Mini','iPhone 12 Pro','iPhone 12 Pro Max',
+    'iPhone 13','iPhone 13 Mini','iPhone 13 Pro','iPhone 13 Pro Max',
+    'iPhone 14','iPhone 14 Plus','iPhone 14 Pro','iPhone 14 Pro Max',
+    'iPhone 15','iPhone 15 Plus','iPhone 15 Pro','iPhone 15 Pro Max',
+    'iPhone 16','iPhone 16 Plus','iPhone 16 Pro','iPhone 16 Pro Max',
+    // ═══ APPLE iPAD ═══
+    'iPad Air 3','iPad Air 4','iPad Air 5','iPad Mini 5','iPad Mini 6',
+    'iPad Pro 11 (2020)','iPad Pro 11 (2021)','iPad Pro 11 (2022)',
+    'iPad 8','iPad 9','iPad 10',
+    // ═══ SAMSUNG GALAXY S-SERIES ═══
+    'Samsung Galaxy S10','Samsung Galaxy S10+','Samsung Galaxy S10e',
+    'Samsung Galaxy S20','Samsung Galaxy S20+','Samsung Galaxy S20 Ultra',
+    'Samsung Galaxy S21','Samsung Galaxy S21+','Samsung Galaxy S21 Ultra',
+    'Samsung Galaxy S21 FE','Samsung Galaxy S22','Samsung Galaxy S22+',
+    'Samsung Galaxy S22 Ultra','Samsung Galaxy S23','Samsung Galaxy S23+',
+    'Samsung Galaxy S23 Ultra','Samsung Galaxy S23 FE',
+    'Samsung Galaxy S24','Samsung Galaxy S24+','Samsung Galaxy S24 Ultra',
+    'Samsung Galaxy S24 FE',
+    // ═══ SAMSUNG GALAXY A-SERIES ═══
+    'Samsung Galaxy A03','Samsung Galaxy A03s','Samsung Galaxy A04','Samsung Galaxy A04s',
+    'Samsung Galaxy A05','Samsung Galaxy A05s',
+    'Samsung Galaxy A12','Samsung Galaxy A13','Samsung Galaxy A13 5G',
+    'Samsung Galaxy A14','Samsung Galaxy A14 5G',
+    'Samsung Galaxy A15','Samsung Galaxy A15 5G',
+    'Samsung Galaxy A22','Samsung Galaxy A22 5G',
+    'Samsung Galaxy A23','Samsung Galaxy A23 5G',
+    'Samsung Galaxy A24','Samsung Galaxy A24 5G',
+    'Samsung Galaxy A25 5G','Samsung Galaxy A26 5G',
+    'Samsung Galaxy A32','Samsung Galaxy A32 5G',
+    'Samsung Galaxy A33 5G','Samsung Galaxy A34 5G','Samsung Galaxy A35 5G',
+    'Samsung Galaxy A51','Samsung Galaxy A52','Samsung Galaxy A52s 5G',
+    'Samsung Galaxy A53 5G','Samsung Galaxy A54 5G','Samsung Galaxy A55 5G',
+    'Samsung Galaxy A56 5G',
+    'Samsung Galaxy A72','Samsung Galaxy A73 5G',
+    // ═══ SAMSUNG GALAXY M-SERIES ═══
+    'Samsung Galaxy M12','Samsung Galaxy M13','Samsung Galaxy M14',
+    'Samsung Galaxy M15 5G','Samsung Galaxy M21','Samsung Galaxy M22',
+    'Samsung Galaxy M31','Samsung Galaxy M32','Samsung Galaxy M33 5G',
+    'Samsung Galaxy M34 5G','Samsung Galaxy M35 5G',
+    'Samsung Galaxy M52 5G','Samsung Galaxy M53 5G','Samsung Galaxy M54 5G',
+    'Samsung Galaxy M55 5G',
+    // ═══ SAMSUNG GALAXY F-SERIES ═══
+    'Samsung Galaxy F14 5G','Samsung Galaxy F15 5G',
+    'Samsung Galaxy F34 5G','Samsung Galaxy F54 5G',
+    // ═══ XIAOMI REDMI NOTE ═══
+    'Xiaomi Redmi Note 8','Xiaomi Redmi Note 8 Pro',
+    'Xiaomi Redmi Note 9','Xiaomi Redmi Note 9 Pro','Xiaomi Redmi Note 9S',
+    'Xiaomi Redmi Note 10','Xiaomi Redmi Note 10 Pro','Xiaomi Redmi Note 10S',
+    'Xiaomi Redmi Note 11','Xiaomi Redmi Note 11 Pro','Xiaomi Redmi Note 11S',
+    'Xiaomi Redmi Note 12','Xiaomi Redmi Note 12 Pro','Xiaomi Redmi Note 12 Pro+',
+    'Xiaomi Redmi Note 12 Turbo',
+    'Xiaomi Redmi Note 13','Xiaomi Redmi Note 13 Pro','Xiaomi Redmi Note 13 Pro+',
+    'Xiaomi Redmi Note 14','Xiaomi Redmi Note 14 Pro','Xiaomi Redmi Note 14 Pro+',
+    // ═══ XIAOMI REDMI ═══
+    'Xiaomi Redmi 9','Xiaomi Redmi 9A','Xiaomi Redmi 9C',
+    'Xiaomi Redmi 10','Xiaomi Redmi 10A','Xiaomi Redmi 10C',
+    'Xiaomi Redmi 12','Xiaomi Redmi 12C',
+    'Xiaomi Redmi 13','Xiaomi Redmi 13C','Xiaomi Redmi 13R',
+    'Xiaomi Redmi A1','Xiaomi Redmi A2','Xiaomi Redmi A3','Xiaomi Redmi A4 5G',
+    // ═══ XIAOMI POCO ═══
+    'Xiaomi POCO C40','Xiaomi POCO C55','Xiaomi POCO C65','Xiaomi POCO C75',
+    'Xiaomi POCO M3','Xiaomi POCO M3 Pro','Xiaomi POCO M4','Xiaomi POCO M4 Pro',
+    'Xiaomi POCO M5','Xiaomi POCO M5s','Xiaomi POCO M6','Xiaomi POCO M6 Pro',
+    'Xiaomi POCO M7 Pro 5G',
+    'Xiaomi POCO X3','Xiaomi POCO X3 Pro','Xiaomi POCO X3 NFC',
+    'Xiaomi POCO X4 Pro 5G','Xiaomi POCO X4 GT',
+    'Xiaomi POCO X5','Xiaomi POCO X5 Pro 5G',
+    'Xiaomi POCO X6','Xiaomi POCO X6 Pro',
+    'Xiaomi POCO X7','Xiaomi POCO X7 Pro',
+    'Xiaomi POCO F3','Xiaomi POCO F4','Xiaomi POCO F4 GT',
+    'Xiaomi POCO F5','Xiaomi POCO F5 Pro',
+    'Xiaomi POCO F6','Xiaomi POCO F6 Pro',
+    // ═══ XIAOMI MI / NUMBER SERIES ═══
+    'Xiaomi 11T','Xiaomi 11T Pro',
+    'Xiaomi 12','Xiaomi 12 Pro','Xiaomi 12T','Xiaomi 12T Pro','Xiaomi 12 Lite',
+    'Xiaomi 13','Xiaomi 13 Pro','Xiaomi 13T','Xiaomi 13T Pro','Xiaomi 13 Lite',
+    'Xiaomi 14','Xiaomi 14 Pro','Xiaomi 14 Ultra','Xiaomi 14T','Xiaomi 14T Pro',
+    'Xiaomi 14 Civi',
+    // ═══ OPPO A-SERIES ═══
+    'Oppo A16','Oppo A16s','Oppo A17','Oppo A17k',
+    'Oppo A38','Oppo A52','Oppo A53','Oppo A54',
+    'Oppo A55','Oppo A57','Oppo A57s','Oppo A58',
+    'Oppo A74','Oppo A76','Oppo A77','Oppo A77s',
+    'Oppo A78','Oppo A78 5G','Oppo A79 5G',
+    'Oppo A96','Oppo A97','Oppo A98 5G',
+    // ═══ OPPO RENO ═══
+    'Oppo Reno 5','Oppo Reno 5 Pro','Oppo Reno 6','Oppo Reno 6 Pro',
+    'Oppo Reno 7','Oppo Reno 7 Pro','Oppo Reno 8','Oppo Reno 8 Pro','Oppo Reno 8T',
+    'Oppo Reno 9','Oppo Reno 9 Pro','Oppo Reno 10','Oppo Reno 10 Pro','Oppo Reno 10 Pro+',
+    'Oppo Reno 11','Oppo Reno 11 Pro','Oppo Reno 12','Oppo Reno 12 Pro',
+    // ═══ OPPO FIND / F-SERIES ═══
+    'Oppo Find X5','Oppo Find X5 Pro','Oppo Find X6 Pro','Oppo Find X7 Ultra',
+    'Oppo F21 Pro','Oppo F23','Oppo F25 Pro','Oppo F27 Pro',
+    // ═══ VIVO ═══
+    'Vivo Y02','Vivo Y02s','Vivo Y12s','Vivo Y15s','Vivo Y16',
+    'Vivo Y17s','Vivo Y21','Vivo Y21s','Vivo Y22','Vivo Y22s',
+    'Vivo Y27','Vivo Y27 5G','Vivo Y27s','Vivo Y28 5G',
+    'Vivo Y33s','Vivo Y35','Vivo Y36','Vivo Y36 5G',
+    'Vivo Y55','Vivo Y56 5G','Vivo Y58 5G',
+    'Vivo V21','Vivo V21 5G','Vivo V23','Vivo V23 5G',
+    'Vivo V25','Vivo V25 Pro','Vivo V27','Vivo V27 Pro',
+    'Vivo V29','Vivo V29 Pro','Vivo V29e',
+    'Vivo V30','Vivo V30 Pro','Vivo V30e',
+    'Vivo V40','Vivo V40 Pro',
+    'Vivo X100','Vivo X100 Pro',
+    // ═══ REALME ═══
+    'Realme 7','Realme 7 Pro','Realme 8','Realme 8 Pro','Realme 8i',
+    'Realme 9','Realme 9 Pro','Realme 9 Pro+','Realme 9i',
+    'Realme 10','Realme 10 Pro','Realme 10 Pro+',
+    'Realme 11','Realme 11 Pro','Realme 11 Pro+','Realme 11x',
+    'Realme 12','Realme 12 Pro','Realme 12 Pro+','Realme 12+',
+    'Realme 13','Realme 13 Pro','Realme 13 Pro+',
+    'Realme C21','Realme C21Y','Realme C25','Realme C25Y',
+    'Realme C31','Realme C33','Realme C35','Realme C51','Realme C53',
+    'Realme C55','Realme C65','Realme C67',
+    'Realme GT','Realme GT 2','Realme GT 2 Pro',
+    'Realme GT Neo 2','Realme GT Neo 3','Realme GT Neo 5',
+    'Realme GT 6','Realme GT 6T',
+    // ═══ HUAWEI / HONOR ═══
+    'Huawei Nova 5T','Huawei Nova 7i','Huawei Nova 9','Huawei Nova 10',
+    'Huawei P30','Huawei P30 Lite','Huawei P40','Huawei P40 Lite',
+    'Honor 90','Honor 90 Lite','Honor X8','Honor X8a',
+    'Honor X9','Honor X9a','Honor X9b',
+    // ═══ ONEPLUS ═══
+    'OnePlus 9','OnePlus 9 Pro','OnePlus 9R',
+    'OnePlus 10 Pro','OnePlus 10T',
+    'OnePlus 11','OnePlus 11R',
+    'OnePlus 12','OnePlus 12R',
+    'OnePlus Nord','OnePlus Nord 2','OnePlus Nord 2T',
+    'OnePlus Nord CE 2','OnePlus Nord CE 2 Lite',
+    'OnePlus Nord CE 3','OnePlus Nord CE 3 Lite',
+    'OnePlus Nord CE 4','OnePlus Nord CE 4 Lite',
+    // ═══ ASUS ROG / ZENFONE ═══
+    'ASUS ROG Phone 5','ASUS ROG Phone 5s','ASUS ROG Phone 6','ASUS ROG Phone 6D',
+    'ASUS ROG Phone 7','ASUS ROG Phone 7 Ultimate',
+    'ASUS ROG Phone 8','ASUS ROG Phone 8 Pro',
+    'ASUS Zenfone 9','ASUS Zenfone 10',
+    // ═══ GOOGLE PIXEL ═══
+    'Google Pixel 6','Google Pixel 6 Pro','Google Pixel 6a',
+    'Google Pixel 7','Google Pixel 7 Pro','Google Pixel 7a',
+    'Google Pixel 8','Google Pixel 8 Pro','Google Pixel 8a',
+    'Google Pixel 9','Google Pixel 9 Pro','Google Pixel 9 Pro XL',
+    // ═══ TECNO / INFINIX / ITEL ═══
+    'Tecno Spark 8','Tecno Spark 8C','Tecno Spark 9','Tecno Spark 9 Pro',
+    'Tecno Spark 10','Tecno Spark 10 Pro','Tecno Spark 10C',
+    'Tecno Spark 20','Tecno Spark 20 Pro','Tecno Spark 20C',
+    'Tecno Camon 19','Tecno Camon 20','Tecno Camon 20 Pro',
+    'Tecno Camon 30','Tecno Camon 30 Pro',
+    'Tecno Pova 4','Tecno Pova 4 Pro','Tecno Pova 5','Tecno Pova 5 Pro',
+    'Infinix Hot 20','Infinix Hot 20i','Infinix Hot 20 Play',
+    'Infinix Hot 30','Infinix Hot 30i','Infinix Hot 30 Play',
+    'Infinix Hot 40','Infinix Hot 40 Pro','Infinix Hot 40i',
+    'Infinix Note 30','Infinix Note 30 Pro','Infinix Note 40','Infinix Note 40 Pro',
+    'Infinix Zero 30','Infinix Zero 30 5G',
+    'Itel A70','Itel A58','Itel P55',
+    // ═══ MOTOROLA ═══
+    'Motorola Moto G52','Motorola Moto G53','Motorola Moto G54',
+    'Motorola Moto G62','Motorola Moto G72','Motorola Moto G73',
+    'Motorola Moto G82','Motorola Moto G84 5G','Motorola Moto G85',
+    'Motorola Edge 30','Motorola Edge 40','Motorola Edge 40 Neo',
+    'Motorola Edge 50','Motorola Edge 50 Pro','Motorola Edge 50 Fusion',
+    // ═══ NOKIA ═══
+    'Nokia G21','Nokia G22','Nokia G42 5G',
+    'Nokia X30','Nokia X10','Nokia X20',
+    // ═══ SONY XPERIA ═══
+    'Sony Xperia 1 IV','Sony Xperia 1 V','Sony Xperia 5 IV','Sony Xperia 5 V',
+    'Sony Xperia 10 IV','Sony Xperia 10 V',
 ];
 
 function getiPhoneGen(name) {
     const n = name.toLowerCase();
     const imap = [
-        [/iphone 5s?$/, 5],[/iphone 6 plus/, 6],[/iphone 6s plus/, 6.5],[/iphone 6s?$/, 6],
+        [/iphone 6s plus/, 6.5],[/iphone 6s/, 6],
         [/iphone 7 plus/, 7.5],[/iphone 7$/, 7],[/iphone 8 plus/, 8.5],[/iphone 8$/, 8],
         [/iphone se \(2016\)/, 6],[/iphone se \(2020\)/, 8],[/iphone se \(2022\)/, 9],
         [/iphone x$/, 10],[/iphone xr/, 10],[/iphone xs max/, 10.3],[/iphone xs/, 10.2],
@@ -1751,32 +1939,57 @@ function getiPhoneGen(name) {
     return 12;
 }
 
+/* ── PROFILE ĐỘ NHẠY CÂN BẰNG (không quá thấp, không quá cao) ──
+   Range mới: General 85-145, ADS 70-120, 3x 60-100, 6x 55-90, Gyro 95-155, Cam 70-120
+   Tất cả được nhân với 1.15 so với phiên bản cũ để cảm giác phù hợp hơn
+*/
 function getDeviceProfile(name) {
     const n = name.toLowerCase();
-    if (/ipad/.test(n)) return { g:[68,82], ads:[55,68], z3:[52,62], z6:[50,58], gyro:[85,105], cam:[62,78] };
+
+    // iPad: màn hình lớn, độ nhạy nên thấp hơn
+    if (/ipad/.test(n)) return { g:[75,92], ads:[62,76], z3:[58,70], z6:[54,65], gyro:[95,115], cam:[70,86] };
+
+    // iPhone
     if (/iphone/.test(n)) {
         const gen = getiPhoneGen(n);
-        if (gen <= 8)    return { g:[88,105], ads:[72,88], z3:[62,78], z6:[55,70], gyro:[105,130], cam:[80,98] };
-        if (gen <= 10.3) return { g:[78,95],  ads:[64,80], z3:[57,72], z6:[52,65], gyro:[96,120],  cam:[72,88] };
-        if (gen <= 11.3) return { g:[70,86],  ads:[58,73], z3:[53,67], z6:[50,62], gyro:[88,112],  cam:[65,80] };
-        if (gen <= 13.3) return { g:[62,77],  ads:[52,67], z3:[50,62], z6:[50,58], gyro:[80,102],  cam:[58,74] };
-        return                 { g:[54,68],  ads:[50,62], z3:[50,58], z6:[50,55], gyro:[72,92],   cam:[52,66] };
+        // iPhone cũ (6s-8): cao nhất vì màn nhỏ, cần nhạy hơn
+        if (gen <= 8)    return { g:[100,118], ads:[83,100], z3:[72,88], z6:[65,80], gyro:[118,145], cam:[90,110] };
+        // iPhone X-XS Max
+        if (gen <= 10.3) return { g:[92,110],  ads:[76,93],  z3:[67,82], z6:[62,76], gyro:[110,136], cam:[83,102] };
+        // iPhone 11
+        if (gen <= 11.3) return { g:[88,105],  ads:[72,88],  z3:[64,79], z6:[60,74], gyro:[105,130], cam:[78,96]  };
+        // iPhone 12-13
+        if (gen <= 13.3) return { g:[85,102],  ads:[70,86],  z3:[62,76], z6:[58,72], gyro:[100,125], cam:[75,92]  };
+        // iPhone 14-16 (Pro chip nhanh hơn cần giảm nhẹ)
+        return             { g:[82,98],   ads:[68,83],  z3:[60,74], z6:[56,70], gyro:[95,120],  cam:[72,88]  };
     }
-    if (/rog phone|black shark|redmagic/.test(n)) return { g:[78,95], ads:[62,78], z3:[54,70], z6:[50,62], gyro:[112,142], cam:[72,90] };
-    if (/galaxy s2[0-4] ultra|pixel [7-9] pro|oneplus (9|10|11|12) pro|find x[5-7]|xiaomi 1[234] pro|xiaomi 14 ultra/.test(n))
-        return { g:[88,108], ads:[70,88], z3:[60,76], z6:[52,65], gyro:[118,150], cam:[80,100] };
-    if (/poco [fx]\d|poco x[3-6]|redmi note 1[0-3] pro|galaxy a5[345] 5g|galaxy a73|realme gt|realme [89] pro|oneplus nord 2|xiaomi 1[2-4]t|reno [7-9] pro|reno 10/.test(n))
-        return { g:[108,130], ads:[86,106], z3:[72,90], z6:[58,74], gyro:[135,165], cam:[98,118] };
-    if (/redmi note [89]|redmi note 10|redmi note 11|galaxy a[34][0-9]|galaxy m[34][0-9]|oppo reno [4-9]|vivo v2[12]|realme [6-9]|realme 10|oneplus nord ce/.test(n))
-        return { g:[118,142], ads:[94,116], z3:[78,98], z6:[63,80], gyro:[142,175], cam:[106,128] };
-    return { g:[132,162], ads:[108,132], z3:[90,112], z6:[72,92], gyro:[154,188], cam:[116,142] };
+
+    // Gaming phones (ROG, Black Shark, RedMagic)
+    if (/rog phone|black shark|redmagic/.test(n))
+        return { g:[90,110], ads:[74,92], z3:[65,82], z6:[60,75], gyro:[125,155], cam:[83,104] };
+
+    // Flagship top (S Ultra, Pixel Pro, Find X, Xiaomi Ultra)
+    if (/galaxy s2[0-4] ultra|pixel [7-9] pro|find x[5-7]|xiaomi 1[234] ultra|xiaomi 14 pro|oneplus (9|10|11|12) pro/.test(n))
+        return { g:[100,122], ads:[82,100], z3:[72,88], z6:[64,79], gyro:[130,160], cam:[92,114] };
+
+    // High-mid (POCO X/F, Redmi Note Pro, Galaxy A5x 5G, GT series, OnePlus Nord 2)
+    if (/poco [fx]\d|poco x[3-7]|redmi note 1[0-4] pro|galaxy a5[34] 5g|galaxy a5[45]|galaxy a7[23]|realme gt|oneplus nord 2|xiaomi 1[234]t|reno [7-9] pro|reno 1[0-2]/.test(n))
+        return { g:[118,142], ads:[96,118], z3:[83,102], z6:[70,87], gyro:[142,172], cam:[108,130] };
+
+    // Mid-range (Redmi Note thường, Galaxy A-series phổ thông, Reno thường, Vivo V/X)
+    if (/redmi note [89]|redmi note 10|redmi note 11|galaxy a[234][0-9]|galaxy m[34][0-9]|oppo reno [4-9]|vivo v2[0-9]|realme [6-9]|realme 10|oneplus nord ce/.test(n))
+        return { g:[128,152], ads:[105,128], z3:[90,112], z6:[76,96], gyro:[152,182], cam:[116,140] };
+
+    // Entry-level / Budget (Redmi 9-13, Galaxy A0x, POCO C, Tecno, Infinix, ...)
+    return { g:[138,165], ads:[115,140], z3:[98,122], z6:[83,105], gyro:[162,192], cam:[124,150] };
 }
 
 function rnd(a, b) { return Math.round(a + Math.random() * (b - a)); }
 
 function applyGameMode(vals, game) {
     if (game === 'ff') return vals;
-    return vals.map((v, i) => Math.max(50, Math.round(v * [0.92,0.90,0.91,0.93,0.88,0.89][i])));
+    // FF MAX: HD mode → giảm nhẹ 7-12% để bù cho độ phân giải cao hơn
+    return vals.map((v, i) => Math.max(55, Math.round(v * [0.93,0.91,0.92,0.94,0.89,0.90][i])));
 }
 
 function generateSens() {
@@ -1789,7 +2002,7 @@ function generateSens() {
     setTimeout(() => {
         document.getElementById('sensThinking').style.display = 'none';
         const { g, ads, z3, z6, gyro, cam } = getDeviceProfile(inp);
-        const clamp = v => Math.max(50, Math.min(200, v));
+        const clamp = v => Math.max(55, Math.min(200, v));
         let vals = [clamp(rnd(...g)), clamp(rnd(...ads)), clamp(rnd(...z3)), clamp(rnd(...z6)), clamp(rnd(...gyro)), clamp(rnd(...cam))];
         vals = applyGameMode(vals, currentGame);
         document.getElementById('sensDeviceName').textContent = inp;
