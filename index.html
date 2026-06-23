@@ -26,6 +26,7 @@
         .ss { position: fixed; z-index: 0; pointer-events: none; width: 2px; height: 2px; background: #fff; border-radius: 50%; box-shadow: 0 0 4px #fff, 0 0 10px rgba(57,230,230,0.6); animation: shoot linear infinite; opacity: 0; }
         @keyframes shoot { 0% { opacity:0; transform:translate(0,0) rotate(-45deg) scaleX(1); } 5% { opacity:1; } 15% { opacity:0; transform:translate(200px,200px) rotate(-45deg) scaleX(80); } 100% { opacity:0; } }
         #snow, #petals { position: fixed; inset: 0; pointer-events: none; z-index: 1; }
+        /* INTRO */
         #intro { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(ellipse at 50% 40%, #060a14 0%, #020408 65%, #000102 100%); transition: opacity .9s ease, filter .9s ease; }
         #intro.hide { opacity: 0; filter: blur(6px); pointer-events: none; }
         .iro { position: absolute; width: 260px; height: 260px; border-radius: 50%; }
@@ -57,8 +58,10 @@
         .ibw { width: 176px; height: 2px; background: rgba(57,230,230,.13); border-radius: 2px; overflow: hidden; margin-top: 14px; opacity: 0; animation: fadeUp .4s ease 2.2s forwards; }
         .ib { height: 100%; width: 0; border-radius: 2px; background: linear-gradient(90deg, rgba(57,230,230,.4), var(--cyan)); box-shadow: 0 0 10px var(--cyan); animation: loadBar 1.9s cubic-bezier(.4,0,.2,1) 2.35s forwards; }
         @keyframes loadBar { from { width:0; } to { width:100%; } }
+        /* APP */
         #app { position: relative; z-index: 2; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; opacity: 0; transition: opacity .6s ease; }
         #app.show { opacity: 1; }
+        /* PAGES */
         .page { display: none; width: 345px; background: rgba(13,18,32,0.85); border: 1px solid var(--pb); border-radius: 18px; padding: 0; text-align: center; position: relative; box-shadow: 0 0 40px rgba(57,230,230,.08), 0 0 80px rgba(80,20,160,.15), inset 0 0 30px rgba(57,230,230,.03); backdrop-filter: blur(16px); animation: pgFade .45s cubic-bezier(.34,1.56,.64,1) forwards; max-height: 95vh; overflow: visible; }
         .page-inner { padding: 46px 22px 28px; max-height: 93vh; overflow-y: auto; border-radius: 18px; }
         .page.active { display: block; }
@@ -217,6 +220,7 @@
         .keyinfo-close:hover { color: var(--cyan); }
         .offline-badge { display: inline-block; background: rgba(255,92,92,.12); color: var(--danger); font-size: 9.5px; padding: 2px 10px; border-radius: 20px; border: 1px solid rgba(255,92,92,.2); letter-spacing: .5px; margin-top: 6px; }
         .offline-badge.online { background: rgba(77,255,145,.12); color: var(--green); border-color: rgba(77,255,145,.2); }
+        /* ── NOTICE BOX cho hướng dẫn Firebase ── */
         .fb-notice { background: rgba(255,153,0,.08); border: 1px solid rgba(255,153,0,.3); border-radius: 10px; padding: 10px 14px; margin-bottom: 12px; font-size: 11.5px; color: var(--vip); line-height: 1.7; text-align: left; }
         .fb-notice code { background: rgba(57,230,230,.1); color: var(--cyan); padding: 1px 5px; border-radius: 4px; font-size: 11px; }
     </style>
@@ -428,7 +432,11 @@
         <div class="brand">Quản trị viên</div>
         <h1 style="font-size:18px;">Admin Panel</h1>
         <div class="admhdr">🔑 Nminh Lock Pro — Toàn quyền quản lý</div>
-        <div id="fbGuide" class="fb-notice" style="display:none;"></div>
+
+        <!-- HƯỚNG DẪN FIREBASE — chỉ hiện khi chưa cấu hình -->
+        <div id="fbGuide" class="fb-notice" style="display:none;">
+        </div>
+
         <div class="tabs">
             <button class="tab active" onclick="switchTab('tabKeys',this)">🗝 Keys</button>
             <button class="tab" onclick="switchTab('tabMusic',this)">🎵 Nhạc</button>
@@ -468,9 +476,10 @@
         <!-- TAB MUSIC -->
         <div id="tabMusic" class="tabp">
             <div class="admsec">
+                <!-- NOTE: File nhạc chỉ lưu trong trình duyệt (IndexedDB), không đồng bộ qua Firebase -->
                 <div style="background:rgba(57,230,230,.06);border:1px solid rgba(57,230,230,.15);border-radius:8px;padding:9px 12px;margin-bottom:12px;font-size:11px;color:var(--dim);line-height:1.6;">
-                    ℹ️ <strong style="color:var(--cyan)">Upload File</strong>: Lưu trong trình duyệt (offline).<br>
-                    ℹ️ <strong style="color:var(--cyan)">Dán Link</strong>: Hỗ trợ link .mp3 trực tiếp <strong style="color:var(--vip)">hoặc link SoundCloud</strong>.
+                    ℹ️ <strong style="color:var(--cyan)">Upload File</strong>: Lưu trong trình duyệt của máy bạn (offline, không chia sẻ qua mạng).<br>
+                    ℹ️ <strong style="color:var(--cyan)">Dán Link</strong>: Lưu trên Firebase, tất cả máy nghe được (cần cấu hình Firebase).
                 </div>
                 <div style="display:flex;gap:6px;margin-bottom:12px;">
                     <button id="mTabFile" onclick="switchMusicTab('file')" style="flex:1;padding:7px;border-radius:8px;background:rgba(57,230,230,.18);color:var(--cyan);border:1.5px solid var(--cyan);font-size:12px;font-weight:700;cursor:pointer;">📁 Upload File</button>
@@ -519,16 +528,13 @@
                 </div>
                 <!-- PANEL LINK -->
                 <div id="mPanelLink" style="display:none;">
-                    <div class="admsec-t">Thêm bài hát (link .mp3 trực tiếp hoặc SoundCloud)</div>
+                    <div class="admsec-t">Thêm bài hát (link trực tiếp .mp3 hoặc SoundCloud)</div>
                     <div class="grid1"><div><div class="albl">Tên bài hát</div>
                         <input type="text" id="mTrackName" class="ainp" placeholder="vd: Tên bài hát"></div></div>
                     <div class="grid1"><div><div class="albl">Nghệ sĩ</div>
                         <input type="text" id="mArtist" class="ainp" placeholder="vd: Tên nghệ sĩ"></div></div>
-                    <div class="grid1"><div>
-                        <div class="albl">Link .mp3 trực tiếp hoặc SoundCloud 🎵</div>
-                        <input type="text" id="mUrl" class="ainp" placeholder="https://soundcloud.com/... hoặc https://...song.mp3">
-                        <div style="font-size:10.5px;color:var(--dim);margin-top:4px;">✅ Hỗ trợ: link SoundCloud, link .mp3 trực tiếp</div>
-                    </div></div>
+                    <div class="grid1"><div><div class="albl">Link .mp3 trực tiếp</div>
+                        <input type="text" id="mUrl" class="ainp" placeholder="https://example.com/song.mp3"></div></div>
                     <div class="grid1"><div><div class="albl">Link ảnh bìa (tuỳ chọn)</div>
                         <input type="text" id="mCover" class="ainp" placeholder="https://...cover.jpg"></div></div>
                     <div id="mMsg" class="ok" style="display:none;"></div>
@@ -585,18 +591,20 @@
 
 <script>
 /* ================================================================
-   NMINH LOCK PRO — Fixed + SoundCloud Support
+   NMINH LOCK PRO — Fixed Version
    ✅ FIX 1: Upload nhạc — phát đúng từ IndexedDB bằng Blob URL
    ✅ FIX 2: Slot đếm đúng — 1 UID chỉ được claim 1 slot duy nhất
    ✅ FIX 3: 1 máy chỉ dùng được 1 key tại 1 thời điểm
    ✅ FIX 4: Firebase đồng bộ key/nhạc/password mọi máy
    ✅ FIX 5: Fallback localStorage khi offline / chưa cấu hình Firebase
-   ✅ FIX 6: Hỗ trợ SoundCloud Widget API — phát link SoundCloud trực tiếp
-   ✅ FIX 7: Làm sạch URL SoundCloud khi thêm/sửa bài hát
-   ✅ FIX 8: Sửa widget SoundCloud autoplay + xử lý play/pause đúng
-   ✅ FIX 9: Cập nhật initMusicPlayer khi quay lại trang chủ
+   ✅ FIX 6: Sửa lỗi trình phát nhạc — loại bỏ SoundCloud API lỗi
    ================================================================ */
 
+/* ════════════════════════════════════════════════════════
+   🔥 FIREBASE CONFIG — Điền thông tin project của bạn
+   Lấy tại: console.firebase.google.com
+   → Project Settings → General → Your apps → Web app → Config
+   ════════════════════════════════════════════════════════ */
 const FIREBASE_CONFIG = {
     apiKey:            "AIzaSyAHqNEdDLet-ker_B7n4s5OhZnRyIv8SD8",
     authDomain:        "aimhead-3548c.firebaseapp.com",
@@ -606,15 +614,18 @@ const FIREBASE_CONFIG = {
     messagingSenderId: "205987052158",
     appId:             "1:205987052158:web:cf3c908d43a29cdd05f62f",
 };
+/* ════════════════════════════════════════════════════════ */
 
 const DEF_PW = "1";
 
+/* ── DEVICE UID ── */
 function myUid() {
     let u = localStorage.getItem('nm_uid');
     if (!u) { u = 'u' + Date.now() + Math.random().toString(36).slice(2, 7); localStorage.setItem('nm_uid', u); }
     return u;
 }
 
+/* ── HELPERS ── */
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function pad(n) { return String(n).padStart(2,'0'); }
 function fmtMs(ms) {
@@ -631,6 +642,7 @@ function fmtShort(ms) {
     return `${m}m`;
 }
 
+/* ── localStorage helpers ── */
 function _lsGet(key, def) { try { const v=localStorage.getItem(key); return v!=null?JSON.parse(v):def; } catch(e) { return def; } }
 function _lsSet(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {} }
 function _lsDel(key) { try { localStorage.removeItem(key); } catch(e) {} }
@@ -675,10 +687,12 @@ async function fbGet(path) {
         const db = await Promise.race([_loadFirebase(), new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),FB_TIMEOUT))]);
         const snap = await db.ref(path).get();
         const val = snap.exists() ? snap.val() : null;
+        // Cache root level
         const root = path.split('/')[0];
         if (path === root && val !== null) _lsSet('nm_fb_'+root, val);
         return val;
     } catch(e) {
+        // Fallback cache
         const root = path.split('/')[0];
         const parts = path.split('/');
         const cached = _lsGet('nm_fb_'+root, null);
@@ -688,6 +702,7 @@ async function fbGet(path) {
 }
 
 async function fbSet(path, val) {
+    // Luôn cập nhật cache trước
     const parts = path.split('/');
     const root = parts[0];
     if (parts.length === 1) {
@@ -726,6 +741,8 @@ async function fbRemove(path) {
     } catch(e) { updateSyncStatus(false); }
 }
 
+/* ════ FIX QUAN TRỌNG: fbTransaction dùng Firebase transaction thật ════
+   Điều này ngăn race condition khi nhiều máy claim slot cùng lúc */
 async function fbTransaction(path, updateFn) {
     try {
         const db = await Promise.race([_loadFirebase(), new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),FB_TIMEOUT))]);
@@ -735,6 +752,7 @@ async function fbTransaction(path, updateFn) {
                 else resolve({ committed, snapshot });
             });
         });
+        // Cập nhật cache sau transaction
         if (result.committed && result.snapshot && result.snapshot.exists()) {
             const parts = path.split('/');
             const root = parts[0];
@@ -749,6 +767,7 @@ async function fbTransaction(path, updateFn) {
     } catch(e) {
         console.warn('fbTransaction fallback:', e.message);
         updateSyncStatus(false);
+        // Fallback: đọc cache, áp updateFn, ghi cache
         const parts = path.split('/');
         const root = parts[0];
         const key = parts[1];
@@ -762,6 +781,7 @@ async function fbTransaction(path, updateFn) {
     }
 }
 
+/* ── Sync status UI ── */
 function updateSyncStatus(ok) {
     const badge = document.getElementById('syncStatusBadge');
     if (!badge) return;
@@ -817,7 +837,7 @@ async function getAdmPw() {
 }
 
 /* ================================================================
-   KEY SYSTEM
+   KEY SYSTEM — FIX SLOT + 1 MÁY 1 KEY
    ================================================================ */
 let cdInterval = null, activeKeyData = null;
 
@@ -833,6 +853,7 @@ async function checkKey() {
     btn.disabled = true;
 
     try {
+        // Luôn lấy dữ liệu mới nhất từ Firebase
         const keys = await fbGet('keys');
         if (!keys) { showErr('❌ Không thể tải dữ liệu key! Kiểm tra kết nối.'); return; }
 
@@ -840,8 +861,10 @@ async function checkKey() {
         if (!kd) { showErr('❌ Key không hợp lệ. Thử lại!'); return; }
 
         const now = Date.now();
+        // Kiểm tra hết hạn
         if (now > kd.expiresAt) {
             document.getElementById('keyInput').value = '';
+            // Xoá uid khỏi slot nếu còn
             const uid = myUid();
             const slots = kd.slots || {};
             if (slots[uid]) {
@@ -857,18 +880,25 @@ async function checkKey() {
         }
 
         const uid = myUid();
+        /* FIX: slots là object { uid: timestamp } thay vì array
+           để tránh trùng lặp và dễ quản lý */
         const slots = kd.slots || {};
         const slotCount = Object.keys(slots).length;
 
+        // Máy này đã claim key này → cho vào lại
         if (slots[uid]) {
+            // Kiểm tra uid này có trong key đúng không
             _lsSet('nm_active_key', val);
             document.getElementById('keyInput').value = '';
+            // Đọc lại data mới nhất để hiển thị đúng slot count
             const freshKeys = await fbGet('keys');
             const freshKd = freshKeys ? freshKeys[val] : kd;
             enterDashboard(val, freshKd);
             return;
         }
 
+        /* FIX QUAN TRỌNG: Kiểm tra máy này đang dùng key khác còn hạn
+           → Không cho nhập key mới cho đến khi key cũ hết hạn */
         const activeKey = _lsGet('nm_active_key', null);
         if (activeKey && activeKey !== val) {
             const oldKd = keys[activeKey];
@@ -880,9 +910,11 @@ async function checkKey() {
                     return;
                 }
             }
+            // Key cũ đã hết hạn hoặc không còn slot → cho phép nhập key mới
             _lsDel('nm_active_key');
         }
 
+        // Kiểm tra slot đầy
         if (slotCount >= kd.maxSlots) {
             document.getElementById('keyInput').value = '';
             document.getElementById('fullMsg').innerHTML =
@@ -891,26 +923,31 @@ async function checkKey() {
             return;
         }
 
+        // Claim slot bằng Firebase transaction thật
         const txResult = await fbTransaction('keys/'+val, (current) => {
             if (!current) return current;
             const sl = current.slots || {};
+            // Đã có UID này rồi (race condition) → không claim thêm
             if (sl[uid]) return current;
             const count = Object.keys(sl).length;
-            if (count >= current.maxSlots) return undefined;
+            if (count >= current.maxSlots) return undefined; // abort
             sl[uid] = now;
             current.slots = sl;
             return current;
         });
 
         if (!txResult.committed) {
+            // Slot đầy sau khi transaction
             document.getElementById('keyInput').value = '';
             document.getElementById('fullMsg').innerHTML = `Key đã đầy slot. Liên hệ admin.`;
             goTo('pageFull');
             return;
         }
 
+        // Lưu active key
         _lsSet('nm_active_key', val);
 
+        // Đọc lại data mới nhất
         const freshKeys = await fbGet('keys');
         const freshKd = freshKeys ? freshKeys[val] : null;
         if (!freshKd) { showErr('❌ Lỗi sau khi claim slot!'); return; }
@@ -935,6 +972,7 @@ function enterDashboard(code, kd) {
     document.getElementById('dKey').textContent = code;
     document.getElementById('dStatus').textContent = 'Hoạt động';
     document.getElementById('dStatus').className = 'kval g';
+    // FIX: đếm đúng số slot (slots là object)
     const slots = kd.slots || {};
     const slotCount = typeof slots === 'object' && !Array.isArray(slots) ? Object.keys(slots).length : (Array.isArray(slots) ? slots.length : 0);
     document.getElementById('dSlot').textContent = slotCount + ' / ' + kd.maxSlots;
@@ -955,6 +993,7 @@ function startCd(exp) {
             clearInterval(cdInterval);
             document.getElementById('dStatus').textContent = 'Hết hạn';
             document.getElementById('dStatus').className = 'kval r';
+            // Tự xoá slot khi hết hạn
             _releaseSlot();
             setTimeout(() => { doLogout(); goTo('pageExp'); }, 2000);
         }
@@ -980,6 +1019,8 @@ async function _releaseSlot() {
 function doLogout() {
     if (cdInterval) clearInterval(cdInterval);
     activeKeyData = null;
+    // Không release slot khi logout — slot giữ cho đến khi key hết hạn
+    // Người dùng có thể đăng nhập lại bằng cùng key
     goTo('page1');
 }
 
@@ -1003,10 +1044,6 @@ function goTo(id) {
     el.classList.add('active');
     if (id === 'page2') setTimeout(() => document.getElementById('keyInput').focus(), 60);
     if (id === 'pageAdmin') { loadKeyList(); loadAdminTrackList(); }
-    // Cập nhật lại widget nhạc khi về trang chủ / dashboard
-    if (id === 'page1' || id === 'page3') {
-        initMusicPlayer();
-    }
 }
 
 function switchTab(tabId, btn) {
@@ -1060,10 +1097,12 @@ async function verifyAdmin() {
 
 /* ================================================================
    ADMIN: KEY MANAGEMENT
+   FIX: Migrate slots array → object khi cần
    ================================================================ */
 function _normalizeSlots(slots) {
     if (!slots) return {};
     if (Array.isArray(slots)) {
+        // Migrate từ array sang object
         const obj = {};
         slots.forEach(uid => { obj[uid] = Date.now(); });
         return obj;
@@ -1106,6 +1145,7 @@ async function loadKeyList() {
             const now = Date.now();
             const exp = now > k.expiresAt;
             const rem = k.expiresAt - now;
+            // FIX: đếm đúng slots
             const slotsObj = _normalizeSlots(k.slots);
             const slots = Object.keys(slotsObj).length;
             const d = document.createElement('div');
@@ -1182,6 +1222,7 @@ async function saveEditKey(oldCode) {
         if (!k) return;
         const addMs = (addDays*86400+addHours*3600)*1000;
         const newExpiry = Math.max(Date.now(), k.expiresAt) + addMs;
+        // FIX: giữ slots object nguyên vẹn khi sửa key
         const existSlots = _normalizeSlots(k.slots);
         const updated = { ...k, code:newCode, type, maxSlots, expiresAt:newExpiry, durationMs:k.durationMs+addMs, slots:existSlots };
         if (newCode !== oldCode) delete keys[oldCode];
@@ -1204,6 +1245,7 @@ async function delKey(code) {
 
 /* ================================================================
    ADMIN: MUSIC MANAGEMENT
+   FIX: Phân biệt rõ local (IndexedDB) vs cloud (Firebase link)
    ================================================================ */
 async function getTracks() {
     const v = await fbGet('tracks');
@@ -1212,33 +1254,18 @@ async function getTracks() {
 }
 async function setTracks(t) { await fbSet('tracks', t); }
 
-function cleanSoundCloudUrl(inputUrl) {
-    if (inputUrl.includes('soundcloud.com/')) {
-        try {
-            const u = new URL(inputUrl);
-            u.search = '';                        // xoá hết ?ref=...&si=...
-            u.hostname = 'soundcloud.com';        // bỏ subdomain 'm.'
-            return u.toString();
-        } catch(e) {}
-    }
-    return inputUrl;
-}
-
 async function adminAddTrack() {
     const name = document.getElementById('mTrackName').value.trim();
     const artist = document.getElementById('mArtist').value.trim();
-    let url = document.getElementById('mUrl').value.trim();
+    const url = document.getElementById('mUrl').value.trim();
     const cover = document.getElementById('mCover').value.trim();
     const msg = document.getElementById('mMsg');
     if (!name || !url) { showAdmMsg(msg,'❌ Nhập tên bài và link nhạc!',false); return; }
-    // Làm sạch URL SoundCloud
-    url = cleanSoundCloudUrl(url);
     try {
         const tracks = await getTracks();
-        const isSC = isSoundCloudUrl(url);
-        tracks.push({ id:Date.now(), name, artist:artist||'Unknown', url, cover, isLocal:false, isSoundCloud:isSC });
+        tracks.push({ id:Date.now(), name, artist:artist||'Unknown', url, cover, isLocal:false });
         await setTracks(tracks);
-        showAdmMsg(msg, `✅ Đã thêm "${name}"! ${isSC?'(SoundCloud)':'(MP3)'}`, true);
+        showAdmMsg(msg,'✅ Đã thêm bài "'+name+'"!',true);
         document.getElementById('mTrackName').value='';
         document.getElementById('mArtist').value='';
         document.getElementById('mUrl').value='';
@@ -1258,16 +1285,11 @@ async function loadAdminTrackList() {
         tracks.forEach((t, i) => {
             const d = document.createElement('div');
             d.className = 'ki';
-            const badge = t.isLocal
-                ? '<span style="color:var(--vip)">📁local</span>'
-                : isSoundCloudUrl(t.url)
-                    ? '<span style="color:#ff5500">☁️SC</span>'
-                    : '<span style="color:var(--cyan)">🔗mp3</span>';
             d.innerHTML = `<div class="kil">
                 <span style="color:var(--dim);font-size:11px;width:16px;">${i+1}</span>
                 <div>
                     <div class="kic" style="font-family:inherit;">${esc(t.name)}</div>
-                    <div class="kim">${esc(t.artist)} ${badge}</div>
+                    <div class="kim">${esc(t.artist)} ${t.isLocal?'<span style="color:var(--vip)">📁local</span>':'<span style="color:var(--cyan)">☁️cloud</span>'}</div>
                 </div>
             </div>
             <div style="display:flex;gap:4px;">
@@ -1287,7 +1309,6 @@ async function editTrack(i) {
     if (!t) return;
     const ov = document.createElement('div');
     ov.className = 'moverlay'; ov.style.zIndex = '1000';
-    const isSC = isSoundCloudUrl(t.url);
     ov.innerHTML = `<div class="mbox" style="width:320px;max-width:94vw;">
         <div class="mhdr"><span class="mtic">✏️</span><span class="mtxt">Sửa bài hát #${i+1}</span></div>
         <div style="padding:14px 18px;">
@@ -1295,7 +1316,7 @@ async function editTrack(i) {
             <input type="text" id="etName" class="ainp" value="${esc(t.name)}" style="margin-bottom:8px;">
             <div class="albl">Nghệ sĩ</div>
             <input type="text" id="etArtist" class="ainp" value="${esc(t.artist)}" style="margin-bottom:8px;">
-            ${!t.isLocal ? `<div class="albl">Link ${isSC?'SoundCloud':'MP3'}</div>
+            ${!t.isLocal ? `<div class="albl">Link .mp3</div>
             <input type="text" id="etUrl" class="ainp" value="${esc(t.url)}" style="margin-bottom:8px;">
             <div class="albl">Link ảnh bìa</div>
             <input type="text" id="etCover" class="ainp" value="${esc(t.cover||'')}" style="margin-bottom:12px;">` :
@@ -1319,10 +1340,9 @@ async function saveEditTrack(i) {
     try {
         const t = tracks[i];
         if (!t.isLocal) {
-            let url = document.getElementById('etUrl').value.trim();
-            url = cleanSoundCloudUrl(url);
+            const url = document.getElementById('etUrl').value.trim();
             const cover = document.getElementById('etCover').value.trim();
-            tracks[i] = { ...t, name, artist:artist||'Unknown', url, cover, isSoundCloud: isSoundCloudUrl(url) };
+            tracks[i] = { ...t, name, artist:artist||'Unknown', url, cover };
         } else {
             tracks[i] = { ...t, name, artist:artist||'Unknown' };
         }
@@ -1374,6 +1394,7 @@ async function saveAppConfig() {
     if (newPw) {
         if (newPw !== pw2) { showAdmMsg(msg,'❌ Mật khẩu xác nhận không khớp!',false); return; }
         if (newPw.length < 6) { showAdmMsg(msg,'❌ Mật khẩu tối thiểu 6 ký tự!',false); return; }
+        // FIX: lưu password lên Firebase VÀ cache local
         await fbSet('adm_pw', newPw);
         _lsSet('nm_adm_pw', newPw);
         document.getElementById('cfgNewPw').value='';
@@ -1458,6 +1479,7 @@ async function idbDeleteFile(id) {
 
 /* ================================================================
    FILE UPLOAD MUSIC
+   FIX: Lưu Blob vào IDB và dùng Blob URL để phát, tránh lỗi CORS
    ================================================================ */
 let _pendingFile = null, _uploadProgressInterval = null;
 
@@ -1507,14 +1529,16 @@ async function adminAddFileTrack() {
             document.getElementById('mFileBar').style.width = prog+'%';
         }, 80);
 
+        // FIX: Lưu Blob gốc vào IndexedDB (không cần đọc thành base64)
         await idbSaveFile(idbId, _pendingFile);
 
         clearInterval(_uploadProgressInterval); _uploadProgressInterval=null;
         document.getElementById('mFileBar').style.width='100%';
         document.getElementById('mFileStatus').textContent='✅ Đã lưu!';
 
+        // Chỉ lưu metadata vào Firebase/local, không lưu file data lên Firebase
         const tracks = await getTracks();
-        tracks.push({ id:Date.now(), name, artist:artist||'Unknown', url:'idb:'+idbId, cover:'', isLocal:true, isSoundCloud:false });
+        tracks.push({ id:Date.now(), name, artist:artist||'Unknown', url:'idb:'+idbId, cover:'', isLocal:true });
         await setTracks(tracks);
 
         showAdmMsg(msg,'✅ Đã thêm bài "'+name+'"!',true);
@@ -1529,128 +1553,11 @@ async function adminAddFileTrack() {
 }
 
 /* ================================================================
-   MUSIC PLAYER — MP3 trực tiếp + SoundCloud Widget
+   MUSIC PLAYER — Chỉ phát MP3 (bỏ SoundCloud)
    ================================================================ */
 let muIdx = 0, muPlaying = false;
 let _localAudio = null, _currentBlobUrl = null;
 let _userGestured = false;
-
-/* ── SoundCloud Widget Support ── */
-let _scWidget = null, _scIframe = null, _scDuration = 0, _scProgTimer = null;
-
-function isSoundCloudUrl(url) {
-    return typeof url === 'string' && url.includes('soundcloud.com/');
-}
-
-function _loadSCApi() {
-    if (window.SC) return Promise.resolve();
-    return new Promise((res, rej) => {
-        const s = document.createElement('script');
-        s.src = 'https://w.soundcloud.com/player/api.js';
-        s.onload = () => res();
-        s.onerror = () => rej(new Error('Không tải được SoundCloud API'));
-        document.head.appendChild(s);
-    });
-}
-
-function _destroySCWidget() {
-    if (_scProgTimer) { clearInterval(_scProgTimer); _scProgTimer = null; }
-    _scWidget = null;
-    _scDuration = 0;
-    if (_scIframe && _scIframe.parentNode) {
-        _scIframe.parentNode.removeChild(_scIframe);
-        _scIframe = null;
-    }
-}
-
-async function _playSoundCloud(url, autoplay) {
-    _destroySCWidget();
-
-    try {
-        await _loadSCApi();
-    } catch(e) {
-        console.error('[SC] Không tải được API:', e);
-        return;
-    }
-
-    let cont = document.getElementById('_scCont');
-    if (!cont) {
-        cont = document.createElement('div');
-        cont.id = '_scCont';
-        cont.style.cssText = 'position:fixed;left:-9999px;bottom:0;width:200px;height:100px;opacity:0;pointer-events:none;z-index:-999;overflow:hidden;';
-        document.body.appendChild(cont);
-    }
-
-    const iframeSrc =
-        'https://w.soundcloud.com/player/?url=' + encodeURIComponent(url) +
-        '&auto_play=false&hide_related=true&show_comments=false' +
-        '&buying=false&sharing=false&download=false' +
-        '&show_artwork=false&color=%2339e6e6&single_active=true';
-
-    cont.innerHTML = '<iframe id="_scFrame" allow="autoplay" style="width:100%;height:100%;border:none;" src="' + iframeSrc + '"></iframe>';
-    _scIframe = document.getElementById('_scFrame');
-
-    return new Promise(function(resolve) {
-        _scIframe.onload = function() {
-            try {
-                _scWidget = SC.Widget(_scIframe);
-            } catch(e) {
-                console.error('[SC] Widget init lỗi:', e);
-                resolve();
-                return;
-            }
-
-            _scWidget.bind(SC.Widget.Events.READY, function() {
-                _scWidget.getDuration(function(d) { _scDuration = d || 0; });
-
-                _scWidget.bind(SC.Widget.Events.PLAY, function() {
-                    muPlaying = true;
-                    _setPlayBtns('⏸');
-                    if (_scProgTimer) clearInterval(_scProgTimer);
-                    _scProgTimer = setInterval(function() {
-                        if (!_scWidget) { clearInterval(_scProgTimer); return; }
-                        _scWidget.getPosition(function(pos) {
-                            if (_scDuration > 0) {
-                                const pct = (pos / _scDuration * 100).toFixed(1) + '%';
-                                ['muProg','muProg3'].forEach(function(id) {
-                                    const el = document.getElementById(id);
-                                    if (el) el.style.width = pct;
-                                });
-                            }
-                        });
-                    }, 500);
-                });
-
-                _scWidget.bind(SC.Widget.Events.PAUSE, function() {
-                    muPlaying = false;
-                    _setPlayBtns('▶');
-                    if (_scProgTimer) { clearInterval(_scProgTimer); _scProgTimer = null; }
-                });
-
-                _scWidget.bind(SC.Widget.Events.FINISH, function() {
-                    muPlaying = false;
-                    _setPlayBtns('▶');
-                    if (_scProgTimer) { clearInterval(_scProgTimer); _scProgTimer = null; }
-                    setTimeout(function() { muNext(); }, 300);
-                });
-
-                _scWidget.bind(SC.Widget.Events.ERROR, function() {
-                    muPlaying = false;
-                    _setPlayBtns('▶');
-                    if (_scProgTimer) { clearInterval(_scProgTimer); _scProgTimer = null; }
-                    console.error('[SC] Lỗi phát nhạc SoundCloud');
-                });
-
-                if (autoplay && _userGestured) {
-                    setTimeout(function() {
-                        try { _scWidget.play(); } catch(e) { console.warn('[SC] Không thể tự phát:', e); }
-                    }, 500);
-                }
-                resolve();
-            });
-        };
-    });
-}
 
 function _setPlayBtns(icon) {
     ['muPlayBtn', 'muPlayBtn3'].forEach(id => {
@@ -1686,16 +1593,16 @@ async function muSyncUI(tracks) {
     ['muArtWrap', 'muArtWrap3'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
-        if (isSoundCloudUrl(t.url)) {
-            el.innerHTML = t.cover ? `<img src="${esc(t.cover)}" onerror="this.parentElement.innerHTML='🎵'">` : '<span title="SoundCloud">🎵</span>';
-        } else {
-            el.innerHTML = t.cover ? `<img src="${esc(t.cover)}" onerror="this.parentElement.innerHTML='🎵'">` : '🎵';
-        }
+        el.innerHTML = t.cover ? `<img src="${esc(t.cover)}" onerror="this.parentElement.innerHTML='🎵'">` : '🎵';
     });
     ['muProg', 'muProg3'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.style.width = '0%';
     });
+}
+
+function _isLocalTrack(track) {
+    return track && (track.isLocal || (track.url && track.url.startsWith('idb:')));
 }
 
 function _stopLocal() {
@@ -1726,12 +1633,17 @@ function _playBlob(blob, autoplay) {
     a.src = blobUrl;
     a.volume = _getCurrentVol();
     _localAudio = a;
-    a.onplay = () => { muPlaying = true; _setPlayBtns('⏸'); };
-    a.onpause = () => { muPlaying = false; _setPlayBtns('▶'); };
-    a.onended = () => { muPlaying = false; _setPlayBtns('▶'); muNext(); };
+    a.onplay = () => { muPlaying = true;
+        _setPlayBtns('⏸'); };
+    a.onpause = () => { muPlaying = false;
+        _setPlayBtns('▶'); };
+    a.onended = () => { muPlaying = false;
+        _setPlayBtns('▶');
+        muNext(); };
     a.onerror = (e) => {
         console.error('Audio error:', a.error ? a.error.code : '?', e);
-        muPlaying = false; _setPlayBtns('▶');
+        muPlaying = false;
+        _setPlayBtns('▶');
     };
     a.ontimeupdate = () => {
         if (!a.duration) return;
@@ -1767,17 +1679,24 @@ function _loadLocalAudio(url, autoplay) {
             a.volume = _getCurrentVol();
             a.preload = 'auto';
             a.oncanplay = function() {
+                console.log('Nhạc đã sẵn sàng');
                 if (autoplay && _userGestured) {
                     const p = a.play();
                     if (p && p.catch) p.catch(err => console.warn('Play error:', err));
                 }
             };
-            a.onplay = function() { muPlaying = true; _setPlayBtns('⏸'); };
-            a.onpause = function() { muPlaying = false; _setPlayBtns('▶'); };
-            a.onended = function() { muPlaying = false; _setPlayBtns('▶'); muNext(); };
+            a.onplay = function() { muPlaying = true;
+                _setPlayBtns('⏸'); };
+            a.onpause = function() { muPlaying = false;
+                _setPlayBtns('▶'); };
+            a.onended = function() { muPlaying = false;
+                _setPlayBtns('▶');
+                muNext(); };
             a.onerror = function(e) {
                 console.error('Lỗi phát nhạc:', a.error ? a.error.code : '?', e);
-                muPlaying = false; _setPlayBtns('▶');
+                muPlaying = false;
+                _setPlayBtns('▶');
+                setTimeout(() => { if (!muPlaying && _localAudio) { _localAudio.load(); } }, 3000);
             };
             a.ontimeupdate = function() {
                 if (!a.duration) return;
@@ -1803,29 +1722,15 @@ async function muLoadTrack(i, autoplay = true) {
     muSyncUI(tracks);
     const t = tracks[i];
     _stopLocal();
-    _destroySCWidget();
-
-    if (isSoundCloudUrl(t.url)) {
-        _playSoundCloud(t.url, autoplay);
-    } else {
-        _loadLocalAudio(t.url, autoplay);
-    }
+    _loadLocalAudio(t.url, autoplay);
 }
 
 function muToggle() {
     _userGestured = true;
     getTracks().then(tracks => {
         if (!tracks.length) return;
-        if (!_scWidget && !_localAudio) {
+        if (!_localAudio) {
             muLoadTrack(muIdx, true);
-            return;
-        }
-        if (_scWidget) {
-            if (muPlaying) {
-                try { _scWidget.pause(); } catch(e) {}
-            } else {
-                try { _scWidget.play(); } catch(e) {}
-            }
             return;
         }
         if (_localAudio) {
@@ -1851,17 +1756,12 @@ function muNext() {
 
 function muVol(v) {
     const vol = parseFloat(v);
-    if (_scWidget) { try { _scWidget.setVolume(Math.round(vol * 100)); } catch(e) {} }
-    if (_localAudio) { _localAudio.volume = vol; }
+    if (_localAudio) { _localAudio.volume = vol; return; }
 }
 
 function muSeek(e) {
     const rect = e.currentTarget.getBoundingClientRect();
     const ratio = (e.clientX - rect.left) / rect.width;
-    if (_scWidget && _scDuration > 0) {
-        try { _scWidget.seekTo(Math.round(ratio * _scDuration)); } catch(e) {}
-        return;
-    }
     if (_localAudio && _localAudio.duration) {
         _localAudio.currentTime = ratio * _localAudio.duration;
     }
@@ -2134,6 +2034,7 @@ document.addEventListener('keypress', e=>{
     if(document.getElementById('pageSens').classList.contains('active'))generateSens();
 });
 
+// Khởi tạo sync status
 updateSyncStatus(_FB_CONFIGURED);
 </script>
 </body>
