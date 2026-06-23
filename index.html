@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nminh Lock Pro</title>
     <style>
         :root {
@@ -174,8 +173,6 @@
         .muprogfill { height: 100%; background: var(--cyan); border-radius: 3px; width: 0%; transition: width .5s linear; }
         .muvol { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--dim); }
         .muvol input { flex: 1; accent-color: var(--cyan); cursor: pointer; }
-        .music-error { color: var(--danger); font-size: 11px; margin-top: 6px; display: none; text-align: center; }
-        .retry-btn { background: none; border: 1px solid var(--danger); color: var(--danger); padding: 3px 10px; border-radius: 12px; font-size: 11px; cursor: pointer; margin-left: 8px; display: none; }
         .alov { position: fixed; inset: 0; z-index: 200; background: rgba(2,4,8,.92); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; animation: fadeIn .2s ease; }
         .albox { width: 300px; background: rgba(10,14,28,.96); border-radius: 14px; border: 1px solid rgba(255,153,0,.3); padding: 26px 22px; text-align: center; }
         .alt { font-size: 16px; font-weight: 800; color: var(--vip); margin-bottom: 6px; letter-spacing: 1px; }
@@ -235,6 +232,7 @@
 <canvas id="snow"></canvas>
 <canvas id="petals"></canvas>
 
+<!-- INTRO -->
 <div id="intro">
     <div class="iro" id="ringOrbit"></div>
     <div class="icw"><div class="ic">👑</div></div>
@@ -251,8 +249,10 @@
     </div>
 </div>
 
+<!-- APP -->
 <div id="app">
 
+<!-- PAGE 1 -->
 <div id="page1" class="page active">
     <div class="cb">👑</div>
     <div class="page-inner">
@@ -284,8 +284,6 @@
             </div>
             <div class="muprog" onclick="muSeek(event)"><div class="muprogfill" id="muProg"></div></div>
             <div class="muvol">🔈<input type="range" min="0" max="1" step="0.05" value="0.7" oninput="muVol(this.value)">🔊</div>
-            <div class="music-error" id="musicError1"></div>
-            <button class="retry-btn" id="retryBtn1" onclick="retryMusic()" style="display:none;">🔄 Thử lại</button>
         </div>
         <div class="hint blink">✦ Hệ thống đang chờ lệnh... ✦</div>
         <div style="margin-top:14px;font-size:10px;color:rgba(126,147,160,0.3);cursor:pointer;" onclick="openAdminLogin()">⚙</div>
@@ -293,6 +291,7 @@
     </div>
 </div>
 
+<!-- PAGE 2 -->
 <div id="page2" class="page">
     <div class="cb">👑</div>
     <div class="page-inner">
@@ -308,6 +307,7 @@
     </div>
 </div>
 
+<!-- PAGE 3 DASHBOARD -->
 <div id="page3" class="page">
     <div class="cb">👑</div>
     <div class="page-inner">
@@ -349,13 +349,12 @@
             </div>
             <div class="muprog" onclick="muSeek(event)"><div class="muprogfill" id="muProg3"></div></div>
             <div class="muvol">🔈<input type="range" min="0" max="1" step="0.05" value="0.7" oninput="muVol(this.value)">🔊</div>
-            <div class="music-error" id="musicError3"></div>
-            <button class="retry-btn" id="retryBtn3" onclick="retryMusic()" style="display:none;">🔄 Thử lại</button>
         </div>
         <span class="back" onclick="doLogout()">↩ Đăng xuất</span>
     </div>
 </div>
 
+<!-- PAGE FULL -->
 <div id="pageFull" class="page">
     <div class="cb">👑</div>
     <div class="page-inner">
@@ -369,6 +368,7 @@
     </div>
 </div>
 
+<!-- PAGE EXPIRED -->
 <div id="pageExp" class="page">
     <div class="cb">👑</div>
     <div class="page-inner">
@@ -382,6 +382,7 @@
     </div>
 </div>
 
+<!-- PAGE SENSITIVITY -->
 <div id="pageSens" class="page">
     <div class="cb">🎯</div>
     <div class="page-inner">
@@ -420,6 +421,7 @@
     </div>
 </div>
 
+<!-- ADMIN PANEL -->
 <div id="pageAdmin" class="page" style="width:360px;">
     <div class="cb">👑</div>
     <div class="page-inner">
@@ -432,17 +434,27 @@
             <button class="tab" onclick="switchTab('tabMusic',this)">🎵 Nhạc</button>
             <button class="tab" onclick="switchTab('tabApp',this)">⚙️ App</button>
         </div>
+
+        <!-- TAB KEYS -->
         <div id="tabKeys" class="tabp active">
             <div class="admsec">
                 <div class="admsec-t">Thêm / Sửa key</div>
-                <div class="grid1"><div><div class="albl">Mã key</div><input type="text" id="aKeyCode" class="ainp" placeholder="vd: nminh-vip-2025"></div></div>
+                <div class="grid1"><div><div class="albl">Mã key</div>
+                    <input type="text" id="aKeyCode" class="ainp" placeholder="vd: nminh-vip-2025"></div></div>
                 <div class="grid2">
-                    <div><div class="albl">Loại</div><select id="aKeyType" class="ainp"><option value="normal">🔵 Key Thường</option><option value="vip">⭐ Key VIP</option></select></div>
-                    <div><div class="albl">Số slot</div><input type="number" id="aMaxSlots" class="ainp" value="100" min="1"></div>
+                    <div><div class="albl">Loại</div>
+                        <select id="aKeyType" class="ainp">
+                            <option value="normal">🔵 Key Thường</option>
+                            <option value="vip">⭐ Key VIP</option>
+                        </select></div>
+                    <div><div class="albl">Số slot</div>
+                        <input type="number" id="aMaxSlots" class="ainp" value="100" min="1"></div>
                 </div>
                 <div class="grid2">
-                    <div><div class="albl">Thời hạn (ngày)</div><input type="number" id="aDays" class="ainp" value="2" min="0"></div>
-                    <div><div class="albl">Thời hạn (giờ)</div><input type="number" id="aHours" class="ainp" value="0" min="0" max="23"></div>
+                    <div><div class="albl">Thời hạn (ngày)</div>
+                        <input type="number" id="aDays" class="ainp" value="2" min="0"></div>
+                    <div><div class="albl">Thời hạn (giờ)</div>
+                        <input type="number" id="aHours" class="ainp" value="0" min="0" max="23"></div>
                 </div>
                 <div id="aKeyMsg" class="ok" style="display:none;"></div>
                 <button class="btn" style="margin-top:4px;" onclick="adminSaveKey()">＋ Lưu Key</button>
@@ -452,6 +464,8 @@
                 <div class="klist" id="adminKeyList"><div class="emp">Đang tải<span class="ldot"></span></div></div>
             </div>
         </div>
+
+        <!-- TAB MUSIC -->
         <div id="tabMusic" class="tabp">
             <div class="admsec">
                 <div style="background:rgba(57,230,230,.06);border:1px solid rgba(57,230,230,.15);border-radius:8px;padding:9px 12px;margin-bottom:12px;font-size:11px;color:var(--dim);line-height:1.6;">
@@ -462,9 +476,14 @@
                     <button id="mTabFile" onclick="switchMusicTab('file')" style="flex:1;padding:7px;border-radius:8px;background:rgba(57,230,230,.18);color:var(--cyan);border:1.5px solid var(--cyan);font-size:12px;font-weight:700;cursor:pointer;">📁 Upload File</button>
                     <button id="mTabLink" onclick="switchMusicTab('link')" style="flex:1;padding:7px;border-radius:8px;background:transparent;color:var(--dim);border:1.5px solid rgba(57,230,230,.2);font-size:12px;font-weight:600;cursor:pointer;">🔗 Dán Link</button>
                 </div>
+                <!-- PANEL FILE -->
                 <div id="mPanelFile">
                     <div class="admsec-t">Upload file nhạc (.mp3, .ogg, .wav)</div>
-                    <div id="mDropZone" onclick="document.getElementById('mFileInput').click()" style="border:2px dashed rgba(57,230,230,.35);border-radius:10px;padding:18px 10px;text-align:center;cursor:pointer;margin-bottom:10px;transition:all .2s;background:rgba(57,230,230,.03);" ondragover="event.preventDefault();this.style.borderColor='var(--cyan)';this.style.background='rgba(57,230,230,.08)'" ondragleave="this.style.borderColor='rgba(57,230,230,.35)';this.style.background='rgba(57,230,230,.03)'" ondrop="event.preventDefault();this.style.borderColor='rgba(57,230,230,.35)';this.style.background='rgba(57,230,230,.03)';handleMusicFileDrop(event)">
+                    <div id="mDropZone" onclick="document.getElementById('mFileInput').click()"
+                        style="border:2px dashed rgba(57,230,230,.35);border-radius:10px;padding:18px 10px;text-align:center;cursor:pointer;margin-bottom:10px;transition:all .2s;background:rgba(57,230,230,.03);"
+                        ondragover="event.preventDefault();this.style.borderColor='var(--cyan)';this.style.background='rgba(57,230,230,.08)'"
+                        ondragleave="this.style.borderColor='rgba(57,230,230,.35)';this.style.background='rgba(57,230,230,.03)'"
+                        ondrop="event.preventDefault();this.style.borderColor='rgba(57,230,230,.35)';this.style.background='rgba(57,230,230,.03)';handleMusicFileDrop(event)">
                         <div style="font-size:26px;margin-bottom:6px;">🎵</div>
                         <div style="font-size:12.5px;color:var(--cyan);font-weight:700;">Nhấn hoặc kéo thả file nhạc vào đây</div>
                         <div style="font-size:10.5px;color:var(--dim);margin-top:4px;">Hỗ trợ: .mp3, .ogg, .wav</div>
@@ -486,18 +505,32 @@
                             <div id="mFileStatus" style="font-size:10.5px;color:var(--dim);margin-top:4px;">Đang xử lý...</div>
                         </div>
                     </div>
-                    <div class="grid1" style="margin-bottom:0;"><div><div class="albl">Tên bài hát</div><input type="text" id="mFileTrackName" class="ainp" placeholder="vd: Tên bài hát"></div></div>
-                    <div class="grid1" style="margin-bottom:0;"><div><div class="albl">Nghệ sĩ (tuỳ chọn)</div><input type="text" id="mFileArtist" class="ainp" placeholder="vd: Tên nghệ sĩ"></div></div>
+                    <div class="grid1" style="margin-bottom:0;">
+                        <div><div class="albl">Tên bài hát</div>
+                            <input type="text" id="mFileTrackName" class="ainp" placeholder="vd: Tên bài hát"></div>
+                    </div>
+                    <div class="grid1" style="margin-bottom:0;">
+                        <div><div class="albl">Nghệ sĩ (tuỳ chọn)</div>
+                            <input type="text" id="mFileArtist" class="ainp" placeholder="vd: Tên nghệ sĩ"></div>
+                    </div>
                     <div id="mFileMsg" class="ok" style="display:none;margin-top:8px;"></div>
                     <button class="btn" style="margin-top:8px;" onclick="adminAddFileTrack()">＋ Thêm Bài Hát</button>
                     <div style="margin-top:8px;font-size:10.5px;color:var(--dim);text-align:center;">⚠️ File lưu trong IndexedDB của trình duyệt này.</div>
                 </div>
+                <!-- PANEL LINK -->
                 <div id="mPanelLink" style="display:none;">
                     <div class="admsec-t">Thêm bài hát (link .mp3 trực tiếp hoặc SoundCloud)</div>
-                    <div class="grid1"><div><div class="albl">Tên bài hát</div><input type="text" id="mTrackName" class="ainp" placeholder="vd: Tên bài hát"></div></div>
-                    <div class="grid1"><div><div class="albl">Nghệ sĩ</div><input type="text" id="mArtist" class="ainp" placeholder="vd: Tên nghệ sĩ"></div></div>
-                    <div class="grid1"><div><div class="albl">Link .mp3 trực tiếp hoặc SoundCloud 🎵</div><input type="text" id="mUrl" class="ainp" placeholder="https://soundcloud.com/... hoặc https://...song.mp3"><div style="font-size:10.5px;color:var(--dim);margin-top:4px;">✅ Hỗ trợ: link SoundCloud, link .mp3 trực tiếp</div></div></div>
-                    <div class="grid1"><div><div class="albl">Link ảnh bìa (tuỳ chọn)</div><input type="text" id="mCover" class="ainp" placeholder="https://...cover.jpg"></div></div>
+                    <div class="grid1"><div><div class="albl">Tên bài hát</div>
+                        <input type="text" id="mTrackName" class="ainp" placeholder="vd: Tên bài hát"></div></div>
+                    <div class="grid1"><div><div class="albl">Nghệ sĩ</div>
+                        <input type="text" id="mArtist" class="ainp" placeholder="vd: Tên nghệ sĩ"></div></div>
+                    <div class="grid1"><div>
+                        <div class="albl">Link .mp3 trực tiếp hoặc SoundCloud 🎵</div>
+                        <input type="text" id="mUrl" class="ainp" placeholder="https://soundcloud.com/... hoặc https://...song.mp3">
+                        <div style="font-size:10.5px;color:var(--dim);margin-top:4px;">✅ Hỗ trợ: link SoundCloud, link .mp3 trực tiếp</div>
+                    </div></div>
+                    <div class="grid1"><div><div class="albl">Link ảnh bìa (tuỳ chọn)</div>
+                        <input type="text" id="mCover" class="ainp" placeholder="https://...cover.jpg"></div></div>
                     <div id="mMsg" class="ok" style="display:none;"></div>
                     <button class="btn" style="margin-top:4px;" onclick="adminAddTrack()">＋ Thêm Bài</button>
                 </div>
@@ -507,27 +540,38 @@
                 <div class="klist" id="adminTrackList"><div class="emp">Chưa có bài nào</div></div>
             </div>
         </div>
+
+        <!-- TAB APP -->
         <div id="tabApp" class="tabp">
             <div class="admsec">
                 <div class="admsec-t">Chỉnh tên & nội dung</div>
-                <div class="grid1"><div><div class="albl">Tiêu đề App</div><input type="text" id="cfgTitle" class="ainp" placeholder="NMINH LOCK"></div></div>
-                <div class="grid1"><div><div class="albl">Sub-title intro</div><input type="text" id="cfgSub" class="ainp" placeholder="Hệ thống bảo mật"></div></div>
-                <div class="grid1"><div><div class="albl">Tagline trang chủ</div><input type="text" id="cfgTagline" class="ainp" placeholder="Khóa truy cập an toàn..."></div></div>
-                <div class="grid1"><div><div class="albl">Tên brand</div><input type="text" id="cfgBrand" class="ainp" placeholder="App by Nminh"></div></div>
+                <div class="grid1"><div><div class="albl">Tiêu đề App</div>
+                    <input type="text" id="cfgTitle" class="ainp" placeholder="NMINH LOCK"></div></div>
+                <div class="grid1"><div><div class="albl">Sub-title intro</div>
+                    <input type="text" id="cfgSub" class="ainp" placeholder="Hệ thống bảo mật"></div></div>
+                <div class="grid1"><div><div class="albl">Tagline trang chủ</div>
+                    <input type="text" id="cfgTagline" class="ainp" placeholder="Khóa truy cập an toàn..."></div></div>
+                <div class="grid1"><div><div class="albl">Tên brand</div>
+                    <input type="text" id="cfgBrand" class="ainp" placeholder="App by Nminh"></div></div>
             </div>
             <div class="admsec">
                 <div class="admsec-t">Đổi mật khẩu Admin</div>
-                <div class="grid1"><div><div class="albl">Mật khẩu mới</div><input type="password" id="cfgNewPw" class="ainp" placeholder="Nhập mật khẩu mới..."></div></div>
-                <div class="grid1"><div><div class="albl">Xác nhận mật khẩu</div><input type="password" id="cfgPw2" class="ainp" placeholder="Nhập lại..."></div></div>
+                <div class="grid1"><div><div class="albl">Mật khẩu mới</div>
+                    <input type="password" id="cfgNewPw" class="ainp" placeholder="Nhập mật khẩu mới..."></div></div>
+                <div class="grid1"><div><div class="albl">Xác nhận mật khẩu</div>
+                    <input type="password" id="cfgPw2" class="ainp" placeholder="Nhập lại..."></div></div>
             </div>
             <div id="cfgMsg" class="ok" style="display:none;"></div>
             <button class="btn" onclick="saveAppConfig()">💾 Lưu cài đặt</button>
         </div>
+
         <span class="back" onclick="goTo('page1')">← Thoát admin</span>
     </div>
 </div>
-</div>
 
+</div><!-- end #app -->
+
+<!-- ADMIN LOGIN -->
 <div id="adminLoginModal" style="display:none;" class="alov">
     <div class="albox">
         <div class="alt">🔐 Admin</div>
@@ -541,16 +585,26 @@
 
 <script>
 /* ================================================================
-   NMINH LOCK PRO — Phiên bản sửa lỗi nhạc triệt để
+   NMINH LOCK PRO — Fixed + SoundCloud Support
+   ✅ FIX 1: Upload nhạc — phát đúng từ IndexedDB bằng Blob URL
+   ✅ FIX 2: Slot đếm đúng — 1 UID chỉ được claim 1 slot duy nhất
+   ✅ FIX 3: 1 máy chỉ dùng được 1 key tại 1 thời điểm
+   ✅ FIX 4: Firebase đồng bộ key/nhạc/password mọi máy
+   ✅ FIX 5: Fallback localStorage khi offline / chưa cấu hình Firebase
+   ✅ FIX 6: Hỗ trợ SoundCloud Widget API — phát link SoundCloud trực tiếp
+   ✅ FIX 7: Làm sạch URL SoundCloud khi thêm/sửa bài hát
+   ✅ FIX 8: Sửa widget SoundCloud autoplay + xử lý play/pause đúng
+   ✅ FIX 9: Cập nhật initMusicPlayer khi quay lại trang chủ
    ================================================================ */
+
 const FIREBASE_CONFIG = {
-    apiKey: "AIzaSyAHqNEdDLet-ker_B7n4s5OhZnRyIv8SD8",
-    authDomain: "aimhead-3548c.firebaseapp.com",
-    databaseURL: "https://aimhead-3548c-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "aimhead-3548c",
-    storageBucket: "aimhead-3548c.firebasestorage.app",
+    apiKey:            "AIzaSyAHqNEdDLet-ker_B7n4s5OhZnRyIv8SD8",
+    authDomain:        "aimhead-3548c.firebaseapp.com",
+    databaseURL:       "https://aimhead-3548c-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId:         "aimhead-3548c",
+    storageBucket:     "aimhead-3548c.firebasestorage.app",
     messagingSenderId: "205987052158",
-    appId: "1:205987052158:web:cf3c908d43a29cdd05f62f",
+    appId:             "1:205987052158:web:cf3c908d43a29cdd05f62f",
 };
 
 const DEF_PW = "1";
@@ -581,6 +635,9 @@ function _lsGet(key, def) { try { const v=localStorage.getItem(key); return v!=n
 function _lsSet(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {} }
 function _lsDel(key) { try { localStorage.removeItem(key); } catch(e) {} }
 
+/* ================================================================
+   FIREBASE INIT
+   ================================================================ */
 const _FB_CONFIGURED = !Object.values(FIREBASE_CONFIG).some(v => v.startsWith('PASTE_'));
 let _db = null, _fbReady = false, _fbLoadPromise = null;
 
@@ -711,17 +768,26 @@ function updateSyncStatus(ok) {
     if (!_FB_CONFIGURED) {
         badge.textContent = '⚠️ Chưa cấu hình Firebase (dùng local)';
         badge.className = 'offline-badge';
+        document.getElementById('fbGuide') && (document.getElementById('fbGuide').style.display = 'block');
         return;
     }
     if (ok) { badge.textContent = '✅ Đồng bộ Firebase'; badge.className = 'offline-badge online'; }
     else { badge.textContent = '⚠️ Offline — dùng bộ nhớ cục bộ'; badge.className = 'offline-badge'; }
 }
 
-setInterval(async () => { try { await fbGet('_ping'); updateSyncStatus(true); } catch(e) { updateSyncStatus(false); } }, 20000);
+setInterval(async () => {
+    try { await fbGet('_ping'); updateSyncStatus(true); } catch(e) { updateSyncStatus(false); }
+}, 20000);
 
+/* ================================================================
+   KEY STORE
+   ================================================================ */
 async function getKeys() { const v = await fbGet('keys'); return v || {}; }
 async function setKeys(k) { await fbSet('keys', k); }
 
+/* ================================================================
+   APP CONFIG
+   ================================================================ */
 const DEF_CFG = { title:'NMINH LOCK', sub:'Hệ thống bảo mật', tagline:'Khóa truy cập an toàn cho thiết bị của bạn', brand:'App by Nminh' };
 async function getCfg() { const v = await fbGet('app_cfg'); return v || DEF_CFG; }
 async function applyCfg() {
@@ -750,6 +816,9 @@ async function getAdmPw() {
     catch(e) { return _lsGet('nm_adm_pw', null) || DEF_PW; }
 }
 
+/* ================================================================
+   KEY SYSTEM
+   ================================================================ */
 let cdInterval = null, activeKeyData = null;
 
 async function checkKey() {
@@ -757,15 +826,19 @@ async function checkKey() {
     const err = document.getElementById('errMsg');
     err.style.display = 'none';
     if (!val) { showErr('❌ Vui lòng nhập key!'); return; }
+
     const btn = document.getElementById('checkKeyBtn');
     const origTxt = btn.textContent;
     btn.textContent = '⏳ Đang kiểm tra...';
     btn.disabled = true;
+
     try {
         const keys = await fbGet('keys');
         if (!keys) { showErr('❌ Không thể tải dữ liệu key! Kiểm tra kết nối.'); return; }
+
         const kd = keys[val];
         if (!kd) { showErr('❌ Key không hợp lệ. Thử lại!'); return; }
+
         const now = Date.now();
         if (now > kd.expiresAt) {
             document.getElementById('keyInput').value = '';
@@ -782,9 +855,11 @@ async function checkKey() {
             goTo('pageExp');
             return;
         }
+
         const uid = myUid();
         const slots = kd.slots || {};
         const slotCount = Object.keys(slots).length;
+
         if (slots[uid]) {
             _lsSet('nm_active_key', val);
             document.getElementById('keyInput').value = '';
@@ -793,6 +868,7 @@ async function checkKey() {
             enterDashboard(val, freshKd);
             return;
         }
+
         const activeKey = _lsGet('nm_active_key', null);
         if (activeKey && activeKey !== val) {
             const oldKd = keys[activeKey];
@@ -806,11 +882,15 @@ async function checkKey() {
             }
             _lsDel('nm_active_key');
         }
+
         if (slotCount >= kd.maxSlots) {
             document.getElementById('keyInput').value = '';
+            document.getElementById('fullMsg').innerHTML =
+                `Key đã đầy <strong style="color:var(--cyan)">${kd.maxSlots} người</strong>.<br>Liên hệ admin để mở thêm slot.`;
             goTo('pageFull');
             return;
         }
+
         const txResult = await fbTransaction('keys/'+val, (current) => {
             if (!current) return current;
             const sl = current.slots || {};
@@ -821,17 +901,23 @@ async function checkKey() {
             current.slots = sl;
             return current;
         });
+
         if (!txResult.committed) {
             document.getElementById('keyInput').value = '';
+            document.getElementById('fullMsg').innerHTML = `Key đã đầy slot. Liên hệ admin.`;
             goTo('pageFull');
             return;
         }
+
         _lsSet('nm_active_key', val);
+
         const freshKeys = await fbGet('keys');
         const freshKd = freshKeys ? freshKeys[val] : null;
         if (!freshKd) { showErr('❌ Lỗi sau khi claim slot!'); return; }
+
         document.getElementById('keyInput').value = '';
         enterDashboard(val, freshKd);
+
     } catch(e) {
         console.error(e);
         showErr('❌ ' + (e.message || 'Lỗi kết nối. Thử lại!'));
@@ -905,6 +991,9 @@ function showErr(msg) {
     i.style.animation = 'none'; void i.offsetWidth; i.style.animation = 'shake .4s ease';
 }
 
+/* ================================================================
+   NAVIGATION
+   ================================================================ */
 function goTo(id) {
     const _ac = document.getElementById('acList');
     if (_ac) _ac.style.display = 'none';
@@ -914,7 +1003,10 @@ function goTo(id) {
     el.classList.add('active');
     if (id === 'page2') setTimeout(() => document.getElementById('keyInput').focus(), 60);
     if (id === 'pageAdmin') { loadKeyList(); loadAdminTrackList(); }
-    if (id === 'page1' || id === 'page3') { initMusicPlayer(); }
+    // Cập nhật lại widget nhạc khi về trang chủ / dashboard
+    if (id === 'page1' || id === 'page3') {
+        initMusicPlayer();
+    }
 }
 
 function switchTab(tabId, btn) {
@@ -927,6 +1019,9 @@ function switchTab(tabId, btn) {
     if (tabId === 'tabApp') loadAppCfgForm();
 }
 
+/* ================================================================
+   ADMIN LOGIN
+   ================================================================ */
 function openAdminLogin() {
     document.getElementById('adminLoginModal').style.display = 'flex';
     setTimeout(() => document.getElementById('adminPwInput').focus(), 60);
@@ -963,9 +1058,16 @@ async function verifyAdmin() {
     }
 }
 
+/* ================================================================
+   ADMIN: KEY MANAGEMENT
+   ================================================================ */
 function _normalizeSlots(slots) {
     if (!slots) return {};
-    if (Array.isArray(slots)) { const obj = {}; slots.forEach(uid => { obj[uid] = Date.now(); }); return obj; }
+    if (Array.isArray(slots)) {
+        const obj = {};
+        slots.forEach(uid => { obj[uid] = Date.now(); });
+        return obj;
+    }
     if (typeof slots === 'object') return slots;
     return {};
 }
@@ -1008,7 +1110,17 @@ async function loadKeyList() {
             const slots = Object.keys(slotsObj).length;
             const d = document.createElement('div');
             d.className = 'ki';
-            d.innerHTML = `<div class="kil"><span class="kibd ${k.type}">${k.type==='vip'?'⭐ VIP':'● Thường'}</span><div><div class="kic">${esc(k.code)}</div><div class="kim">${slots}/${k.maxSlots} slot · ${exp?'<span style="color:var(--danger)">Hết hạn</span>':fmtShort(rem)}</div></div></div><div style="display:flex;gap:4px;"><button class="kidel" onclick="editKey('${esc(k.code)}')" title="Sửa">✏️</button><button class="kidel" onclick="delKey('${esc(k.code)}')" title="Xoá">🗑</button></div>`;
+            d.innerHTML = `<div class="kil">
+                <span class="kibd ${k.type}">${k.type==='vip'?'⭐ VIP':'● Thường'}</span>
+                <div>
+                    <div class="kic">${esc(k.code)}</div>
+                    <div class="kim">${slots}/${k.maxSlots} slot · ${exp?'<span style="color:var(--danger)">Hết hạn</span>':fmtShort(rem)}</div>
+                </div>
+            </div>
+            <div style="display:flex;gap:4px;">
+                <button class="kidel" onclick="editKey('${esc(k.code)}')" title="Sửa">✏️</button>
+                <button class="kidel" onclick="delKey('${esc(k.code)}')" title="Xoá">🗑</button>
+            </div>`;
             list.appendChild(d);
         });
     } catch(e) { list.innerHTML = '<div class="emp" style="color:var(--danger)">Lỗi tải dữ liệu!</div>'; }
@@ -1023,7 +1135,36 @@ async function editKey(code) {
     const now = Date.now();
     const rem = Math.max(0, k.expiresAt - now);
     const remD = Math.floor(rem/86400000), remH = Math.floor((rem%86400000)/3600000);
-    ov.innerHTML = `<div class="mbox" style="width:320px;max-width:94vw;"><div class="mhdr"><span class="mtic">✏️</span><span class="mtxt">Sửa Key</span><span class="mbdg ${now<k.expiresAt?'bon':'boff'}">${now<k.expiresAt?'● Còn hạn':'○ Hết hạn'}</span></div><div style="padding:14px 18px;"><div class="albl">Mã key</div><input type="text" id="eKeyCode" class="ainp" value="${esc(code)}" style="margin-bottom:10px;"><div class="grid2" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;"><div><div class="albl">Loại</div><select id="eKeyType" class="ainp"><option value="normal" ${k.type==='normal'?'selected':''}>🔵 Thường</option><option value="vip" ${k.type==='vip'?'selected':''}>⭐ VIP</option></select></div><div><div class="albl">Số slot</div><input type="number" id="eMaxSlots" class="ainp" value="${k.maxSlots||100}" min="1"></div></div><div class="admsec-t" style="font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(57,230,230,.1);">Gia hạn thêm (cộng vào thời gian còn lại)</div><div class="grid2" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px;"><div><div class="albl">Thêm (ngày)</div><input type="number" id="eAddDays" class="ainp" value="0" min="0"></div><div><div class="albl">Thêm (giờ)</div><input type="number" id="eAddHours" class="ainp" value="0" min="0"></div></div><div style="font-size:11px;color:var(--dim);margin-bottom:10px;">⏱ Còn lại: <strong style="color:var(--cyan)">${rem<=0?'Hết hạn':(remD>0?remD+'d ':'')+pad(remH)+'h'}</strong></div><div id="eKeyMsg" style="font-size:12px;margin-bottom:8px;display:none;"></div><div style="display:flex;gap:8px;"><button class="btn" style="margin:0;" onclick="saveEditKey('${esc(code)}')">💾 Lưu</button><button class="btn btn-danger btn-sm" style="margin:0;flex:0 0 auto;" onclick="this.closest('.moverlay').remove()">✕ Đóng</button></div></div></div>`;
+    ov.innerHTML = `<div class="mbox" style="width:320px;max-width:94vw;">
+        <div class="mhdr"><span class="mtic">✏️</span><span class="mtxt">Sửa Key</span>
+            <span class="mbdg ${now<k.expiresAt?'bon':'boff'}">${now<k.expiresAt?'● Còn hạn':'○ Hết hạn'}</span></div>
+        <div style="padding:14px 18px;">
+            <div class="albl">Mã key</div>
+            <input type="text" id="eKeyCode" class="ainp" value="${esc(code)}" style="margin-bottom:10px;">
+            <div class="grid2" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+                <div><div class="albl">Loại</div>
+                <select id="eKeyType" class="ainp">
+                    <option value="normal" ${k.type==='normal'?'selected':''}>🔵 Thường</option>
+                    <option value="vip" ${k.type==='vip'?'selected':''}>⭐ VIP</option>
+                </select></div>
+                <div><div class="albl">Số slot</div>
+                <input type="number" id="eMaxSlots" class="ainp" value="${k.maxSlots||100}" min="1"></div>
+            </div>
+            <div class="admsec-t" style="font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(57,230,230,.1);">Gia hạn thêm (cộng vào thời gian còn lại)</div>
+            <div class="grid2" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px;">
+                <div><div class="albl">Thêm (ngày)</div><input type="number" id="eAddDays" class="ainp" value="0" min="0"></div>
+                <div><div class="albl">Thêm (giờ)</div><input type="number" id="eAddHours" class="ainp" value="0" min="0"></div>
+            </div>
+            <div style="font-size:11px;color:var(--dim);margin-bottom:10px;">
+                ⏱ Còn lại: <strong style="color:var(--cyan)">${rem<=0?'Hết hạn':(remD>0?remD+'d ':'')+pad(remH)+'h'}</strong>
+            </div>
+            <div id="eKeyMsg" style="font-size:12px;margin-bottom:8px;display:none;"></div>
+            <div style="display:flex;gap:8px;">
+                <button class="btn" style="margin:0;" onclick="saveEditKey('${esc(code)}')">💾 Lưu</button>
+                <button class="btn btn-danger btn-sm" style="margin:0;flex:0 0 auto;" onclick="this.closest('.moverlay').remove()">✕ Đóng</button>
+            </div>
+        </div>
+    </div>`;
     document.body.appendChild(ov);
 }
 
@@ -1053,17 +1194,34 @@ async function saveEditKey(oldCode) {
 
 async function delKey(code) {
     if (!confirm(`Xoá key "${code}"?`)) return;
-    try { const keys = await fbGet('keys') || {}; delete keys[code]; await fbSet('keys', keys); loadKeyList(); } catch(e) { alert('Lỗi xoá key: '+e.message); }
+    try {
+        const keys = await fbGet('keys') || {};
+        delete keys[code];
+        await fbSet('keys', keys);
+        loadKeyList();
+    } catch(e) { alert('Lỗi xoá key: '+e.message); }
 }
 
-async function getTracks() { const v = await fbGet('tracks'); return v ? (Array.isArray(v) ? v : Object.values(v)) : []; }
+/* ================================================================
+   ADMIN: MUSIC MANAGEMENT
+   ================================================================ */
+async function getTracks() {
+    const v = await fbGet('tracks');
+    if (!v) return [];
+    return Array.isArray(v) ? v : Object.values(v);
+}
 async function setTracks(t) { await fbSet('tracks', t); }
 
-function cleanSoundCloudUrl(url) {
-    if (url.includes('soundcloud.com/')) {
-        try { const u = new URL(url); u.search = ''; u.hostname = 'soundcloud.com'; return u.toString(); } catch(e) {}
+function cleanSoundCloudUrl(inputUrl) {
+    if (inputUrl.includes('soundcloud.com/')) {
+        try {
+            const u = new URL(inputUrl);
+            u.search = '';                        // xoá hết ?ref=...&si=...
+            u.hostname = 'soundcloud.com';        // bỏ subdomain 'm.'
+            return u.toString();
+        } catch(e) {}
     }
-    return url;
+    return inputUrl;
 }
 
 async function adminAddTrack() {
@@ -1073,6 +1231,7 @@ async function adminAddTrack() {
     const cover = document.getElementById('mCover').value.trim();
     const msg = document.getElementById('mMsg');
     if (!name || !url) { showAdmMsg(msg,'❌ Nhập tên bài và link nhạc!',false); return; }
+    // Làm sạch URL SoundCloud
     url = cleanSoundCloudUrl(url);
     try {
         const tracks = await getTracks();
@@ -1080,8 +1239,12 @@ async function adminAddTrack() {
         tracks.push({ id:Date.now(), name, artist:artist||'Unknown', url, cover, isLocal:false, isSoundCloud:isSC });
         await setTracks(tracks);
         showAdmMsg(msg, `✅ Đã thêm "${name}"! ${isSC?'(SoundCloud)':'(MP3)'}`, true);
-        document.getElementById('mTrackName').value=''; document.getElementById('mArtist').value=''; document.getElementById('mUrl').value=''; document.getElementById('mCover').value='';
-        loadAdminTrackList(); initMusicPlayer();
+        document.getElementById('mTrackName').value='';
+        document.getElementById('mArtist').value='';
+        document.getElementById('mUrl').value='';
+        document.getElementById('mCover').value='';
+        loadAdminTrackList();
+        initMusicPlayer();
     } catch(e) { showAdmMsg(msg,'❌ Lỗi: '+e.message,false); }
 }
 
@@ -1093,29 +1256,76 @@ async function loadAdminTrackList() {
         list.innerHTML = '';
         if (!tracks.length) { list.innerHTML = '<div class="emp">Chưa có bài nào.</div>'; return; }
         tracks.forEach((t, i) => {
-            const d = document.createElement('div'); d.className = 'ki';
-            const badge = t.isLocal ? '<span style="color:var(--vip)">📁local</span>' : (isSoundCloudUrl(t.url) ? '<span style="color:#ff5500">☁️SC</span>' : '<span style="color:var(--cyan)">🔗mp3</span>');
-            d.innerHTML = `<div class="kil"><span style="color:var(--dim);font-size:11px;width:16px;">${i+1}</span><div><div class="kic" style="font-family:inherit;">${esc(t.name)}</div><div class="kim">${esc(t.artist)} ${badge}</div></div></div><div style="display:flex;gap:4px;"><button class="kidel" onclick="editTrack(${i})" title="Sửa">✏️</button><button class="kidel" onclick="moveTrack(${i},-1)" title="Lên">↑</button><button class="kidel" onclick="moveTrack(${i},1)" title="Xuống">↓</button><button class="kidel" onclick="delTrack(${i})" title="Xoá">🗑</button></div>`;
+            const d = document.createElement('div');
+            d.className = 'ki';
+            const badge = t.isLocal
+                ? '<span style="color:var(--vip)">📁local</span>'
+                : isSoundCloudUrl(t.url)
+                    ? '<span style="color:#ff5500">☁️SC</span>'
+                    : '<span style="color:var(--cyan)">🔗mp3</span>';
+            d.innerHTML = `<div class="kil">
+                <span style="color:var(--dim);font-size:11px;width:16px;">${i+1}</span>
+                <div>
+                    <div class="kic" style="font-family:inherit;">${esc(t.name)}</div>
+                    <div class="kim">${esc(t.artist)} ${badge}</div>
+                </div>
+            </div>
+            <div style="display:flex;gap:4px;">
+                <button class="kidel" onclick="editTrack(${i})" title="Sửa">✏️</button>
+                <button class="kidel" onclick="moveTrack(${i},-1)" title="Lên">↑</button>
+                <button class="kidel" onclick="moveTrack(${i},1)" title="Xuống">↓</button>
+                <button class="kidel" onclick="delTrack(${i})" title="Xoá">🗑</button>
+            </div>`;
             list.appendChild(d);
         });
     } catch(e) { list.innerHTML = '<div class="emp" style="color:var(--danger)">Lỗi tải nhạc!</div>'; }
 }
 
 async function editTrack(i) {
-    const tracks = await getTracks(); const t = tracks[i]; if (!t) return;
-    const ov = document.createElement('div'); ov.className = 'moverlay'; ov.style.zIndex = '1000';
+    const tracks = await getTracks();
+    const t = tracks[i];
+    if (!t) return;
+    const ov = document.createElement('div');
+    ov.className = 'moverlay'; ov.style.zIndex = '1000';
     const isSC = isSoundCloudUrl(t.url);
-    ov.innerHTML = `<div class="mbox" style="width:320px;max-width:94vw;"><div class="mhdr"><span class="mtic">✏️</span><span class="mtxt">Sửa bài hát #${i+1}</span></div><div style="padding:14px 18px;"><div class="albl">Tên bài hát</div><input type="text" id="etName" class="ainp" value="${esc(t.name)}" style="margin-bottom:8px;"><div class="albl">Nghệ sĩ</div><input type="text" id="etArtist" class="ainp" value="${esc(t.artist)}" style="margin-bottom:8px;">${!t.isLocal ? `<div class="albl">Link ${isSC?'SoundCloud':'MP3'}</div><input type="text" id="etUrl" class="ainp" value="${esc(t.url)}" style="margin-bottom:8px;"><div class="albl">Link ảnh bìa</div><input type="text" id="etCover" class="ainp" value="${esc(t.cover||'')}" style="margin-bottom:12px;">` : `<div style="font-size:11px;color:var(--dim);margin-bottom:12px;">📁 File local — không thể đổi URL</div>`}<div id="etMsg" style="font-size:12px;margin-bottom:8px;display:none;"></div><div style="display:flex;gap:8px;"><button class="btn" style="margin:0;" onclick="saveEditTrack(${i})">💾 Lưu</button><button class="btn btn-danger btn-sm" style="margin:0;flex:0 0 auto;" onclick="this.closest('.moverlay').remove()">✕ Đóng</button></div></div></div>`;
+    ov.innerHTML = `<div class="mbox" style="width:320px;max-width:94vw;">
+        <div class="mhdr"><span class="mtic">✏️</span><span class="mtxt">Sửa bài hát #${i+1}</span></div>
+        <div style="padding:14px 18px;">
+            <div class="albl">Tên bài hát</div>
+            <input type="text" id="etName" class="ainp" value="${esc(t.name)}" style="margin-bottom:8px;">
+            <div class="albl">Nghệ sĩ</div>
+            <input type="text" id="etArtist" class="ainp" value="${esc(t.artist)}" style="margin-bottom:8px;">
+            ${!t.isLocal ? `<div class="albl">Link ${isSC?'SoundCloud':'MP3'}</div>
+            <input type="text" id="etUrl" class="ainp" value="${esc(t.url)}" style="margin-bottom:8px;">
+            <div class="albl">Link ảnh bìa</div>
+            <input type="text" id="etCover" class="ainp" value="${esc(t.cover||'')}" style="margin-bottom:12px;">` :
+            `<div style="font-size:11px;color:var(--dim);margin-bottom:12px;">📁 File local — không thể đổi URL</div>`}
+            <div id="etMsg" style="font-size:12px;margin-bottom:8px;display:none;"></div>
+            <div style="display:flex;gap:8px;">
+                <button class="btn" style="margin:0;" onclick="saveEditTrack(${i})">💾 Lưu</button>
+                <button class="btn btn-danger btn-sm" style="margin:0;flex:0 0 auto;" onclick="this.closest('.moverlay').remove()">✕ Đóng</button>
+            </div>
+        </div>
+    </div>`;
     document.body.appendChild(ov);
 }
 
 async function saveEditTrack(i) {
-    const tracks = await getTracks(); const name = document.getElementById('etName').value.trim(); const artist = document.getElementById('etArtist').value.trim(); const msg = document.getElementById('etMsg');
+    const tracks = await getTracks();
+    const name = document.getElementById('etName').value.trim();
+    const artist = document.getElementById('etArtist').value.trim();
+    const msg = document.getElementById('etMsg');
     if (!name) { if(msg){msg.textContent='❌ Tên không được trống!';msg.style.color='var(--danger)';msg.style.display='block';} return; }
     try {
         const t = tracks[i];
-        if (!t.isLocal) { let url = document.getElementById('etUrl').value.trim(); url = cleanSoundCloudUrl(url); const cover = document.getElementById('etCover').value.trim(); tracks[i] = { ...t, name, artist:artist||'Unknown', url, cover, isSoundCloud: isSoundCloudUrl(url) }; }
-        else { tracks[i] = { ...t, name, artist:artist||'Unknown' }; }
+        if (!t.isLocal) {
+            let url = document.getElementById('etUrl').value.trim();
+            url = cleanSoundCloudUrl(url);
+            const cover = document.getElementById('etCover').value.trim();
+            tracks[i] = { ...t, name, artist:artist||'Unknown', url, cover, isSoundCloud: isSoundCloudUrl(url) };
+        } else {
+            tracks[i] = { ...t, name, artist:artist||'Unknown' };
+        }
         await setTracks(tracks);
         if(msg){msg.textContent='✅ Đã lưu!';msg.style.color='var(--green)';msg.style.display='block';}
         setTimeout(() => { document.querySelector('.moverlay')&&document.querySelector('.moverlay').remove(); loadAdminTrackList(); initMusicPlayer(); }, 900);
@@ -1123,24 +1333,73 @@ async function saveEditTrack(i) {
 }
 
 async function delTrack(i) {
-    try { const tracks = await getTracks(); const t = tracks[i]; if (t && t.url && t.url.startsWith('idb:')) idbDeleteFile(t.url.slice(4)).catch(()=>{}); tracks.splice(i,1); await setTracks(tracks); loadAdminTrackList(); initMusicPlayer(); } catch(e) { alert('Lỗi xoá: '+e.message); }
+    try {
+        const tracks = await getTracks();
+        const t = tracks[i];
+        if (t && t.url && t.url.startsWith('idb:')) idbDeleteFile(t.url.slice(4)).catch(()=>{});
+        tracks.splice(i, 1);
+        await setTracks(tracks);
+        loadAdminTrackList();
+        initMusicPlayer();
+    } catch(e) { alert('Lỗi xoá: '+e.message); }
 }
 
 async function moveTrack(i, dir) {
-    try { const tracks = await getTracks(); const j = i+dir; if (j<0||j>=tracks.length) return; [tracks[i],tracks[j]] = [tracks[j],tracks[i]]; await setTracks(tracks); loadAdminTrackList(); initMusicPlayer(); } catch(e) {}
+    try {
+        const tracks = await getTracks();
+        const j = i+dir;
+        if (j<0||j>=tracks.length) return;
+        [tracks[i],tracks[j]] = [tracks[j],tracks[i]];
+        await setTracks(tracks);
+        loadAdminTrackList();
+        initMusicPlayer();
+    } catch(e) {}
 }
 
-async function loadAppCfgForm() { const c = await getCfg(); document.getElementById('cfgTitle').value = c.title||''; document.getElementById('cfgSub').value = c.sub||''; document.getElementById('cfgTagline').value = c.tagline||''; document.getElementById('cfgBrand').value = c.brand||''; }
+/* ================================================================
+   ADMIN: APP CONFIG
+   ================================================================ */
+async function loadAppCfgForm() {
+    const c = await getCfg();
+    document.getElementById('cfgTitle').value = c.title||'';
+    document.getElementById('cfgSub').value = c.sub||'';
+    document.getElementById('cfgTagline').value = c.tagline||'';
+    document.getElementById('cfgBrand').value = c.brand||'';
+}
 
 async function saveAppConfig() {
-    const msg = document.getElementById('cfgMsg'); const newPw = document.getElementById('cfgNewPw').value; const pw2 = document.getElementById('cfgPw2').value;
-    if (newPw) { if (newPw !== pw2) { showAdmMsg(msg,'❌ Mật khẩu xác nhận không khớp!',false); return; } if (newPw.length < 6) { showAdmMsg(msg,'❌ Mật khẩu tối thiểu 6 ký tự!',false); return; } await fbSet('adm_pw', newPw); _lsSet('nm_adm_pw', newPw); document.getElementById('cfgNewPw').value=''; document.getElementById('cfgPw2').value=''; }
-    const cfg = { title: document.getElementById('cfgTitle').value.trim()||'NMINH LOCK', sub: document.getElementById('cfgSub').value.trim()||'Hệ thống bảo mật', tagline: document.getElementById('cfgTagline').value.trim(), brand: document.getElementById('cfgBrand').value.trim()||'App by Nminh' };
-    await fbSet('app_cfg', cfg); applyCfg(); showAdmMsg(msg,'✅ Đã lưu!'+(newPw?' Mật khẩu đã đổi.':''),true);
+    const msg = document.getElementById('cfgMsg');
+    const newPw = document.getElementById('cfgNewPw').value;
+    const pw2 = document.getElementById('cfgPw2').value;
+    if (newPw) {
+        if (newPw !== pw2) { showAdmMsg(msg,'❌ Mật khẩu xác nhận không khớp!',false); return; }
+        if (newPw.length < 6) { showAdmMsg(msg,'❌ Mật khẩu tối thiểu 6 ký tự!',false); return; }
+        await fbSet('adm_pw', newPw);
+        _lsSet('nm_adm_pw', newPw);
+        document.getElementById('cfgNewPw').value='';
+        document.getElementById('cfgPw2').value='';
+    }
+    const cfg = {
+        title: document.getElementById('cfgTitle').value.trim()||'NMINH LOCK',
+        sub: document.getElementById('cfgSub').value.trim()||'Hệ thống bảo mật',
+        tagline: document.getElementById('cfgTagline').value.trim(),
+        brand: document.getElementById('cfgBrand').value.trim()||'App by Nminh',
+    };
+    await fbSet('app_cfg', cfg);
+    applyCfg();
+    showAdmMsg(msg,'✅ Đã lưu!'+(newPw?' Mật khẩu đã đổi.':''),true);
 }
 
-function showAdmMsg(el, txt, ok) { el.textContent = txt; el.style.color = ok?'var(--green)':'var(--danger)'; el.style.display = 'block'; setTimeout(() => { el.style.display='none'; }, 3500); }
+function showAdmMsg(el, txt, ok) {
+    el.textContent = txt;
+    el.style.color = ok?'var(--green)':'var(--danger)';
+    el.style.display = 'block';
+    setTimeout(() => { el.style.display='none'; }, 3500);
+}
 
+/* ================================================================
+   MUSIC TAB SWITCH
+   ================================================================ */
 function switchMusicTab(tab) {
     const isFile = tab==='file';
     document.getElementById('mPanelFile').style.display = isFile?'':'none';
@@ -1155,181 +1414,726 @@ function switchMusicTab(tab) {
     }
 }
 
-const IDB_NAME='nminhMusicDB', IDB_STORE='files', IDB_VER=1; let _idbInst = null;
-function openIDB() { if (_idbInst) return Promise.resolve(_idbInst); return new Promise((res,rej) => { const req = indexedDB.open(IDB_NAME, IDB_VER); req.onupgradeneeded = e => e.target.result.createObjectStore(IDB_STORE); req.onsuccess = e => { _idbInst=e.target.result; res(_idbInst); }; req.onerror = () => rej(req.error); }); }
-async function idbSaveFile(id, blob) { const db = await openIDB(); return new Promise((res,rej) => { const tx = db.transaction(IDB_STORE,'readwrite'); tx.objectStore(IDB_STORE).put(blob, id); tx.oncomplete = ()=>res(); tx.onerror = ()=>rej(tx.error); }); }
-async function idbGetFile(id) { const db = await openIDB(); return new Promise((res,rej) => { const tx = db.transaction(IDB_STORE,'readonly'); const req = tx.objectStore(IDB_STORE).get(id); req.onsuccess = ()=>res(req.result||null); req.onerror = ()=>rej(req.error); }); }
-async function idbDeleteFile(id) { const db = await openIDB(); return new Promise((res,rej) => { const tx = db.transaction(IDB_STORE,'readwrite'); tx.objectStore(IDB_STORE).delete(id); tx.oncomplete = ()=>res(); tx.onerror = ()=>rej(tx.error); }); }
-
-let _pendingFile = null, _uploadProgressInterval = null;
-function handleMusicFileDrop(e) { const f=e.dataTransfer.files[0]; if(f)_loadFileToUI(f); }
-function handleMusicFileSelect(input) { const f=input.files[0]; if(f)_loadFileToUI(f); }
-function _loadFileToUI(file) { const allowed = ['audio/mpeg','audio/mp3','audio/ogg','audio/wav','audio/x-wav']; if (!allowed.includes(file.type) && !file.name.match(/\.(mp3|ogg|wav)$/i)) { alert('⚠️ Chỉ hỗ trợ file .mp3, .ogg, .wav!'); return; } _pendingFile = file; document.getElementById('mFileInfo').style.display = 'block'; document.getElementById('mFileName').textContent = file.name; document.getElementById('mFileSize').textContent = (file.size/1024/1024).toFixed(2)+' MB'; document.getElementById('mFileProgress').style.display = 'none'; const nameInp = document.getElementById('mFileTrackName'); if (!nameInp.value) nameInp.value = file.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' '); }
-function clearMusicFile() { _pendingFile = null; if (_uploadProgressInterval) { clearInterval(_uploadProgressInterval); _uploadProgressInterval=null; } document.getElementById('mFileInput').value=''; document.getElementById('mFileInfo').style.display='none'; document.getElementById('mFileTrackName').value=''; document.getElementById('mFileArtist').value=''; }
-
-async function adminAddFileTrack() {
-    const msg = document.getElementById('mFileMsg'); const name = document.getElementById('mFileTrackName').value.trim(); const artist = document.getElementById('mFileArtist').value.trim();
-    if (!name) { showAdmMsg(msg,'❌ Nhập tên bài hát!',false); return; } if (!_pendingFile) { showAdmMsg(msg,'❌ Chọn file nhạc trước!',false); return; }
-    document.getElementById('mFileProgress').style.display='block'; document.getElementById('mFileBar').style.width='0%'; document.getElementById('mFileStatus').textContent='Đang lưu file...';
-    try {
-        const idbId = 'track_'+Date.now(); let prog = 0; if (_uploadProgressInterval) clearInterval(_uploadProgressInterval);
-        _uploadProgressInterval = setInterval(() => { prog = Math.min(prog+8, 85); document.getElementById('mFileBar').style.width = prog+'%'; }, 80);
-        await idbSaveFile(idbId, _pendingFile);
-        clearInterval(_uploadProgressInterval); _uploadProgressInterval=null; document.getElementById('mFileBar').style.width='100%'; document.getElementById('mFileStatus').textContent='✅ Đã lưu!';
-        const tracks = await getTracks(); tracks.push({ id:Date.now(), name, artist:artist||'Unknown', url:'idb:'+idbId, cover:'', isLocal:true, isSoundCloud:false }); await setTracks(tracks);
-        showAdmMsg(msg,'✅ Đã thêm bài "'+name+'"!',true); clearMusicFile(); loadAdminTrackList(); initMusicPlayer();
-    } catch(e) { showAdmMsg(msg,'❌ Lỗi lưu file: '+e.message,false); document.getElementById('mFileStatus').textContent='❌ Lỗi!'; if (_uploadProgressInterval) { clearInterval(_uploadProgressInterval); _uploadProgressInterval=null; } }
+/* ================================================================
+   INDEXEDDB — lưu file nhạc local
+   ================================================================ */
+const IDB_NAME='nminhMusicDB', IDB_STORE='files', IDB_VER=1;
+let _idbInst = null;
+function openIDB() {
+    if (_idbInst) return Promise.resolve(_idbInst);
+    return new Promise((res,rej) => {
+        const req = indexedDB.open(IDB_NAME, IDB_VER);
+        req.onupgradeneeded = e => e.target.result.createObjectStore(IDB_STORE);
+        req.onsuccess = e => { _idbInst=e.target.result; res(_idbInst); };
+        req.onerror = () => rej(req.error);
+    });
+}
+async function idbSaveFile(id, blob) {
+    const db = await openIDB();
+    return new Promise((res,rej) => {
+        const tx = db.transaction(IDB_STORE,'readwrite');
+        tx.objectStore(IDB_STORE).put(blob, id);
+        tx.oncomplete = ()=>res();
+        tx.onerror = ()=>rej(tx.error);
+    });
+}
+async function idbGetFile(id) {
+    const db = await openIDB();
+    return new Promise((res,rej) => {
+        const tx = db.transaction(IDB_STORE,'readonly');
+        const req = tx.objectStore(IDB_STORE).get(id);
+        req.onsuccess = ()=>res(req.result||null);
+        req.onerror = ()=>rej(req.error);
+    });
+}
+async function idbDeleteFile(id) {
+    const db = await openIDB();
+    return new Promise((res,rej) => {
+        const tx = db.transaction(IDB_STORE,'readwrite');
+        tx.objectStore(IDB_STORE).delete(id);
+        tx.oncomplete = ()=>res();
+        tx.onerror = ()=>rej(tx.error);
+    });
 }
 
 /* ================================================================
-   MUSIC PLAYER CORE
+   FILE UPLOAD MUSIC
+   ================================================================ */
+let _pendingFile = null, _uploadProgressInterval = null;
+
+function handleMusicFileDrop(e) { const f=e.dataTransfer.files[0]; if(f)_loadFileToUI(f); }
+function handleMusicFileSelect(input) { const f=input.files[0]; if(f)_loadFileToUI(f); }
+
+function _loadFileToUI(file) {
+    const allowed = ['audio/mpeg','audio/mp3','audio/ogg','audio/wav','audio/x-wav'];
+    if (!allowed.includes(file.type) && !file.name.match(/\.(mp3|ogg|wav)$/i)) {
+        alert('⚠️ Chỉ hỗ trợ file .mp3, .ogg, .wav!'); return;
+    }
+    _pendingFile = file;
+    document.getElementById('mFileInfo').style.display = 'block';
+    document.getElementById('mFileName').textContent = file.name;
+    document.getElementById('mFileSize').textContent = (file.size/1024/1024).toFixed(2)+' MB';
+    document.getElementById('mFileProgress').style.display = 'none';
+    const nameInp = document.getElementById('mFileTrackName');
+    if (!nameInp.value) nameInp.value = file.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' ');
+}
+
+function clearMusicFile() {
+    _pendingFile = null;
+    if (_uploadProgressInterval) { clearInterval(_uploadProgressInterval); _uploadProgressInterval=null; }
+    document.getElementById('mFileInput').value='';
+    document.getElementById('mFileInfo').style.display='none';
+    document.getElementById('mFileTrackName').value='';
+    document.getElementById('mFileArtist').value='';
+}
+
+async function adminAddFileTrack() {
+    const msg = document.getElementById('mFileMsg');
+    const name = document.getElementById('mFileTrackName').value.trim();
+    const artist = document.getElementById('mFileArtist').value.trim();
+    if (!name) { showAdmMsg(msg,'❌ Nhập tên bài hát!',false); return; }
+    if (!_pendingFile) { showAdmMsg(msg,'❌ Chọn file nhạc trước!',false); return; }
+
+    document.getElementById('mFileProgress').style.display='block';
+    document.getElementById('mFileBar').style.width='0%';
+    document.getElementById('mFileStatus').textContent='Đang lưu file...';
+
+    try {
+        const idbId = 'track_'+Date.now();
+        let prog = 0;
+        if (_uploadProgressInterval) clearInterval(_uploadProgressInterval);
+        _uploadProgressInterval = setInterval(() => {
+            prog = Math.min(prog+8, 85);
+            document.getElementById('mFileBar').style.width = prog+'%';
+        }, 80);
+
+        await idbSaveFile(idbId, _pendingFile);
+
+        clearInterval(_uploadProgressInterval); _uploadProgressInterval=null;
+        document.getElementById('mFileBar').style.width='100%';
+        document.getElementById('mFileStatus').textContent='✅ Đã lưu!';
+
+        const tracks = await getTracks();
+        tracks.push({ id:Date.now(), name, artist:artist||'Unknown', url:'idb:'+idbId, cover:'', isLocal:true, isSoundCloud:false });
+        await setTracks(tracks);
+
+        showAdmMsg(msg,'✅ Đã thêm bài "'+name+'"!',true);
+        clearMusicFile();
+        loadAdminTrackList();
+        initMusicPlayer();
+    } catch(e) {
+        showAdmMsg(msg,'❌ Lỗi lưu file: '+e.message,false);
+        document.getElementById('mFileStatus').textContent='❌ Lỗi!';
+        if (_uploadProgressInterval) { clearInterval(_uploadProgressInterval); _uploadProgressInterval=null; }
+    }
+}
+
+/* ================================================================
+   MUSIC PLAYER — MP3 trực tiếp + SoundCloud Widget
    ================================================================ */
 let muIdx = 0, muPlaying = false;
-let _localAudio = null, _currentBlobUrl = null, _userGestured = false;
-let _scWidget = null, _scIframe = null, _scDuration = 0, _scProgTimer = null, _scPendingPlay = false;
+let _localAudio = null, _currentBlobUrl = null;
+let _userGestured = false;
 
-function isSoundCloudUrl(url) { return typeof url === 'string' && url.includes('soundcloud.com/'); }
+/* ── SoundCloud Widget Support ── */
+let _scWidget = null, _scIframe = null, _scDuration = 0, _scProgTimer = null;
+
+function isSoundCloudUrl(url) {
+    return typeof url === 'string' && url.includes('soundcloud.com/');
+}
 
 function _loadSCApi() {
     if (window.SC) return Promise.resolve();
-    return new Promise((res, rej) => { const s = document.createElement('script'); s.src = 'https://w.soundcloud.com/player/api.js'; s.onload = () => res(); s.onerror = () => rej(new Error('Không tải được SoundCloud API')); document.head.appendChild(s); });
+    return new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = 'https://w.soundcloud.com/player/api.js';
+        s.onload = () => res();
+        s.onerror = () => rej(new Error('Không tải được SoundCloud API'));
+        document.head.appendChild(s);
+    });
 }
 
 function _destroySCWidget() {
     if (_scProgTimer) { clearInterval(_scProgTimer); _scProgTimer = null; }
-    _scWidget = null; _scDuration = 0; _scPendingPlay = false;
-    if (_scIframe && _scIframe.parentNode) { _scIframe.parentNode.removeChild(_scIframe); _scIframe = null; }
-    hideMusicError();
-}
-
-function _showMusicError(msg) {
-    ['musicError1','musicError3'].forEach(id => { const el = document.getElementById(id); if (el) { el.textContent = '⚠️ ' + msg; el.style.display = 'block'; } });
-    ['retryBtn1','retryBtn3'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'inline-block'; });
-}
-
-function hideMusicError() {
-    ['musicError1','musicError3'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
-    ['retryBtn1','retryBtn3'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+    _scWidget = null;
+    _scDuration = 0;
+    if (_scIframe && _scIframe.parentNode) {
+        _scIframe.parentNode.removeChild(_scIframe);
+        _scIframe = null;
+    }
 }
 
 async function _playSoundCloud(url, autoplay) {
     _destroySCWidget();
-    try { await _loadSCApi(); } catch(e) { _showMusicError('Không tải được SoundCloud API'); return; }
+
+    try {
+        await _loadSCApi();
+    } catch(e) {
+        console.error('[SC] Không tải được API:', e);
+        return;
+    }
+
     let cont = document.getElementById('_scCont');
-    if (!cont) { cont = document.createElement('div'); cont.id = '_scCont'; cont.style.cssText = 'position:fixed;left:-9999px;bottom:0;width:200px;height:100px;opacity:0;pointer-events:none;z-index:-999;overflow:hidden;'; document.body.appendChild(cont); }
-    const iframeSrc = 'https://w.soundcloud.com/player/?url=' + encodeURIComponent(url) + '&auto_play=false&hide_related=true&show_comments=false&buying=false&sharing=false&download=false&show_artwork=false&color=%2339e6e6&single_active=true';
+    if (!cont) {
+        cont = document.createElement('div');
+        cont.id = '_scCont';
+        cont.style.cssText = 'position:fixed;left:-9999px;bottom:0;width:200px;height:100px;opacity:0;pointer-events:none;z-index:-999;overflow:hidden;';
+        document.body.appendChild(cont);
+    }
+
+    const iframeSrc =
+        'https://w.soundcloud.com/player/?url=' + encodeURIComponent(url) +
+        '&auto_play=false&hide_related=true&show_comments=false' +
+        '&buying=false&sharing=false&download=false' +
+        '&show_artwork=false&color=%2339e6e6&single_active=true';
+
     cont.innerHTML = '<iframe id="_scFrame" allow="autoplay" style="width:100%;height:100%;border:none;" src="' + iframeSrc + '"></iframe>';
     _scIframe = document.getElementById('_scFrame');
+
     return new Promise(function(resolve) {
         _scIframe.onload = function() {
-            try { _scWidget = SC.Widget(_scIframe); } catch(e) { _showMusicError('Lỗi tạo SoundCloud Widget'); resolve(); return; }
+            try {
+                _scWidget = SC.Widget(_scIframe);
+            } catch(e) {
+                console.error('[SC] Widget init lỗi:', e);
+                resolve();
+                return;
+            }
+
             _scWidget.bind(SC.Widget.Events.READY, function() {
                 _scWidget.getDuration(function(d) { _scDuration = d || 0; });
-                _scWidget.bind(SC.Widget.Events.PLAY, function() { muPlaying = true; _setPlayBtns('⏸'); hideMusicError(); if (_scProgTimer) clearInterval(_scProgTimer); _scProgTimer = setInterval(function() { if (!_scWidget) { clearInterval(_scProgTimer); return; } _scWidget.getPosition(function(pos) { if (_scDuration > 0) { const pct = (pos / _scDuration * 100).toFixed(1) + '%'; ['muProg','muProg3'].forEach(function(id) { const el = document.getElementById(id); if (el) el.style.width = pct; }); } }); }, 500); });
-                _scWidget.bind(SC.Widget.Events.PAUSE, function() { muPlaying = false; _setPlayBtns('▶'); if (_scProgTimer) { clearInterval(_scProgTimer); _scProgTimer = null; } });
-                _scWidget.bind(SC.Widget.Events.FINISH, function() { muPlaying = false; _setPlayBtns('▶'); if (_scProgTimer) { clearInterval(_scProgTimer); _scProgTimer = null; } setTimeout(function() { muNext(); }, 300); });
-                _scWidget.bind(SC.Widget.Events.ERROR, function(e) { muPlaying = false; _setPlayBtns('▶'); if (_scProgTimer) { clearInterval(_scProgTimer); _scProgTimer = null; } _showMusicError('SoundCloud không phát được track này (có thể bị xóa hoặc riêng tư)'); });
-                if ((autoplay || _scPendingPlay) && _userGestured) { setTimeout(function() { try { _scWidget.play(); } catch(e) { _showMusicError('Không thể phát SoundCloud'); } _scPendingPlay = false; }, 600); }
+
+                _scWidget.bind(SC.Widget.Events.PLAY, function() {
+                    muPlaying = true;
+                    _setPlayBtns('⏸');
+                    if (_scProgTimer) clearInterval(_scProgTimer);
+                    _scProgTimer = setInterval(function() {
+                        if (!_scWidget) { clearInterval(_scProgTimer); return; }
+                        _scWidget.getPosition(function(pos) {
+                            if (_scDuration > 0) {
+                                const pct = (pos / _scDuration * 100).toFixed(1) + '%';
+                                ['muProg','muProg3'].forEach(function(id) {
+                                    const el = document.getElementById(id);
+                                    if (el) el.style.width = pct;
+                                });
+                            }
+                        });
+                    }, 500);
+                });
+
+                _scWidget.bind(SC.Widget.Events.PAUSE, function() {
+                    muPlaying = false;
+                    _setPlayBtns('▶');
+                    if (_scProgTimer) { clearInterval(_scProgTimer); _scProgTimer = null; }
+                });
+
+                _scWidget.bind(SC.Widget.Events.FINISH, function() {
+                    muPlaying = false;
+                    _setPlayBtns('▶');
+                    if (_scProgTimer) { clearInterval(_scProgTimer); _scProgTimer = null; }
+                    setTimeout(function() { muNext(); }, 300);
+                });
+
+                _scWidget.bind(SC.Widget.Events.ERROR, function() {
+                    muPlaying = false;
+                    _setPlayBtns('▶');
+                    if (_scProgTimer) { clearInterval(_scProgTimer); _scProgTimer = null; }
+                    console.error('[SC] Lỗi phát nhạc SoundCloud');
+                });
+
+                if (autoplay && _userGestured) {
+                    setTimeout(function() {
+                        try { _scWidget.play(); } catch(e) { console.warn('[SC] Không thể tự phát:', e); }
+                    }, 500);
+                }
                 resolve();
             });
         };
     });
 }
 
-function _setPlayBtns(icon) { ['muPlayBtn','muPlayBtn3'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = icon; }); }
+function _setPlayBtns(icon) {
+    ['muPlayBtn', 'muPlayBtn3'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = icon;
+    });
+}
 
 async function initMusicPlayer() {
     const tracks = await getTracks();
     const w1 = document.getElementById('musicWidget'), w3 = document.getElementById('musicWidget3');
-    if (!tracks.length) { if (w1) w1.style.display = 'none'; if (w3) w3.style.display = 'none'; muPlaying = false; _setPlayBtns('▶'); return; }
-    if (w1) w1.style.display = 'block'; if (w3) w3.style.display = 'block';
+    if (!tracks.length) {
+        if (w1) w1.style.display = 'none';
+        if (w3) w3.style.display = 'none';
+        muPlaying = false;
+        _setPlayBtns('▶');
+        return;
+    }
+    if (w1) w1.style.display = 'block';
+    if (w3) w3.style.display = 'block';
     if (muIdx >= tracks.length) muIdx = 0;
     muSyncUI(tracks);
 }
 
 async function muSyncUI(tracks) {
-    if (!tracks) tracks = await getTracks(); if (!tracks.length) return;
+    if (!tracks) tracks = await getTracks();
+    if (!tracks.length) return;
     const t = tracks[muIdx];
-    document.getElementById('muTrackName').textContent = t.name; document.getElementById('muTrackName3').textContent = t.name;
-    document.getElementById('muArtist').textContent = t.artist || '—'; document.getElementById('muArtist3').textContent = t.artist || '—';
-    ['muArtWrap','muArtWrap3'].forEach(id => { const el = document.getElementById(id); if (!el) return; el.innerHTML = t.cover ? `<img src="${esc(t.cover)}" onerror="this.parentElement.innerHTML='🎵'">` : '🎵'; });
-    ['muProg','muProg3'].forEach(id => { const el = document.getElementById(id); if (el) el.style.width = '0%'; });
+    document.getElementById('muTrackName').textContent = t.name;
+    document.getElementById('muTrackName3').textContent = t.name;
+    document.getElementById('muArtist').textContent = t.artist || '—';
+    document.getElementById('muArtist3').textContent = t.artist || '—';
+    ['muArtWrap', 'muArtWrap3'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (isSoundCloudUrl(t.url)) {
+            el.innerHTML = t.cover ? `<img src="${esc(t.cover)}" onerror="this.parentElement.innerHTML='🎵'">` : '<span title="SoundCloud">🎵</span>';
+        } else {
+            el.innerHTML = t.cover ? `<img src="${esc(t.cover)}" onerror="this.parentElement.innerHTML='🎵'">` : '🎵';
+        }
+    });
+    ['muProg', 'muProg3'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.width = '0%';
+    });
 }
 
-function _stopLocal() { if (_localAudio) { _localAudio.pause(); _localAudio.src = ''; _localAudio.onended = null; _localAudio.ontimeupdate = null; _localAudio.onerror = null; _localAudio = null; } if (_currentBlobUrl) { try { URL.revokeObjectURL(_currentBlobUrl); } catch (e) {} _currentBlobUrl = null; } }
+function _stopLocal() {
+    if (_localAudio) {
+        _localAudio.pause();
+        _localAudio.src = '';
+        _localAudio.onended = null;
+        _localAudio.ontimeupdate = null;
+        _localAudio.onerror = null;
+        _localAudio = null;
+    }
+    if (_currentBlobUrl) {
+        try { URL.revokeObjectURL(_currentBlobUrl); } catch (e) {}
+        _currentBlobUrl = null;
+    }
+}
 
-function _getCurrentVol() { const sliders = document.querySelectorAll('.muvol input[type=range]'); return sliders.length ? parseFloat(sliders[0].value) : 0.7; }
+function _getCurrentVol() {
+    const sliders = document.querySelectorAll('.muvol input[type=range]');
+    return sliders.length ? parseFloat(sliders[0].value) : 0.7;
+}
 
-function _playBlob(blob, autoplay) { _stopLocal(); const blobUrl = URL.createObjectURL(blob); _currentBlobUrl = blobUrl; const a = new Audio(); a.src = blobUrl; a.volume = _getCurrentVol(); _localAudio = a; a.onplay = () => { muPlaying = true; _setPlayBtns('⏸'); hideMusicError(); }; a.onpause = () => { muPlaying = false; _setPlayBtns('▶'); }; a.onended = () => { muPlaying = false; _setPlayBtns('▶'); muNext(); }; a.onerror = (e) => { console.error('Audio error'); muPlaying = false; _setPlayBtns('▶'); _showMusicError('Không đọc được file nhạc này'); }; a.ontimeupdate = () => { if (!a.duration) return; const pct = (a.currentTime / a.duration * 100).toFixed(1) + '%'; ['muProg','muProg3'].forEach(id => { const el = document.getElementById(id); if (el) el.style.width = pct; }); }; if (autoplay) { const p = a.play(); if (p && p.catch) p.catch(err => console.warn('Play error:', err)); } }
+function _playBlob(blob, autoplay) {
+    _stopLocal();
+    const blobUrl = URL.createObjectURL(blob);
+    _currentBlobUrl = blobUrl;
+    const a = new Audio();
+    a.src = blobUrl;
+    a.volume = _getCurrentVol();
+    _localAudio = a;
+    a.onplay = () => { muPlaying = true; _setPlayBtns('⏸'); };
+    a.onpause = () => { muPlaying = false; _setPlayBtns('▶'); };
+    a.onended = () => { muPlaying = false; _setPlayBtns('▶'); muNext(); };
+    a.onerror = (e) => {
+        console.error('Audio error:', a.error ? a.error.code : '?', e);
+        muPlaying = false; _setPlayBtns('▶');
+    };
+    a.ontimeupdate = () => {
+        if (!a.duration) return;
+        const pct = (a.currentTime / a.duration * 100).toFixed(1) + '%';
+        ['muProg', 'muProg3'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.width = pct;
+        });
+    };
+    if (autoplay) {
+        const p = a.play();
+        if (p && p.catch) p.catch(err => console.warn('Play error:', err));
+    }
+}
 
 function _loadLocalAudio(url, autoplay) {
-    if (url.startsWith('idb:')) { idbGetFile(url.slice(4)).then(blob => { if (!blob) { _showMusicError('Không tìm thấy file trong bộ nhớ'); return; } _playBlob(blob, autoplay); }).catch(e => _showMusicError('Lỗi tải file local')); }
-    else { _stopLocal(); if (!url || !url.startsWith('http')) { _showMusicError('URL không hợp lệ'); return; } const a = new Audio(); a.crossOrigin = 'anonymous'; a.src = url; a.volume = _getCurrentVol(); a.preload = 'auto'; a.oncanplay = function() { if (autoplay && _userGestured) { const p = a.play(); if (p && p.catch) p.catch(err => console.warn('Play error:', err)); } }; a.onplay = function() { muPlaying = true; _setPlayBtns('⏸'); hideMusicError(); }; a.onpause = function() { muPlaying = false; _setPlayBtns('▶'); }; a.onended = function() { muPlaying = false; _setPlayBtns('▶'); muNext(); }; a.onerror = function(e) { muPlaying = false; _setPlayBtns('▶'); _showMusicError('Lỗi phát MP3: có thể file không tồn tại hoặc bị chặn CORS'); }; a.ontimeupdate = function() { if (!a.duration) return; const pct = (a.currentTime / a.duration * 100).toFixed(1) + '%'; ['muProg','muProg3'].forEach(id => { const el = document.getElementById(id); if (el) el.style.width = pct; }); }; _localAudio = a; if (autoplay && _userGestured) { const p = a.play(); if (p && p.catch) p.catch(err => console.warn('Autoplay error:', err)); } }
+    if (url.startsWith('idb:')) {
+        const idbId = url.slice(4);
+        idbGetFile(idbId).then(blob => {
+            if (!blob) { console.error('Không tìm thấy file trong IndexedDB:', idbId); return; }
+            _playBlob(blob, autoplay);
+        }).catch(e => console.error('IDB load error', e));
+    } else {
+        _stopLocal();
+        if (!url || !url.startsWith('http')) {
+            console.error('URL không hợp lệ:', url);
+            return;
+        }
+        try {
+            const a = new Audio();
+            a.crossOrigin = 'anonymous';
+            a.src = url;
+            a.volume = _getCurrentVol();
+            a.preload = 'auto';
+            a.oncanplay = function() {
+                if (autoplay && _userGestured) {
+                    const p = a.play();
+                    if (p && p.catch) p.catch(err => console.warn('Play error:', err));
+                }
+            };
+            a.onplay = function() { muPlaying = true; _setPlayBtns('⏸'); };
+            a.onpause = function() { muPlaying = false; _setPlayBtns('▶'); };
+            a.onended = function() { muPlaying = false; _setPlayBtns('▶'); muNext(); };
+            a.onerror = function(e) {
+                console.error('Lỗi phát nhạc:', a.error ? a.error.code : '?', e);
+                muPlaying = false; _setPlayBtns('▶');
+            };
+            a.ontimeupdate = function() {
+                if (!a.duration) return;
+                const pct = (a.currentTime / a.duration * 100).toFixed(1) + '%';
+                ['muProg', 'muProg3'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.style.width = pct;
+                });
+            };
+            _localAudio = a;
+            if (autoplay && _userGestured) {
+                const p = a.play();
+                if (p && p.catch) p.catch(err => console.warn('Autoplay error:', err));
+            }
+        } catch (e) { console.error('Lỗi tạo Audio:', e); }
+    }
 }
 
 async function muLoadTrack(i, autoplay = true) {
-    const tracks = await getTracks(); if (!tracks.length) return;
-    muIdx = i; muSyncUI(tracks); const t = tracks[i];
-    _stopLocal(); _destroySCWidget();
-    if (isSoundCloudUrl(t.url)) { _playSoundCloud(t.url, autoplay); }
-    else { _loadLocalAudio(t.url, autoplay); }
-}
+    const tracks = await getTracks();
+    if (!tracks.length) return;
+    muIdx = i;
+    muSyncUI(tracks);
+    const t = tracks[i];
+    _stopLocal();
+    _destroySCWidget();
 
-function retryMusic() { _userGestured = true; if (_scWidget) { try { _scWidget.play(); } catch(e) { muLoadTrack(muIdx, true); } } else if (_localAudio) { _localAudio.play().catch(() => muLoadTrack(muIdx, true)); } else { muLoadTrack(muIdx, true); } }
+    if (isSoundCloudUrl(t.url)) {
+        _playSoundCloud(t.url, autoplay);
+    } else {
+        _loadLocalAudio(t.url, autoplay);
+    }
+}
 
 function muToggle() {
     _userGestured = true;
     getTracks().then(tracks => {
         if (!tracks.length) return;
-        if (!_scWidget && !_localAudio) { muLoadTrack(muIdx, true); return; }
-        if (_scWidget) { if (muPlaying) { try { _scWidget.pause(); } catch(e) {} } else { try { _scWidget.play(); } catch(e) { _scPendingPlay = true; muLoadTrack(muIdx, true); } } return; }
-        if (_localAudio) { if (muPlaying) { _localAudio.pause(); } else { const p = _localAudio.play(); if (p && p.catch) p.catch(() => muLoadTrack(muIdx, true)); } }
+        if (!_scWidget && !_localAudio) {
+            muLoadTrack(muIdx, true);
+            return;
+        }
+        if (_scWidget) {
+            if (muPlaying) {
+                try { _scWidget.pause(); } catch(e) {}
+            } else {
+                try { _scWidget.play(); } catch(e) {}
+            }
+            return;
+        }
+        if (_localAudio) {
+            if (muPlaying) {
+                _localAudio.pause();
+            } else {
+                const p = _localAudio.play();
+                if (p && p.catch) p.catch(() => muLoadTrack(muIdx, true));
+            }
+        }
     });
 }
 
-function muPrev() { _userGestured = true; getTracks().then(t => { if (t.length) muLoadTrack((muIdx - 1 + t.length) % t.length); }); }
-function muNext() { _userGestured = true; getTracks().then(t => { if (t.length) muLoadTrack((muIdx + 1) % t.length); }); }
-function muVol(v) { const vol = parseFloat(v); if (_scWidget) { try { _scWidget.setVolume(Math.round(vol * 100)); } catch(e) {} } if (_localAudio) { _localAudio.volume = vol; } }
-function muSeek(e) { const rect = e.currentTarget.getBoundingClientRect(); const ratio = (e.clientX - rect.left) / rect.width; if (_scWidget && _scDuration > 0) { try { _scWidget.seekTo(Math.round(ratio * _scDuration)); } catch(e) {} return; } if (_localAudio && _localAudio.duration) { _localAudio.currentTime = ratio * _localAudio.duration; } }
+function muPrev() {
+    _userGestured = true;
+    getTracks().then(t => { if (t.length) muLoadTrack((muIdx - 1 + t.length) % t.length); });
+}
+
+function muNext() {
+    _userGestured = true;
+    getTracks().then(t => { if (t.length) muLoadTrack((muIdx + 1) % t.length); });
+}
+
+function muVol(v) {
+    const vol = parseFloat(v);
+    if (_scWidget) { try { _scWidget.setVolume(Math.round(vol * 100)); } catch(e) {} }
+    if (_localAudio) { _localAudio.volume = vol; }
+}
+
+function muSeek(e) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const ratio = (e.clientX - rect.left) / rect.width;
+    if (_scWidget && _scDuration > 0) {
+        try { _scWidget.seekTo(Math.round(ratio * _scDuration)); } catch(e) {}
+        return;
+    }
+    if (_localAudio && _localAudio.duration) {
+        _localAudio.currentTime = ratio * _localAudio.duration;
+    }
+}
 
 initMusicPlayer();
 
 /* ================================================================
-   SENSITIVITY, TOGGLE, CANVAS, ETC.
-   (Các hàm phụ trợ giữ nguyên, rút gọn để tập trung sửa nhạc)
+   KEY INFO POPUP
    ================================================================ */
-async function onKeyInputChange(val) { /* giữ nguyên */ }
-async function showKeyInfo() { /* giữ nguyên */ }
-const DEVICE_LIST = [ /* giữ nguyên */ ];
-let acSelected=-1;
-function onSensInput(val) { /* giữ nguyên */ }
-function onSensKey(e) { /* giữ nguyên */ }
-function selectDevice(name) { /* giữ nguyên */ }
-document.addEventListener('click', e=>{ if(!e.target.closest('.sens-search-wrap'))document.getElementById('acList').style.display='none'; });
-function getDeviceClass(name) { /* giữ nguyên */ }
-function generateSens() { /* giữ nguyên */ }
-const TCFG = { /* giữ nguyên */ };
-let effRun=false;
-function handleToggle(el,name,type){ /* giữ nguyên */ }
-function showCodeModal(name,isOn,type){ /* giữ nguyên */ }
+async function onKeyInputChange(val) {
+    const hint=document.getElementById('keyInfoHint');
+    const hintTxt=document.getElementById('keyInfoText');
+    if(!val.trim()){hint.style.display='none';return;}
+    try {
+        const keys=await fbGet('keys')||{};
+        const kd=keys[val.trim()];
+        if(!kd){hint.style.display='none';return;}
+        const now=Date.now();
+        const slotsObj=_normalizeSlots(kd.slots);
+        const slots=Object.keys(slotsObj).length;
+        const full=slots>=kd.maxSlots, expired=now>kd.expiresAt;
+        if(expired){hintTxt.textContent='⏰ Key đã hết hạn';hint.style.color='var(--danger)';}
+        else if(full){hintTxt.textContent=`🔴 Đã đầy ${slots}/${kd.maxSlots} người — không thể dùng`;}
+        else{hintTxt.textContent=`👁 ${slots}/${kd.maxSlots} người đã dùng — Xem chi tiết`;}
+        hint.style.display='block';
+    } catch(e){hint.style.display='none';}
+}
 
-const gC=document.getElementById('galaxy'), gX=gC.getContext('2d'); let gW, gH, stars=[];
-function resizeAll(){ gW=gC.width=window.innerWidth; gH=gC.height=window.innerHeight; document.getElementById('snow').width=gW; document.getElementById('snow').height=gH; pC.width=gW; pC.height=gH; }
+async function showKeyInfo() {
+    const val=document.getElementById('keyInput').value.trim();
+    try {
+        const keys=await fbGet('keys')||{};
+        const kd=keys[val];
+        if(!kd)return;
+        const now=Date.now();
+        const slotsObj=_normalizeSlots(kd.slots);
+        const slots=Object.keys(slotsObj).length;
+        const pct=Math.min(100,Math.round(slots/kd.maxSlots*100));
+        const expired=now>kd.expiresAt, full=slots>=kd.maxSlots;
+        const rem=kd.expiresAt-now;
+        const barColor=full?'var(--danger)':pct>70?'var(--vip)':'var(--cyan)';
+        const ov=document.createElement('div');
+        ov.className='keyinfo-overlay';
+        ov.innerHTML=`<div class="keyinfo-box">
+            <div class="keyinfo-title">${kd.type==='vip'?'⭐ KEY VIP':'🔵 KEY THƯỜNG'} — Thông tin</div>
+            <div class="keyinfo-stat"><span class="keyinfo-lbl">Mã key</span><span class="keyinfo-val" style="font-family:monospace;color:var(--cyan);font-size:12px;">${esc(val)}</span></div>
+            <div class="keyinfo-stat"><span class="keyinfo-lbl">Số người đã dùng</span><span class="keyinfo-val" style="color:${full?'var(--danger)':kd.type==='vip'?'var(--vip)':'var(--green)'}">${slots} / ${kd.maxSlots}</span></div>
+            <div class="keyinfo-stat"><span class="keyinfo-lbl">Trạng thái</span><span class="keyinfo-val" style="color:${expired?'var(--danger)':full?'#ff8800':'var(--green)'}">${expired?'Hết hạn':full?'Đầy slot':'Còn trống'}</span></div>
+            <div class="keyinfo-stat"><span class="keyinfo-lbl">Thời hạn còn lại</span><span class="keyinfo-val">${expired?'<span style="color:var(--danger)">Đã hết hạn</span>':fmtMs(rem)}</span></div>
+            <div class="keyinfo-progress"><div class="keyinfo-progfill" style="width:${pct}%;background:${barColor};"></div></div>
+            <div style="font-size:10.5px;color:var(--dim);margin-bottom:2px;">Lấp đầy ${pct}% (${kd.maxSlots-slots} chỗ còn trống)</div>
+            <div style="font-size:10px;color:rgba(126,147,160,.5);margin-top:4px;">${full||expired?'⚠️ Key này không thể sử dụng':'✅ Key có thể sử dụng'}</div>
+            <span class="keyinfo-close" onclick="this.closest('.keyinfo-overlay').remove()">✕ Đóng</span>
+        </div>`;
+        ov.addEventListener('click', e=>{if(e.target===ov)ov.remove();});
+        document.body.appendChild(ov);
+    } catch(e){}
+}
+
+/* ================================================================
+   SENSITIVITY / AUTOCOMPLETE
+   ================================================================ */
+const DEVICE_LIST = [
+    'iPhone 6','iPhone 6s','iPhone 7','iPhone 8','iPhone X','iPhone XR','iPhone XS','iPhone XS Max',
+    'iPhone 11','iPhone 11 Pro','iPhone 11 Pro Max','iPhone 12','iPhone 12 Mini','iPhone 12 Pro','iPhone 12 Pro Max',
+    'iPhone 13','iPhone 13 Mini','iPhone 13 Pro','iPhone 13 Pro Max',
+    'iPhone 14','iPhone 14 Plus','iPhone 14 Pro','iPhone 14 Pro Max',
+    'iPhone 15','iPhone 15 Plus','iPhone 15 Pro','iPhone 15 Pro Max',
+    'Samsung Galaxy A03','Samsung Galaxy A05','Samsung Galaxy A12','Samsung Galaxy A13','Samsung Galaxy A14',
+    'Samsung Galaxy A23','Samsung Galaxy A33','Samsung Galaxy A34','Samsung Galaxy A53','Samsung Galaxy A54',
+    'Samsung Galaxy S21','Samsung Galaxy S22','Samsung Galaxy S23','Samsung Galaxy S24',
+    'Samsung Galaxy M13','Samsung Galaxy M14','Samsung Galaxy M23','Samsung Galaxy M33','Samsung Galaxy M34',
+    'Xiaomi Redmi 9','Xiaomi Redmi 9A','Xiaomi Redmi 9C','Xiaomi Redmi 10','Xiaomi Redmi 10C',
+    'Xiaomi Redmi Note 9','Xiaomi Redmi Note 10','Xiaomi Redmi Note 11','Xiaomi Redmi Note 12','Xiaomi Redmi Note 13',
+    'Xiaomi POCO M3','Xiaomi POCO M4','Xiaomi POCO M5','Xiaomi POCO X3','Xiaomi POCO X4','Xiaomi POCO X5',
+    'Oppo A15','Oppo A17','Oppo A37','Oppo A53','Oppo A54','Oppo A55','Oppo A57','Oppo A74','Oppo A76','Oppo A78','Oppo A96',
+    'Oppo Reno 4','Oppo Reno 5','Oppo Reno 6','Oppo Reno 7','Oppo Reno 8','Oppo Reno 10',
+    'Vivo Y12','Vivo Y15','Vivo Y17','Vivo Y21','Vivo Y22','Vivo Y31','Vivo Y33','Vivo Y52','Vivo Y53',
+    'Realme 5','Realme 6','Realme 7','Realme 8','Realme 9','Realme 10','Realme C11','Realme C15','Realme C21','Realme C25','Realme C33',
+    'Huawei Y6','Huawei Y7','Huawei Y9','Huawei Nova 3i','Huawei Nova 5T','Huawei P30','Huawei P40',
+    'OnePlus 9','OnePlus 10','OnePlus 11','OnePlus Nord','OnePlus Nord CE 2','OnePlus Nord CE 3',
+    'ASUS ROG Phone 5','ASUS ROG Phone 6','ASUS ROG Phone 7','ASUS Zenfone 9','ASUS Zenfone 10',
+    'iPad Air','iPad Mini','iPad Pro 11','iPad Pro 12.9',
+];
+let acSelected=-1;
+function onSensInput(val) {
+    const list=document.getElementById('acList'); acSelected=-1;
+    if(!val.trim()){list.style.display='none';return;}
+    const q=val.toLowerCase();
+    const matches=DEVICE_LIST.filter(d=>d.toLowerCase().includes(q)).slice(0,8);
+    if(!matches.length){list.style.display='none';return;}
+    list.innerHTML=matches.map((d,i)=>{
+        const hl=d.replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>');
+        return `<div class="autocomplete-item" onmousedown="selectDevice('${esc(d)}')" data-idx="${i}">${hl}</div>`;
+    }).join('');
+    list.style.display='block';
+}
+function onSensKey(e) {
+    const list=document.getElementById('acList');
+    const items=list.querySelectorAll('.autocomplete-item');
+    if(!items.length)return;
+    if(e.key==='ArrowDown'){e.preventDefault();acSelected=Math.min(acSelected+1,items.length-1);items.forEach((el,i)=>el.classList.toggle('active',i===acSelected));}
+    else if(e.key==='ArrowUp'){e.preventDefault();acSelected=Math.max(acSelected-1,0);items.forEach((el,i)=>el.classList.toggle('active',i===acSelected));}
+    else if(e.key==='Enter'&&acSelected>=0){e.preventDefault();selectDevice(items[acSelected].textContent);}
+    else if(e.key==='Escape'){list.style.display='none';}
+}
+function selectDevice(name) {
+    document.getElementById('sensDeviceInput').value=name;
+    document.getElementById('acList').style.display='none';
+    acSelected=-1;
+}
+document.addEventListener('click', e=>{
+    if(!e.target.closest('.sens-search-wrap'))document.getElementById('acList').style.display='none';
+});
+function getDeviceClass(name) {
+    const n=name.toLowerCase();
+    if(/iphone 1[3-9]|iphone (x[rs]|11|12|13|14|15) pro|s2[1-4]|rog phone|oneplus 1[0-9]|find x|pixel [6-9]/.test(n))return'flagship';
+    if(/iphone (x|xr|8|11|12 mini|12|13 mini)|redmi note 1[0-9]|galaxy a[5-9]\d|poco x|reno [6-9]|realme [7-9]/.test(n))return'midrange';
+    return'budget';
+}
+function generateSens() {
+    const inp=document.getElementById('sensDeviceInput').value.trim();
+    if(!inp){alert('Vui lòng nhập tên máy!');return;}
+    document.getElementById('acList').style.display='none';
+    document.getElementById('sensResult').style.display='none';
+    document.getElementById('sensThinking').style.display='flex';
+    setTimeout(()=>{
+        document.getElementById('sensThinking').style.display='none';
+        const cls=getDeviceClass(inp);
+        const ranges={
+            flagship:{g:[85,110],ads:[60,80],z3:[45,65],z6:[30,50],gyro:[150,185]},
+            midrange:{g:[100,130],ads:[70,95],z3:[55,75],z6:[38,58],gyro:[130,165]},
+            budget:{g:[115,150],ads:[80,110],z3:[65,90],z6:[45,70],gyro:[110,145]},
+        };
+        const r=ranges[cls];
+        function rnd(a,b){return Math.round(a+Math.random()*(b-a));}
+        const vals=[rnd(...r.g),rnd(...r.ads),rnd(...r.z3),rnd(...r.z6),rnd(...r.gyro)];
+        document.getElementById('sensDeviceName').textContent=inp;
+        ['sv0','sv1','sv2','sv3','sv4'].forEach((id,i)=>{document.getElementById(id).textContent=vals[i];});
+        ['sb0','sb1','sb2','sb3','sb4'].forEach((id,i)=>{
+            const el=document.getElementById(id); el.style.width='0%';
+            setTimeout(()=>{el.style.width=Math.round(vals[i]/200*100)+'%';},50+i*80);
+        });
+        document.getElementById('sensResult').style.display='block';
+    },1800);
+}
+
+/* ================================================================
+   TOGGLE CONFIG
+   ================================================================ */
+const TCFG = {
+    theme:{color:'#c8a0ff',icon:'🌙',offIcon:'☀️',lines:['[THEME] Khởi tạo engine chủ đề...','[GPU]   Tải shader bảng màu tối: depth_blur=3.2px','[CSS]   Áp dụng biến --bg=#020408 --panel=#0d1220','[LAYER] Thiết lập nebula opacity=0.35 blend=screen','[FONT]  antialiasing=lcd subpixel=off hinting=auto','[SYNC]  GPU vsync=true refresh=144hz framebuffer=swap','[CACHE] Ghi theme → key="nminh_dark_v4" scope=session','[DONE]  Chủ đề tối đã được áp dụng thành công ✓']},
+    relax:{color:'#7fffb0',icon:'🍃',offIcon:'⚡',lines:['[INIT]  Khởi động module Nhẹ Tâm...','[NEURO] Điều chỉnh sóng não: freq=0.5Hz amplitude=low','[ALERT] Tắt thông báo ưu tiên: queue=clear mode=silent','[SYNC]  Đồng bộ hơi thở: inhale=4s hold=4s exhale=6s','[BIO]   Chặn cortisol threshold=auto HRV_sensor=active','[AUDIO] Tải âm thanh: rain+pink_noise vol=28%','[LIGHT] Bộ lọc ánh sáng xanh: temp=3200K strength=80%','[DONE]  Chế độ Nhẹ Tâm đã kích hoạt thành công ✓']},
+    fps:{color:'#ffdd55',icon:'📉',offIcon:'🔥',lines:['[INIT]  Khởi động bộ giới hạn FPS...','[DISP]  Đặt giới hạn: cap=30fps vsync=adaptive','[REND]  Giảm độ phân giải: scale=0.75x DLSS=quality','[LOD]   Điều chỉnh chi tiết: near=80 far=200 shadow=512','[PART]  Giới hạn particle: max=256 physics_hz=20Hz','[CULL]  Bật tối ưu render: frustum=on occlusion=on','[TEMP]  Giám sát nhiệt độ: max=72°C fan=aggressive','[DONE]  Chế độ Giảm FPS đã áp dụng thành công ✓']},
+    optimize:{color:'#55ccff',icon:'⚙️',offIcon:'🛑',lines:['[INIT]  Bắt đầu quét tiến trình hệ thống...','[PROC]  Dọn tiến trình zombie: 14 đã tắt idle=trimmed','[MEM]   Defrag bộ nhớ: huge_pages=on swap=zstd 4096MB','[CPU]   Ghim CPU: isolcpus=2,3 nohz_full=on rcu=enabled','[CACHE] Xả cache: L1=clean L2=clean L3=warm TLB=flush','[IO]    Tối ưu ổ đĩa: mq-deadline queue=64 ncq=on','[NET]   Tinh chỉnh mạng: tcp_bbr=on rmem=16MB wmem=16MB','[DONE]  Tối Ưu Máy hoàn tất thành công ✓']},
+    sens:{color:'#ff9966',icon:'🎯',offIcon:'🔕',lines:['[INIT]  Khởi động module tăng độ nhạy...','[INPUT] Đặt tốc độ poll: rate=8000Hz latency=0.125ms','[RAW]   Kích hoạt raw input: bypass=true accel=false','[DPI]   Áp dụng profile: 800dpi step=50 snap=disabled','[USB]   Ưu tiên USB IRQ: priority=99 affinity=cpu0','[HID]   Bộ lọc HID: driver=hidraw buffer=1 mode=direct','[CLICK] Debounce=0ms pre_travel=0.2mm actuation=47g','[DONE]  Tăng Nhạy đã kích hoạt thành công ✓']},
+    vibration:{color:'#ff80c0',icon:'📳',offIcon:'🔔',lines:['[INIT]  Khởi động module Fix Rung...','[HAL]   Kết nối HAL haptic: driver=ff_memless override=on','[MOTOR] Tắt motor rung: duty_cycle=0% carrier=200Hz','[FF]    Chặn force feedback: rumble=off periodic=off','[PAD]   Tắt rung tay cầm: left=0x00 right=0x00 trim=0','[TOUCH] Vô hiệu hóa phản hồi cảm ứng: amplitude=0','[SYS]   Ghi đè pattern rung hệ thống: pattern=null','[DONE]  Fix Rung đã áp dụng thành công ✓']},
+    dpi:{color:'#80d8ff',icon:'🖱️',offIcon:'🖥️',lines:['[INIT]  Khởi động DPI Engine...','[DRV]   Tải driver: libinput backend=evdev mode=raw','[PTR]   Tốc độ con trỏ: scale=1.0x accel_profile=flat','[DPI1]  Stage 1 → 800dpi  sens=1.000 LED=#ff0000','[DPI2]  Stage 2 → 1200dpi sens=1.000 LED=#00ff00','[DPI3]  Stage 3 → 1600dpi sens=1.000 LED=#0000ff','[DPI4]  Stage 4 → 3200dpi sens=1.000 LED=#ffffff','[DONE]  DPI đã bật và cấu hình thành công ✓']},
+};
+let effRun=false;
+function handleToggle(el,name,type){if(effRun)return;el.classList.toggle('on');showCodeModal(name,el.classList.contains('on'),type);}
+function showCodeModal(name,isOn,type){
+    effRun=true;
+    const cfg=TCFG[type]||TCFG.optimize;
+    const ov=document.createElement('div'); ov.className='moverlay';
+    const bx=document.createElement('div'); bx.className='mbox';
+    const hd=document.createElement('div'); hd.className='mhdr';
+    hd.innerHTML=`<span class="mtic">${isOn?cfg.icon:cfg.offIcon}</span><span class="mtxt">Đang ${isOn?'bật':'tắt'}: ${name}</span><span class="mbdg ${isOn?'bon':'boff'}">${isOn?'● BẬT':'○ TẮT'}</span>`;
+    const ca=document.createElement('div'); ca.className='mca';
+    const ci=document.createElement('div'); ci.className='mci';
+    ci.style.color=cfg.color; ci.style.transform='translateY(100%)'; ci.style.transition='none';
+    ci.textContent=cfg.lines.map((l,i)=>`[+${String(i*200).padStart(4,'0')}ms] ${l}`).join('\n');
+    ca.appendChild(ci);
+    const ft=document.createElement('div'); ft.className='mftr';
+    ft.innerHTML=`<span class="fic">${isOn?'✅':'❌'}</span><span class="fmsg" style="color:${isOn?'var(--green)':'#ff6b6b'}">${isOn?'Bật thành công!':'Đã tắt!'} — ${name}</span>`;
+    bx.appendChild(hd); bx.appendChild(ca); bx.appendChild(ft); ov.appendChild(bx); document.body.appendChild(ov);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        const ey=Math.min(0,(ca.clientHeight||200)-ci.scrollHeight-20);
+        ci.style.transition='transform 2s linear'; ci.style.transform=`translateY(${ey}px)`;
+    }));
+    setTimeout(()=>ft.classList.add('show'),2050);
+    setTimeout(()=>{ov.style.transition='opacity .35s ease';ov.style.opacity='0';setTimeout(()=>{ov.remove();effRun=false;},350);},3500);
+}
+
+/* ================================================================
+   GALAXY / SNOW / PETALS
+   ================================================================ */
+const gC=document.getElementById('galaxy'), gX=gC.getContext('2d');
+let gW, gH, stars=[];
+function resizeAll(){
+    gW=gC.width=window.innerWidth; gH=gC.height=window.innerHeight;
+    document.getElementById('snow').width=gW; document.getElementById('snow').height=gH;
+    pC.width=gW; pC.height=gH;
+}
 window.addEventListener('resize',()=>{resizeAll();mkStars(220);});
-function mkStars(n){ stars=[]; for(let i=0;i<n;i++)stars.push({x:Math.random()*gW,y:Math.random()*gH,r:Math.random()*1.2+.2,op:Math.random()*.8+.2,ts:Math.random()*.02+.005,to:Math.random()*Math.PI*2,c:['#fff','#adf','#ffe','#ccf'][~~(Math.random()*4)]}); }
-let gT=0; function drawGalaxy(){ gX.clearRect(0,0,gW,gH); gT+=.016; stars.forEach(s=>{const tw=.5+.5*Math.sin(gT*s.ts*60+s.to);gX.globalAlpha=s.op*tw;gX.fillStyle=s.c;gX.beginPath();gX.arc(s.x,s.y,s.r,0,Math.PI*2);gX.fill();}); gX.globalAlpha=1; requestAnimationFrame(drawGalaxy); }
-const sC=document.getElementById('snow'), sX=sC.getContext('2d'); let flakes=[];
+function mkStars(n){
+    stars=[];
+    for(let i=0;i<n;i++)stars.push({x:Math.random()*gW,y:Math.random()*gH,r:Math.random()*1.2+.2,op:Math.random()*.8+.2,ts:Math.random()*.02+.005,to:Math.random()*Math.PI*2,c:['#fff','#adf','#ffe','#ccf'][~~(Math.random()*4)]});
+}
+let gT=0;
+function drawGalaxy(){
+    gX.clearRect(0,0,gW,gH); gT+=.016;
+    stars.forEach(s=>{const tw=.5+.5*Math.sin(gT*s.ts*60+s.to);gX.globalAlpha=s.op*tw;gX.fillStyle=s.c;gX.beginPath();gX.arc(s.x,s.y,s.r,0,Math.PI*2);gX.fill();});
+    gX.globalAlpha=1; requestAnimationFrame(drawGalaxy);
+}
+const sC=document.getElementById('snow'), sX=sC.getContext('2d');
+let flakes=[];
 function mkSnow(){flakes=[];for(let i=0;i<40;i++)flakes.push({x:Math.random()*gW,y:Math.random()*gH,r:Math.random()*1.4+.4,sp:Math.random()*.4+.2,d:Math.random()*10,op:Math.random()*.25+.1});}
-function drawSnow(){ sX.clearRect(0,0,gW,gH); sX.fillStyle='#fff'; flakes.forEach(f=>{sX.globalAlpha=f.op;sX.beginPath();sX.arc(f.x,f.y,f.r,0,Math.PI*2);sX.fill();f.y+=f.sp;f.x+=Math.sin(f.d)*.2;f.d+=.01;if(f.y>gH){f.y=-5;f.x=Math.random()*gW;}if(f.x>gW)f.x=0;if(f.x<0)f.x=gW;}); sX.globalAlpha=1; requestAnimationFrame(drawSnow); }
-const pC=document.getElementById('petals'), pX=pC.getContext('2d'); let petals=[]; const PC=['rgba(255,182,193,.7)','rgba(255,153,168,.6)','rgba(255,200,210,.65)','rgba(255,220,228,.55)'];
+function drawSnow(){
+    sX.clearRect(0,0,gW,gH); sX.fillStyle='#fff';
+    flakes.forEach(f=>{sX.globalAlpha=f.op;sX.beginPath();sX.arc(f.x,f.y,f.r,0,Math.PI*2);sX.fill();f.y+=f.sp;f.x+=Math.sin(f.d)*.2;f.d+=.01;if(f.y>gH){f.y=-5;f.x=Math.random()*gW;}if(f.x>gW)f.x=0;if(f.x<0)f.x=gW;});
+    sX.globalAlpha=1; requestAnimationFrame(drawSnow);
+}
+const pC=document.getElementById('petals'), pX=pC.getContext('2d');
+let petals=[];
+const PC=['rgba(255,182,193,.7)','rgba(255,153,168,.6)','rgba(255,200,210,.65)','rgba(255,220,228,.55)'];
 function mkP(){return{x:Math.random()*gW,y:-20,s:Math.random()*6+4,sy:Math.random()*1+.4,sx:Math.random()*.6-.3,r:Math.random()*Math.PI*2,rs:(Math.random()-.5)*.035,sw:Math.random()*2+1,so:Math.random()*Math.PI*2,c:PC[~~(Math.random()*PC.length)],op:Math.random()*.5+.35};}
 function initPetals(n){petals=[];for(let i=0;i<n;i++){const p=mkP();p.y=Math.random()*gH;petals.push(p);}}
-let pT=0; function drawPetals(){ pX.clearRect(0,0,gW,gH); pT++; if(pT%20===0&&petals.length<45)petals.push(mkP()); petals.forEach((p,i)=>{ p.y+=p.sy; p.x+=p.sx+Math.sin(pT*.015+p.so)*p.sw*.035; p.r+=p.rs; pX.save(); pX.translate(p.x,p.y); pX.rotate(p.r); pX.globalAlpha=p.op; pX.fillStyle=p.c; for(let k=0;k<5;k++){pX.save();pX.rotate((k/5)*Math.PI*2);pX.beginPath();pX.ellipse(0,-p.s*.55,p.s*.3,p.s*.65,0,0,Math.PI*2);pX.fill();pX.restore();} pX.restore(); if(p.y>gH+20||p.x<-30||p.x>gW+30)petals[i]=mkP(); }); requestAnimationFrame(drawPetals); }
-resizeAll(); mkStars(220); mkSnow(); initPetals(18); drawGalaxy(); drawSnow(); drawPetals();
+let pT=0;
+function drawPetals(){
+    pX.clearRect(0,0,gW,gH); pT++;
+    if(pT%20===0&&petals.length<45)petals.push(mkP());
+    petals.forEach((p,i)=>{
+        p.y+=p.sy; p.x+=p.sx+Math.sin(pT*.015+p.so)*p.sw*.035; p.r+=p.rs;
+        pX.save(); pX.translate(p.x,p.y); pX.rotate(p.r); pX.globalAlpha=p.op; pX.fillStyle=p.c;
+        for(let k=0;k<5;k++){pX.save();pX.rotate((k/5)*Math.PI*2);pX.beginPath();pX.ellipse(0,-p.s*.55,p.s*.3,p.s*.65,0,0,Math.PI*2);pX.fill();pX.restore();}
+        pX.restore();
+        if(p.y>gH+20||p.x<-30||p.x>gW+30)petals[i]=mkP();
+    });
+    requestAnimationFrame(drawPetals);
+}
 
-window.addEventListener('load', ()=>{ setTimeout(()=>{ const intro=document.getElementById('intro'), app=document.getElementById('app'); intro.classList.add('hide'); app.classList.add('show'); setTimeout(()=>{intro.style.display='none';},900); },3400); });
-(function buildFx(){ const orbit=document.getElementById('ringOrbit'), R=130; for(let i=0;i<5;i++){ const t=document.createElement('div'); t.className='irt'; const a=(i/5)*Math.PI*2-Math.PI/2; t.style.left=(130+R*Math.cos(a))+'px'; t.style.top=(130+R*Math.sin(a))+'px'; t.style.animationDelay=(.3+i*.32)+'s'; orbit.appendChild(t); } const cw=document.querySelector('.icw'); for(let i=0;i<8;i++){ const s=document.createElement('div'); s.className='csp'; const a=(i/8)*Math.PI*2; s.style.left='50%'; s.style.top='50%'; s.style.setProperty('--dx',(Math.cos(a)*34)+'px'); s.style.setProperty('--dy',(Math.sin(a)*34)+'px'); s.style.animation='sparkOut .55s ease-out '+(.45+Math.random()*.1)+'s forwards'; s.style.transform='translate(-50%,-50%)'; cw.appendChild(s); } })();
-document.addEventListener('keypress', e=>{ if(e.key!=='Enter')return; if(document.getElementById('adminLoginModal').style.display==='flex'){verifyAdmin();return;} if(document.getElementById('page2').classList.contains('active'))checkKey(); if(document.getElementById('pageSens').classList.contains('active'))generateSens(); });
+resizeAll(); mkStars(220); mkSnow(); initPetals(18);
+drawGalaxy(); drawSnow(); drawPetals();
+
+/* INTRO */
+window.addEventListener('load', ()=>{
+    setTimeout(()=>{
+        const intro=document.getElementById('intro'), app=document.getElementById('app');
+        intro.classList.add('hide'); app.classList.add('show');
+        setTimeout(()=>{intro.style.display='none';},900);
+    },3400);
+});
+
+(function buildFx(){
+    const orbit=document.getElementById('ringOrbit'), R=130;
+    for(let i=0;i<5;i++){
+        const t=document.createElement('div'); t.className='irt';
+        const a=(i/5)*Math.PI*2-Math.PI/2;
+        t.style.left=(130+R*Math.cos(a))+'px'; t.style.top=(130+R*Math.sin(a))+'px';
+        t.style.animationDelay=(.3+i*.32)+'s'; orbit.appendChild(t);
+    }
+    const cw=document.querySelector('.icw');
+    for(let i=0;i<8;i++){
+        const s=document.createElement('div'); s.className='csp';
+        const a=(i/8)*Math.PI*2;
+        s.style.left='50%'; s.style.top='50%';
+        s.style.setProperty('--dx',(Math.cos(a)*34)+'px'); s.style.setProperty('--dy',(Math.sin(a)*34)+'px');
+        s.style.animation='sparkOut .55s ease-out '+(.45+Math.random()*.1)+'s forwards';
+        s.style.transform='translate(-50%,-50%)'; cw.appendChild(s);
+    }
+})();
+
+/* KEYBOARD */
+document.addEventListener('keypress', e=>{
+    if(e.key!=='Enter')return;
+    if(document.getElementById('adminLoginModal').style.display==='flex'){verifyAdmin();return;}
+    if(document.getElementById('page2').classList.contains('active'))checkKey();
+    if(document.getElementById('pageSens').classList.contains('active'))generateSens();
+});
+
 updateSyncStatus(_FB_CONFIGURED);
 </script>
 </body>
