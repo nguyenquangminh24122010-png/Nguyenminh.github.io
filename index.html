@@ -220,7 +220,6 @@
         .keyinfo-close:hover { color: var(--cyan); }
         .offline-badge { display: inline-block; background: rgba(255,92,92,.12); color: var(--danger); font-size: 9.5px; padding: 2px 10px; border-radius: 20px; border: 1px solid rgba(255,92,92,.2); letter-spacing: .5px; margin-top: 6px; }
         .offline-badge.online { background: rgba(77,255,145,.12); color: var(--green); border-color: rgba(77,255,145,.2); }
-        /* ── NOTICE BOX cho hướng dẫn Firebase ── */
         .fb-notice { background: rgba(255,153,0,.08); border: 1px solid rgba(255,153,0,.3); border-radius: 10px; padding: 10px 14px; margin-bottom: 12px; font-size: 11.5px; color: var(--vip); line-height: 1.7; text-align: left; }
         .fb-notice code { background: rgba(57,230,230,.1); color: var(--cyan); padding: 1px 5px; border-radius: 4px; font-size: 11px; }
     </style>
@@ -386,7 +385,9 @@
     </div>
 </div>
 
-<!-- PAGE SENSITIVITY -->
+<!-- ═══════════════════════════════════════════════════
+     PAGE SENSITIVITY — ĐÃ CẬP NHẬT: 6 mục + nhiều máy
+     ═══════════════════════════════════════════════════ -->
 <div id="pageSens" class="page">
     <div class="cb">🎯</div>
     <div class="page-inner">
@@ -394,23 +395,38 @@
         <h1 style="font-size:18px;">Độ Nhạy Theo Máy</h1>
         <div class="tg" style="margin-bottom:14px;">Nhập tên máy để tạo độ nhạy phù hợp</div>
         <div class="sens-search-wrap">
-            <input type="text" id="sensDeviceInput" class="inp" placeholder="Nhập tên máy (vd: iPhone 11)..." autocomplete="off" oninput="onSensInput(this.value)" onkeydown="onSensKey(event)">
+            <input type="text" id="sensDeviceInput" class="inp" placeholder="Nhập tên máy (vd: iPhone 13, Samsung A54)..." autocomplete="off" oninput="onSensInput(this.value)" onkeydown="onSensKey(event)">
             <div class="autocomplete-list" id="acList" style="display:none;"></div>
         </div>
         <button class="btn" onclick="generateSens()" style="margin-top:8px;">✨ Tạo Độ Nhạy</button>
         <div id="sensResult" style="display:none;">
             <div class="sens-result">
                 <div class="sens-result-title">📊 Độ nhạy cho <span id="sensDeviceName" style="color:var(--cyan);font-weight:700;"></span></div>
+
+                <!-- Mục 1: Nhìn chung -->
                 <div class="sens-row"><span class="sens-label">🎯 Nhìn chung (General)</span><span class="sens-val" id="sv0">—</span></div>
                 <div class="sens-bar-wrap"><div class="sens-bar" id="sb0" style="width:0%"></div></div>
+
+                <!-- Mục 2: Ngắm ADS -->
                 <div class="sens-row" style="margin-top:8px;"><span class="sens-label">🔴 Ngắm ADS</span><span class="sens-val" id="sv1">—</span></div>
                 <div class="sens-bar-wrap"><div class="sens-bar" id="sb1" style="width:0%;background:linear-gradient(90deg,rgba(255,100,100,.5),#ff5c5c);"></div></div>
+
+                <!-- Mục 3: Thu phóng 3x -->
                 <div class="sens-row" style="margin-top:8px;"><span class="sens-label">🔭 Thu phóng 3x</span><span class="sens-val" id="sv2">—</span></div>
                 <div class="sens-bar-wrap"><div class="sens-bar" id="sb2" style="width:0%;background:linear-gradient(90deg,rgba(255,200,80,.5),#ffd700);"></div></div>
+
+                <!-- Mục 4: Thu phóng 6x -->
                 <div class="sens-row" style="margin-top:8px;"><span class="sens-label">🔬 Thu phóng 6x</span><span class="sens-val" id="sv3">—</span></div>
                 <div class="sens-bar-wrap"><div class="sens-bar" id="sb3" style="width:0%;background:linear-gradient(90deg,rgba(150,100,255,.5),#a060ff);"></div></div>
+
+                <!-- Mục 5: Gyroscope -->
                 <div class="sens-row" style="margin-top:8px;"><span class="sens-label">🌀 Gyroscope</span><span class="sens-val" id="sv4">—</span></div>
                 <div class="sens-bar-wrap"><div class="sens-bar" id="sb4" style="width:0%;background:linear-gradient(90deg,rgba(100,255,200,.5),#4dff91);"></div></div>
+
+                <!-- Mục 6 MỚI: Camera nhìn tự do -->
+                <div class="sens-row" style="margin-top:8px;"><span class="sens-label">📷 Camera Nhìn Tự Do</span><span class="sens-val" id="sv5">—</span></div>
+                <div class="sens-bar-wrap"><div class="sens-bar" id="sb5" style="width:0%;background:linear-gradient(90deg,rgba(255,153,0,.5),#ff9900);"></div></div>
+
                 <div style="margin-top:10px;font-size:10.5px;color:var(--dim);text-align:center;">Tối đa: 200 · Tạo dựa trên phần cứng máy</div>
             </div>
         </div>
@@ -432,17 +448,12 @@
         <div class="brand">Quản trị viên</div>
         <h1 style="font-size:18px;">Admin Panel</h1>
         <div class="admhdr">🔑 Nminh Lock Pro — Toàn quyền quản lý</div>
-
-        <!-- HƯỚNG DẪN FIREBASE — chỉ hiện khi chưa cấu hình -->
-        <div id="fbGuide" class="fb-notice" style="display:none;">
-        </div>
-
+        <div id="fbGuide" class="fb-notice" style="display:none;"></div>
         <div class="tabs">
             <button class="tab active" onclick="switchTab('tabKeys',this)">🗝 Keys</button>
             <button class="tab" onclick="switchTab('tabMusic',this)">🎵 Nhạc</button>
             <button class="tab" onclick="switchTab('tabApp',this)">⚙️ App</button>
         </div>
-
         <!-- TAB KEYS -->
         <div id="tabKeys" class="tabp active">
             <div class="admsec">
@@ -472,20 +483,17 @@
                 <div class="klist" id="adminKeyList"><div class="emp">Đang tải<span class="ldot"></span></div></div>
             </div>
         </div>
-
         <!-- TAB MUSIC -->
         <div id="tabMusic" class="tabp">
             <div class="admsec">
-                <!-- NOTE: File nhạc chỉ lưu trong trình duyệt (IndexedDB), không đồng bộ qua Firebase -->
                 <div style="background:rgba(57,230,230,.06);border:1px solid rgba(57,230,230,.15);border-radius:8px;padding:9px 12px;margin-bottom:12px;font-size:11px;color:var(--dim);line-height:1.6;">
-                    ℹ️ <strong style="color:var(--cyan)">Upload File</strong>: Lưu trong trình duyệt của máy bạn (offline, không chia sẻ qua mạng).<br>
-                    ℹ️ <strong style="color:var(--cyan)">Dán Link</strong>: Lưu trên Firebase, tất cả máy nghe được (cần cấu hình Firebase).
+                    ℹ️ <strong style="color:var(--cyan)">Upload File</strong>: Lưu trong trình duyệt của máy bạn (offline).<br>
+                    ℹ️ <strong style="color:var(--cyan)">Dán Link</strong>: Lưu trên Firebase, tất cả máy nghe được.
                 </div>
                 <div style="display:flex;gap:6px;margin-bottom:12px;">
                     <button id="mTabFile" onclick="switchMusicTab('file')" style="flex:1;padding:7px;border-radius:8px;background:rgba(57,230,230,.18);color:var(--cyan);border:1.5px solid var(--cyan);font-size:12px;font-weight:700;cursor:pointer;">📁 Upload File</button>
                     <button id="mTabLink" onclick="switchMusicTab('link')" style="flex:1;padding:7px;border-radius:8px;background:transparent;color:var(--dim);border:1.5px solid rgba(57,230,230,.2);font-size:12px;font-weight:600;cursor:pointer;">🔗 Dán Link</button>
                 </div>
-                <!-- PANEL FILE -->
                 <div id="mPanelFile">
                     <div class="admsec-t">Upload file nhạc (.mp3, .ogg, .wav)</div>
                     <div id="mDropZone" onclick="document.getElementById('mFileInput').click()"
@@ -526,9 +534,8 @@
                     <button class="btn" style="margin-top:8px;" onclick="adminAddFileTrack()">＋ Thêm Bài Hát</button>
                     <div style="margin-top:8px;font-size:10.5px;color:var(--dim);text-align:center;">⚠️ File lưu trong IndexedDB của trình duyệt này.</div>
                 </div>
-                <!-- PANEL LINK -->
                 <div id="mPanelLink" style="display:none;">
-                    <div class="admsec-t">Thêm bài hát (link trực tiếp .mp3 hoặc SoundCloud)</div>
+                    <div class="admsec-t">Thêm bài hát (link trực tiếp .mp3)</div>
                     <div class="grid1"><div><div class="albl">Tên bài hát</div>
                         <input type="text" id="mTrackName" class="ainp" placeholder="vd: Tên bài hát"></div></div>
                     <div class="grid1"><div><div class="albl">Nghệ sĩ</div>
@@ -546,7 +553,6 @@
                 <div class="klist" id="adminTrackList"><div class="emp">Chưa có bài nào</div></div>
             </div>
         </div>
-
         <!-- TAB APP -->
         <div id="tabApp" class="tabp">
             <div class="admsec">
@@ -570,7 +576,6 @@
             <div id="cfgMsg" class="ok" style="display:none;"></div>
             <button class="btn" onclick="saveAppConfig()">💾 Lưu cài đặt</button>
         </div>
-
         <span class="back" onclick="goTo('page1')">← Thoát admin</span>
     </div>
 </div>
@@ -591,20 +596,14 @@
 
 <script>
 /* ================================================================
-   NMINH LOCK PRO — Fixed Version
-   ✅ FIX 1: Upload nhạc — phát đúng từ IndexedDB bằng Blob URL
-   ✅ FIX 2: Slot đếm đúng — 1 UID chỉ được claim 1 slot duy nhất
-   ✅ FIX 3: 1 máy chỉ dùng được 1 key tại 1 thời điểm
-   ✅ FIX 4: Firebase đồng bộ key/nhạc/password mọi máy
-   ✅ FIX 5: Fallback localStorage khi offline / chưa cấu hình Firebase
-   ✅ FIX 6: Sửa lỗi trình phát nhạc — loại bỏ SoundCloud API lỗi
+   NMINH LOCK PRO — v2.1 (Sensitivity Update)
+   ✅ 6 mục độ nhạy (thêm Camera Nhìn Tự Do)
+   ✅ Danh sách thiết bị mở rộng 120+ máy
+   ✅ iPhone: độ nhạy thấp hơn, tối thiểu 50
+   ✅ Android: độ nhạy cao hơn (budget > midrange > flagship)
+   ✅ Phân loại chính xác: iOS vs Android vs Tablet
    ================================================================ */
 
-/* ════════════════════════════════════════════════════════
-   🔥 FIREBASE CONFIG — Điền thông tin project của bạn
-   Lấy tại: console.firebase.google.com
-   → Project Settings → General → Your apps → Web app → Config
-   ════════════════════════════════════════════════════════ */
 const FIREBASE_CONFIG = {
     apiKey:            "AIzaSyAHqNEdDLet-ker_B7n4s5OhZnRyIv8SD8",
     authDomain:        "aimhead-3548c.firebaseapp.com",
@@ -614,18 +613,15 @@ const FIREBASE_CONFIG = {
     messagingSenderId: "205987052158",
     appId:             "1:205987052158:web:cf3c908d43a29cdd05f62f",
 };
-/* ════════════════════════════════════════════════════════ */
 
 const DEF_PW = "1";
 
-/* ── DEVICE UID ── */
 function myUid() {
     let u = localStorage.getItem('nm_uid');
     if (!u) { u = 'u' + Date.now() + Math.random().toString(36).slice(2, 7); localStorage.setItem('nm_uid', u); }
     return u;
 }
 
-/* ── HELPERS ── */
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function pad(n) { return String(n).padStart(2,'0'); }
 function fmtMs(ms) {
@@ -642,14 +638,11 @@ function fmtShort(ms) {
     return `${m}m`;
 }
 
-/* ── localStorage helpers ── */
 function _lsGet(key, def) { try { const v=localStorage.getItem(key); return v!=null?JSON.parse(v):def; } catch(e) { return def; } }
 function _lsSet(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {} }
 function _lsDel(key) { try { localStorage.removeItem(key); } catch(e) {} }
 
-/* ================================================================
-   FIREBASE INIT
-   ================================================================ */
+/* ── FIREBASE ── */
 const _FB_CONFIGURED = !Object.values(FIREBASE_CONFIG).some(v => v.startsWith('PASTE_'));
 let _db = null, _fbReady = false, _fbLoadPromise = null;
 
@@ -687,12 +680,10 @@ async function fbGet(path) {
         const db = await Promise.race([_loadFirebase(), new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),FB_TIMEOUT))]);
         const snap = await db.ref(path).get();
         const val = snap.exists() ? snap.val() : null;
-        // Cache root level
         const root = path.split('/')[0];
         if (path === root && val !== null) _lsSet('nm_fb_'+root, val);
         return val;
     } catch(e) {
-        // Fallback cache
         const root = path.split('/')[0];
         const parts = path.split('/');
         const cached = _lsGet('nm_fb_'+root, null);
@@ -702,7 +693,6 @@ async function fbGet(path) {
 }
 
 async function fbSet(path, val) {
-    // Luôn cập nhật cache trước
     const parts = path.split('/');
     const root = parts[0];
     if (parts.length === 1) {
@@ -718,7 +708,6 @@ async function fbSet(path, val) {
         updateSyncStatus(true);
         return true;
     } catch(e) {
-        console.warn('fbSet offline:', e.message);
         updateSyncStatus(false);
         return false;
     }
@@ -727,13 +716,8 @@ async function fbSet(path, val) {
 async function fbRemove(path) {
     const parts = path.split('/');
     const root = parts[0];
-    if (parts.length === 1) {
-        _lsDel('nm_fb_'+root);
-    } else {
-        const cached = _lsGet('nm_fb_'+root, {}) || {};
-        delete cached[parts[1]];
-        _lsSet('nm_fb_'+root, cached);
-    }
+    if (parts.length === 1) { _lsDel('nm_fb_'+root); }
+    else { const cached = _lsGet('nm_fb_'+root, {}) || {}; delete cached[parts[1]]; _lsSet('nm_fb_'+root, cached); }
     try {
         const db = await Promise.race([_loadFirebase(), new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),FB_TIMEOUT))]);
         await db.ref(path).remove();
@@ -741,8 +725,6 @@ async function fbRemove(path) {
     } catch(e) { updateSyncStatus(false); }
 }
 
-/* ════ FIX QUAN TRỌNG: fbTransaction dùng Firebase transaction thật ════
-   Điều này ngăn race condition khi nhiều máy claim slot cùng lúc */
 async function fbTransaction(path, updateFn) {
     try {
         const db = await Promise.race([_loadFirebase(), new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),FB_TIMEOUT))]);
@@ -752,22 +734,16 @@ async function fbTransaction(path, updateFn) {
                 else resolve({ committed, snapshot });
             });
         });
-        // Cập nhật cache sau transaction
         if (result.committed && result.snapshot && result.snapshot.exists()) {
             const parts = path.split('/');
             const root = parts[0];
             const cached = _lsGet('nm_fb_'+root, {}) || {};
-            if (parts.length > 1) {
-                cached[parts[1]] = result.snapshot.val();
-                _lsSet('nm_fb_'+root, cached);
-            }
+            if (parts.length > 1) { cached[parts[1]] = result.snapshot.val(); _lsSet('nm_fb_'+root, cached); }
         }
         updateSyncStatus(true);
         return result;
     } catch(e) {
-        console.warn('fbTransaction fallback:', e.message);
         updateSyncStatus(false);
-        // Fallback: đọc cache, áp updateFn, ghi cache
         const parts = path.split('/');
         const root = parts[0];
         const key = parts[1];
@@ -781,14 +757,14 @@ async function fbTransaction(path, updateFn) {
     }
 }
 
-/* ── Sync status UI ── */
 function updateSyncStatus(ok) {
     const badge = document.getElementById('syncStatusBadge');
     if (!badge) return;
     if (!_FB_CONFIGURED) {
         badge.textContent = '⚠️ Chưa cấu hình Firebase (dùng local)';
         badge.className = 'offline-badge';
-        document.getElementById('fbGuide') && (document.getElementById('fbGuide').style.display = 'block');
+        const fg = document.getElementById('fbGuide');
+        if (fg) fg.style.display = 'block';
         return;
     }
     if (ok) { badge.textContent = '✅ Đồng bộ Firebase'; badge.className = 'offline-badge online'; }
@@ -799,15 +775,11 @@ setInterval(async () => {
     try { await fbGet('_ping'); updateSyncStatus(true); } catch(e) { updateSyncStatus(false); }
 }, 20000);
 
-/* ================================================================
-   KEY STORE
-   ================================================================ */
+/* ── KEY STORE ── */
 async function getKeys() { const v = await fbGet('keys'); return v || {}; }
 async function setKeys(k) { await fbSet('keys', k); }
 
-/* ================================================================
-   APP CONFIG
-   ================================================================ */
+/* ── APP CONFIG ── */
 const DEF_CFG = { title:'NMINH LOCK', sub:'Hệ thống bảo mật', tagline:'Khóa truy cập an toàn cho thiết bị của bạn', brand:'App by Nminh' };
 async function getCfg() { const v = await fbGet('app_cfg'); return v || DEF_CFG; }
 async function applyCfg() {
@@ -836,9 +808,7 @@ async function getAdmPw() {
     catch(e) { return _lsGet('nm_adm_pw', null) || DEF_PW; }
 }
 
-/* ================================================================
-   KEY SYSTEM — FIX SLOT + 1 MÁY 1 KEY
-   ================================================================ */
+/* ── KEY SYSTEM ── */
 let cdInterval = null, activeKeyData = null;
 
 async function checkKey() {
@@ -846,25 +816,18 @@ async function checkKey() {
     const err = document.getElementById('errMsg');
     err.style.display = 'none';
     if (!val) { showErr('❌ Vui lòng nhập key!'); return; }
-
     const btn = document.getElementById('checkKeyBtn');
     const origTxt = btn.textContent;
     btn.textContent = '⏳ Đang kiểm tra...';
     btn.disabled = true;
-
     try {
-        // Luôn lấy dữ liệu mới nhất từ Firebase
         const keys = await fbGet('keys');
         if (!keys) { showErr('❌ Không thể tải dữ liệu key! Kiểm tra kết nối.'); return; }
-
         const kd = keys[val];
         if (!kd) { showErr('❌ Key không hợp lệ. Thử lại!'); return; }
-
         const now = Date.now();
-        // Kiểm tra hết hạn
         if (now > kd.expiresAt) {
             document.getElementById('keyInput').value = '';
-            // Xoá uid khỏi slot nếu còn
             const uid = myUid();
             const slots = kd.slots || {};
             if (slots[uid]) {
@@ -878,27 +841,17 @@ async function checkKey() {
             goTo('pageExp');
             return;
         }
-
         const uid = myUid();
-        /* FIX: slots là object { uid: timestamp } thay vì array
-           để tránh trùng lặp và dễ quản lý */
         const slots = kd.slots || {};
         const slotCount = Object.keys(slots).length;
-
-        // Máy này đã claim key này → cho vào lại
         if (slots[uid]) {
-            // Kiểm tra uid này có trong key đúng không
             _lsSet('nm_active_key', val);
             document.getElementById('keyInput').value = '';
-            // Đọc lại data mới nhất để hiển thị đúng slot count
             const freshKeys = await fbGet('keys');
             const freshKd = freshKeys ? freshKeys[val] : kd;
             enterDashboard(val, freshKd);
             return;
         }
-
-        /* FIX QUAN TRỌNG: Kiểm tra máy này đang dùng key khác còn hạn
-           → Không cho nhập key mới cho đến khi key cũ hết hạn */
         const activeKey = _lsGet('nm_active_key', null);
         if (activeKey && activeKey !== val) {
             const oldKd = keys[activeKey];
@@ -910,11 +863,8 @@ async function checkKey() {
                     return;
                 }
             }
-            // Key cũ đã hết hạn hoặc không còn slot → cho phép nhập key mới
             _lsDel('nm_active_key');
         }
-
-        // Kiểm tra slot đầy
         if (slotCount >= kd.maxSlots) {
             document.getElementById('keyInput').value = '';
             document.getElementById('fullMsg').innerHTML =
@@ -922,39 +872,28 @@ async function checkKey() {
             goTo('pageFull');
             return;
         }
-
-        // Claim slot bằng Firebase transaction thật
         const txResult = await fbTransaction('keys/'+val, (current) => {
             if (!current) return current;
             const sl = current.slots || {};
-            // Đã có UID này rồi (race condition) → không claim thêm
             if (sl[uid]) return current;
             const count = Object.keys(sl).length;
-            if (count >= current.maxSlots) return undefined; // abort
+            if (count >= current.maxSlots) return undefined;
             sl[uid] = now;
             current.slots = sl;
             return current;
         });
-
         if (!txResult.committed) {
-            // Slot đầy sau khi transaction
             document.getElementById('keyInput').value = '';
             document.getElementById('fullMsg').innerHTML = `Key đã đầy slot. Liên hệ admin.`;
             goTo('pageFull');
             return;
         }
-
-        // Lưu active key
         _lsSet('nm_active_key', val);
-
-        // Đọc lại data mới nhất
         const freshKeys = await fbGet('keys');
         const freshKd = freshKeys ? freshKeys[val] : null;
         if (!freshKd) { showErr('❌ Lỗi sau khi claim slot!'); return; }
-
         document.getElementById('keyInput').value = '';
         enterDashboard(val, freshKd);
-
     } catch(e) {
         console.error(e);
         showErr('❌ ' + (e.message || 'Lỗi kết nối. Thử lại!'));
@@ -972,7 +911,6 @@ function enterDashboard(code, kd) {
     document.getElementById('dKey').textContent = code;
     document.getElementById('dStatus').textContent = 'Hoạt động';
     document.getElementById('dStatus').className = 'kval g';
-    // FIX: đếm đúng số slot (slots là object)
     const slots = kd.slots || {};
     const slotCount = typeof slots === 'object' && !Array.isArray(slots) ? Object.keys(slots).length : (Array.isArray(slots) ? slots.length : 0);
     document.getElementById('dSlot').textContent = slotCount + ' / ' + kd.maxSlots;
@@ -993,7 +931,6 @@ function startCd(exp) {
             clearInterval(cdInterval);
             document.getElementById('dStatus').textContent = 'Hết hạn';
             document.getElementById('dStatus').className = 'kval r';
-            // Tự xoá slot khi hết hạn
             _releaseSlot();
             setTimeout(() => { doLogout(); goTo('pageExp'); }, 2000);
         }
@@ -1012,15 +949,13 @@ async function _releaseSlot() {
             if (current.slots && current.slots[uid]) delete current.slots[uid];
             return current;
         });
-    } catch(e) { console.warn('Release slot error:', e); }
+    } catch(e) {}
     _lsDel('nm_active_key');
 }
 
 function doLogout() {
     if (cdInterval) clearInterval(cdInterval);
     activeKeyData = null;
-    // Không release slot khi logout — slot giữ cho đến khi key hết hạn
-    // Người dùng có thể đăng nhập lại bằng cùng key
     goTo('page1');
 }
 
@@ -1032,9 +967,7 @@ function showErr(msg) {
     i.style.animation = 'none'; void i.offsetWidth; i.style.animation = 'shake .4s ease';
 }
 
-/* ================================================================
-   NAVIGATION
-   ================================================================ */
+/* ── NAVIGATION ── */
 function goTo(id) {
     const _ac = document.getElementById('acList');
     if (_ac) _ac.style.display = 'none';
@@ -1056,9 +989,7 @@ function switchTab(tabId, btn) {
     if (tabId === 'tabApp') loadAppCfgForm();
 }
 
-/* ================================================================
-   ADMIN LOGIN
-   ================================================================ */
+/* ── ADMIN LOGIN ── */
 function openAdminLogin() {
     document.getElementById('adminLoginModal').style.display = 'flex';
     setTimeout(() => document.getElementById('adminPwInput').focus(), 60);
@@ -1077,10 +1008,8 @@ async function verifyAdmin() {
     btn.disabled = true;
     try {
         const correctPw = await getAdmPw();
-        if (input === correctPw) {
-            closeAdminLogin();
-            goTo('pageAdmin');
-        } else {
+        if (input === correctPw) { closeAdminLogin(); goTo('pageAdmin'); }
+        else {
             errEl.textContent = '❌ Sai mật khẩu!';
             errEl.style.display = 'block';
             document.getElementById('adminPwInput').value = '';
@@ -1095,18 +1024,10 @@ async function verifyAdmin() {
     }
 }
 
-/* ================================================================
-   ADMIN: KEY MANAGEMENT
-   FIX: Migrate slots array → object khi cần
-   ================================================================ */
+/* ── ADMIN: KEY MANAGEMENT ── */
 function _normalizeSlots(slots) {
     if (!slots) return {};
-    if (Array.isArray(slots)) {
-        // Migrate từ array sang object
-        const obj = {};
-        slots.forEach(uid => { obj[uid] = Date.now(); });
-        return obj;
-    }
+    if (Array.isArray(slots)) { const obj = {}; slots.forEach(uid => { obj[uid] = Date.now(); }); return obj; }
     if (typeof slots === 'object') return slots;
     return {};
 }
@@ -1145,7 +1066,6 @@ async function loadKeyList() {
             const now = Date.now();
             const exp = now > k.expiresAt;
             const rem = k.expiresAt - now;
-            // FIX: đếm đúng slots
             const slotsObj = _normalizeSlots(k.slots);
             const slots = Object.keys(slotsObj).length;
             const d = document.createElement('div');
@@ -1222,7 +1142,6 @@ async function saveEditKey(oldCode) {
         if (!k) return;
         const addMs = (addDays*86400+addHours*3600)*1000;
         const newExpiry = Math.max(Date.now(), k.expiresAt) + addMs;
-        // FIX: giữ slots object nguyên vẹn khi sửa key
         const existSlots = _normalizeSlots(k.slots);
         const updated = { ...k, code:newCode, type, maxSlots, expiresAt:newExpiry, durationMs:k.durationMs+addMs, slots:existSlots };
         if (newCode !== oldCode) delete keys[oldCode];
@@ -1243,10 +1162,7 @@ async function delKey(code) {
     } catch(e) { alert('Lỗi xoá key: '+e.message); }
 }
 
-/* ================================================================
-   ADMIN: MUSIC MANAGEMENT
-   FIX: Phân biệt rõ local (IndexedDB) vs cloud (Firebase link)
-   ================================================================ */
+/* ── ADMIN: MUSIC ── */
 async function getTracks() {
     const v = await fbGet('tracks');
     if (!v) return [];
@@ -1376,9 +1292,7 @@ async function moveTrack(i, dir) {
     } catch(e) {}
 }
 
-/* ================================================================
-   ADMIN: APP CONFIG
-   ================================================================ */
+/* ── ADMIN: APP CONFIG ── */
 async function loadAppCfgForm() {
     const c = await getCfg();
     document.getElementById('cfgTitle').value = c.title||'';
@@ -1394,7 +1308,6 @@ async function saveAppConfig() {
     if (newPw) {
         if (newPw !== pw2) { showAdmMsg(msg,'❌ Mật khẩu xác nhận không khớp!',false); return; }
         if (newPw.length < 6) { showAdmMsg(msg,'❌ Mật khẩu tối thiểu 6 ký tự!',false); return; }
-        // FIX: lưu password lên Firebase VÀ cache local
         await fbSet('adm_pw', newPw);
         _lsSet('nm_adm_pw', newPw);
         document.getElementById('cfgNewPw').value='';
@@ -1418,9 +1331,6 @@ function showAdmMsg(el, txt, ok) {
     setTimeout(() => { el.style.display='none'; }, 3500);
 }
 
-/* ================================================================
-   MUSIC TAB SWITCH
-   ================================================================ */
 function switchMusicTab(tab) {
     const isFile = tab==='file';
     document.getElementById('mPanelFile').style.display = isFile?'':'none';
@@ -1435,9 +1345,7 @@ function switchMusicTab(tab) {
     }
 }
 
-/* ================================================================
-   INDEXEDDB — lưu file nhạc local
-   ================================================================ */
+/* ── INDEXEDDB ── */
 const IDB_NAME='nminhMusicDB', IDB_STORE='files', IDB_VER=1;
 let _idbInst = null;
 function openIDB() {
@@ -1477,10 +1385,7 @@ async function idbDeleteFile(id) {
     });
 }
 
-/* ================================================================
-   FILE UPLOAD MUSIC
-   FIX: Lưu Blob vào IDB và dùng Blob URL để phát, tránh lỗi CORS
-   ================================================================ */
+/* ── FILE UPLOAD MUSIC ── */
 let _pendingFile = null, _uploadProgressInterval = null;
 
 function handleMusicFileDrop(e) { const f=e.dataTransfer.files[0]; if(f)_loadFileToUI(f); }
@@ -1515,11 +1420,9 @@ async function adminAddFileTrack() {
     const artist = document.getElementById('mFileArtist').value.trim();
     if (!name) { showAdmMsg(msg,'❌ Nhập tên bài hát!',false); return; }
     if (!_pendingFile) { showAdmMsg(msg,'❌ Chọn file nhạc trước!',false); return; }
-
     document.getElementById('mFileProgress').style.display='block';
     document.getElementById('mFileBar').style.width='0%';
     document.getElementById('mFileStatus').textContent='Đang lưu file...';
-
     try {
         const idbId = 'track_'+Date.now();
         let prog = 0;
@@ -1528,19 +1431,13 @@ async function adminAddFileTrack() {
             prog = Math.min(prog+8, 85);
             document.getElementById('mFileBar').style.width = prog+'%';
         }, 80);
-
-        // FIX: Lưu Blob gốc vào IndexedDB (không cần đọc thành base64)
         await idbSaveFile(idbId, _pendingFile);
-
         clearInterval(_uploadProgressInterval); _uploadProgressInterval=null;
         document.getElementById('mFileBar').style.width='100%';
         document.getElementById('mFileStatus').textContent='✅ Đã lưu!';
-
-        // Chỉ lưu metadata vào Firebase/local, không lưu file data lên Firebase
         const tracks = await getTracks();
         tracks.push({ id:Date.now(), name, artist:artist||'Unknown', url:'idb:'+idbId, cover:'', isLocal:true });
         await setTracks(tracks);
-
         showAdmMsg(msg,'✅ Đã thêm bài "'+name+'"!',true);
         clearMusicFile();
         loadAdminTrackList();
@@ -1552,9 +1449,7 @@ async function adminAddFileTrack() {
     }
 }
 
-/* ================================================================
-   MUSIC PLAYER — Chỉ phát MP3 (bỏ SoundCloud)
-   ================================================================ */
+/* ── MUSIC PLAYER ── */
 let muIdx = 0, muPlaying = false;
 let _localAudio = null, _currentBlobUrl = null;
 let _userGestured = false;
@@ -1601,10 +1496,6 @@ async function muSyncUI(tracks) {
     });
 }
 
-function _isLocalTrack(track) {
-    return track && (track.isLocal || (track.url && track.url.startsWith('idb:')));
-}
-
 function _stopLocal() {
     if (_localAudio) {
         _localAudio.pause();
@@ -1633,84 +1524,46 @@ function _playBlob(blob, autoplay) {
     a.src = blobUrl;
     a.volume = _getCurrentVol();
     _localAudio = a;
-    a.onplay = () => { muPlaying = true;
-        _setPlayBtns('⏸'); };
-    a.onpause = () => { muPlaying = false;
-        _setPlayBtns('▶'); };
-    a.onended = () => { muPlaying = false;
-        _setPlayBtns('▶');
-        muNext(); };
-    a.onerror = (e) => {
-        console.error('Audio error:', a.error ? a.error.code : '?', e);
-        muPlaying = false;
-        _setPlayBtns('▶');
-    };
+    a.onplay = () => { muPlaying = true; _setPlayBtns('⏸'); };
+    a.onpause = () => { muPlaying = false; _setPlayBtns('▶'); };
+    a.onended = () => { muPlaying = false; _setPlayBtns('▶'); muNext(); };
+    a.onerror = () => { muPlaying = false; _setPlayBtns('▶'); };
     a.ontimeupdate = () => {
         if (!a.duration) return;
         const pct = (a.currentTime / a.duration * 100).toFixed(1) + '%';
-        ['muProg', 'muProg3'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.style.width = pct;
-        });
+        ['muProg', 'muProg3'].forEach(id => { const el = document.getElementById(id); if (el) el.style.width = pct; });
     };
-    if (autoplay) {
-        const p = a.play();
-        if (p && p.catch) p.catch(err => console.warn('Play error:', err));
-    }
+    if (autoplay) { const p = a.play(); if (p && p.catch) p.catch(err => console.warn('Play error:', err)); }
 }
 
 function _loadLocalAudio(url, autoplay) {
     if (url.startsWith('idb:')) {
         const idbId = url.slice(4);
         idbGetFile(idbId).then(blob => {
-            if (!blob) { console.error('Không tìm thấy file trong IndexedDB:', idbId); return; }
+            if (!blob) { console.error('Không tìm thấy file:', idbId); return; }
             _playBlob(blob, autoplay);
         }).catch(e => console.error('IDB load error', e));
     } else {
         _stopLocal();
-        if (!url || !url.startsWith('http')) {
-            console.error('URL không hợp lệ:', url);
-            return;
-        }
+        if (!url || !url.startsWith('http')) return;
         try {
             const a = new Audio();
             a.crossOrigin = 'anonymous';
             a.src = url;
             a.volume = _getCurrentVol();
             a.preload = 'auto';
-            a.oncanplay = function() {
-                console.log('Nhạc đã sẵn sàng');
-                if (autoplay && _userGestured) {
-                    const p = a.play();
-                    if (p && p.catch) p.catch(err => console.warn('Play error:', err));
-                }
-            };
-            a.onplay = function() { muPlaying = true;
-                _setPlayBtns('⏸'); };
-            a.onpause = function() { muPlaying = false;
-                _setPlayBtns('▶'); };
-            a.onended = function() { muPlaying = false;
-                _setPlayBtns('▶');
-                muNext(); };
-            a.onerror = function(e) {
-                console.error('Lỗi phát nhạc:', a.error ? a.error.code : '?', e);
-                muPlaying = false;
-                _setPlayBtns('▶');
-                setTimeout(() => { if (!muPlaying && _localAudio) { _localAudio.load(); } }, 3000);
-            };
+            a.oncanplay = function() { if (autoplay && _userGestured) { const p = a.play(); if (p && p.catch) p.catch(()=>{}); } };
+            a.onplay = function() { muPlaying = true; _setPlayBtns('⏸'); };
+            a.onpause = function() { muPlaying = false; _setPlayBtns('▶'); };
+            a.onended = function() { muPlaying = false; _setPlayBtns('▶'); muNext(); };
+            a.onerror = function() { muPlaying = false; _setPlayBtns('▶'); };
             a.ontimeupdate = function() {
                 if (!a.duration) return;
                 const pct = (a.currentTime / a.duration * 100).toFixed(1) + '%';
-                ['muProg', 'muProg3'].forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) el.style.width = pct;
-                });
+                ['muProg', 'muProg3'].forEach(id => { const el = document.getElementById(id); if (el) el.style.width = pct; });
             };
             _localAudio = a;
-            if (autoplay && _userGestured) {
-                const p = a.play();
-                if (p && p.catch) p.catch(err => console.warn('Autoplay error:', err));
-            }
+            if (autoplay && _userGestured) { const p = a.play(); if (p && p.catch) p.catch(()=>{}); }
         } catch (e) { console.error('Lỗi tạo Audio:', e); }
     }
 }
@@ -1729,49 +1582,24 @@ function muToggle() {
     _userGestured = true;
     getTracks().then(tracks => {
         if (!tracks.length) return;
-        if (!_localAudio) {
-            muLoadTrack(muIdx, true);
-            return;
-        }
-        if (_localAudio) {
-            if (muPlaying) {
-                _localAudio.pause();
-            } else {
-                const p = _localAudio.play();
-                if (p && p.catch) p.catch(() => muLoadTrack(muIdx, true));
-            }
-        }
+        if (!_localAudio) { muLoadTrack(muIdx, true); return; }
+        if (muPlaying) { _localAudio.pause(); }
+        else { const p = _localAudio.play(); if (p && p.catch) p.catch(() => muLoadTrack(muIdx, true)); }
     });
 }
 
-function muPrev() {
-    _userGestured = true;
-    getTracks().then(t => { if (t.length) muLoadTrack((muIdx - 1 + t.length) % t.length); });
-}
-
-function muNext() {
-    _userGestured = true;
-    getTracks().then(t => { if (t.length) muLoadTrack((muIdx + 1) % t.length); });
-}
-
-function muVol(v) {
-    const vol = parseFloat(v);
-    if (_localAudio) { _localAudio.volume = vol; return; }
-}
-
+function muPrev() { _userGestured = true; getTracks().then(t => { if (t.length) muLoadTrack((muIdx - 1 + t.length) % t.length); }); }
+function muNext() { _userGestured = true; getTracks().then(t => { if (t.length) muLoadTrack((muIdx + 1) % t.length); }); }
+function muVol(v) { if (_localAudio) { _localAudio.volume = parseFloat(v); } }
 function muSeek(e) {
     const rect = e.currentTarget.getBoundingClientRect();
     const ratio = (e.clientX - rect.left) / rect.width;
-    if (_localAudio && _localAudio.duration) {
-        _localAudio.currentTime = ratio * _localAudio.duration;
-    }
+    if (_localAudio && _localAudio.duration) { _localAudio.currentTime = ratio * _localAudio.duration; }
 }
 
 initMusicPlayer();
 
-/* ================================================================
-   KEY INFO POPUP
-   ================================================================ */
+/* ── KEY INFO POPUP ── */
 async function onKeyInputChange(val) {
     const hint=document.getElementById('keyInfoHint');
     const hintTxt=document.getElementById('keyInfoText');
@@ -1822,97 +1650,309 @@ async function showKeyInfo() {
     } catch(e){}
 }
 
-/* ================================================================
-   SENSITIVITY / AUTOCOMPLETE
-   ================================================================ */
+/* ════════════════════════════════════════════════════════════════
+   🎯 SENSITIVITY MODULE — ĐÃ CẬP NHẬT HOÀN TOÀN
+   ════════════════════════════════════════════════════════════════
+   Quy tắc mới:
+   - iPhone (iOS): nhạy thấp hơn Android, min 50 cho tất cả mục
+   - Android flagship: nhạy trung bình
+   - Android midrange: nhạy cao hơn flagship một chút
+   - Android budget: nhạy cao nhất (cần bù đắp phần cứng yếu)
+   - Gyroscope & Camera tự do: scale riêng (max ~200)
+   ════════════════════════════════════════════════════════════════ */
+
+/* Danh sách máy mở rộng — 120+ thiết bị */
 const DEVICE_LIST = [
-    'iPhone 6','iPhone 6s','iPhone 7','iPhone 8','iPhone X','iPhone XR','iPhone XS','iPhone XS Max',
-    'iPhone 11','iPhone 11 Pro','iPhone 11 Pro Max','iPhone 12','iPhone 12 Mini','iPhone 12 Pro','iPhone 12 Pro Max',
+    /* ── iPhone ── */
+    'iPhone 6','iPhone 6s','iPhone 6s Plus',
+    'iPhone 7','iPhone 7 Plus',
+    'iPhone 8','iPhone 8 Plus',
+    'iPhone X','iPhone XR','iPhone XS','iPhone XS Max',
+    'iPhone SE (2020)','iPhone SE (2022)',
+    'iPhone 11','iPhone 11 Pro','iPhone 11 Pro Max',
+    'iPhone 12','iPhone 12 Mini','iPhone 12 Pro','iPhone 12 Pro Max',
     'iPhone 13','iPhone 13 Mini','iPhone 13 Pro','iPhone 13 Pro Max',
     'iPhone 14','iPhone 14 Plus','iPhone 14 Pro','iPhone 14 Pro Max',
     'iPhone 15','iPhone 15 Plus','iPhone 15 Pro','iPhone 15 Pro Max',
-    'Samsung Galaxy A03','Samsung Galaxy A05','Samsung Galaxy A12','Samsung Galaxy A13','Samsung Galaxy A14',
-    'Samsung Galaxy A23','Samsung Galaxy A33','Samsung Galaxy A34','Samsung Galaxy A53','Samsung Galaxy A54',
-    'Samsung Galaxy S21','Samsung Galaxy S22','Samsung Galaxy S23','Samsung Galaxy S24',
-    'Samsung Galaxy M13','Samsung Galaxy M14','Samsung Galaxy M23','Samsung Galaxy M33','Samsung Galaxy M34',
-    'Xiaomi Redmi 9','Xiaomi Redmi 9A','Xiaomi Redmi 9C','Xiaomi Redmi 10','Xiaomi Redmi 10C',
-    'Xiaomi Redmi Note 9','Xiaomi Redmi Note 10','Xiaomi Redmi Note 11','Xiaomi Redmi Note 12','Xiaomi Redmi Note 13',
-    'Xiaomi POCO M3','Xiaomi POCO M4','Xiaomi POCO M5','Xiaomi POCO X3','Xiaomi POCO X4','Xiaomi POCO X5',
-    'Oppo A15','Oppo A17','Oppo A37','Oppo A53','Oppo A54','Oppo A55','Oppo A57','Oppo A74','Oppo A76','Oppo A78','Oppo A96',
-    'Oppo Reno 4','Oppo Reno 5','Oppo Reno 6','Oppo Reno 7','Oppo Reno 8','Oppo Reno 10',
-    'Vivo Y12','Vivo Y15','Vivo Y17','Vivo Y21','Vivo Y22','Vivo Y31','Vivo Y33','Vivo Y52','Vivo Y53',
-    'Realme 5','Realme 6','Realme 7','Realme 8','Realme 9','Realme 10','Realme C11','Realme C15','Realme C21','Realme C25','Realme C33',
-    'Huawei Y6','Huawei Y7','Huawei Y9','Huawei Nova 3i','Huawei Nova 5T','Huawei P30','Huawei P40',
-    'OnePlus 9','OnePlus 10','OnePlus 11','OnePlus Nord','OnePlus Nord CE 2','OnePlus Nord CE 3',
-    'ASUS ROG Phone 5','ASUS ROG Phone 6','ASUS ROG Phone 7','ASUS Zenfone 9','ASUS Zenfone 10',
-    'iPad Air','iPad Mini','iPad Pro 11','iPad Pro 12.9',
+    'iPhone 16','iPhone 16 Plus','iPhone 16 Pro','iPhone 16 Pro Max',
+
+    /* ── iPad ── */
+    'iPad Air 4','iPad Air 5','iPad Mini 6',
+    'iPad Pro 11 (2021)','iPad Pro 11 (2022)','iPad Pro 12.9 (2021)','iPad Pro 12.9 (2022)',
+    'iPad 9','iPad 10',
+
+    /* ── Samsung Galaxy S ── */
+    'Samsung Galaxy S20','Samsung Galaxy S20 FE','Samsung Galaxy S21','Samsung Galaxy S21 FE',
+    'Samsung Galaxy S22','Samsung Galaxy S22 Plus','Samsung Galaxy S22 Ultra',
+    'Samsung Galaxy S23','Samsung Galaxy S23 Plus','Samsung Galaxy S23 Ultra',
+    'Samsung Galaxy S24','Samsung Galaxy S24 Plus','Samsung Galaxy S24 Ultra',
+
+    /* ── Samsung Galaxy A ── */
+    'Samsung Galaxy A03','Samsung Galaxy A03s','Samsung Galaxy A04','Samsung Galaxy A04s',
+    'Samsung Galaxy A05','Samsung Galaxy A05s',
+    'Samsung Galaxy A12','Samsung Galaxy A12 Nacho',
+    'Samsung Galaxy A13','Samsung Galaxy A13 5G',
+    'Samsung Galaxy A14','Samsung Galaxy A14 5G',
+    'Samsung Galaxy A15','Samsung Galaxy A15 5G',
+    'Samsung Galaxy A23','Samsung Galaxy A23 5G',
+    'Samsung Galaxy A24','Samsung Galaxy A24 4G',
+    'Samsung Galaxy A25 5G',
+    'Samsung Galaxy A33 5G','Samsung Galaxy A34 5G',
+    'Samsung Galaxy A53 5G','Samsung Galaxy A54 5G',
+    'Samsung Galaxy A73 5G',
+
+    /* ── Samsung Galaxy M ── */
+    'Samsung Galaxy M13','Samsung Galaxy M13 5G',
+    'Samsung Galaxy M14','Samsung Galaxy M14 5G',
+    'Samsung Galaxy M23','Samsung Galaxy M23 5G',
+    'Samsung Galaxy M33','Samsung Galaxy M33 5G',
+    'Samsung Galaxy M34','Samsung Galaxy M34 5G',
+    'Samsung Galaxy M53 5G','Samsung Galaxy M54 5G',
+
+    /* ── Xiaomi Redmi ── */
+    'Xiaomi Redmi 9','Xiaomi Redmi 9A','Xiaomi Redmi 9C','Xiaomi Redmi 9T',
+    'Xiaomi Redmi 10','Xiaomi Redmi 10A','Xiaomi Redmi 10C',
+    'Xiaomi Redmi 12','Xiaomi Redmi 12C',
+    'Xiaomi Redmi 13C',
+    'Xiaomi Redmi Note 9','Xiaomi Redmi Note 9 Pro',
+    'Xiaomi Redmi Note 10','Xiaomi Redmi Note 10 Pro','Xiaomi Redmi Note 10S',
+    'Xiaomi Redmi Note 11','Xiaomi Redmi Note 11 Pro','Xiaomi Redmi Note 11S',
+    'Xiaomi Redmi Note 12','Xiaomi Redmi Note 12 Pro','Xiaomi Redmi Note 12S',
+    'Xiaomi Redmi Note 13','Xiaomi Redmi Note 13 Pro','Xiaomi Redmi Note 13 Pro+',
+
+    /* ── Xiaomi POCO ── */
+    'Xiaomi POCO M3','Xiaomi POCO M4','Xiaomi POCO M4 Pro','Xiaomi POCO M5','Xiaomi POCO M5s','Xiaomi POCO M6 Pro',
+    'Xiaomi POCO X3','Xiaomi POCO X3 Pro','Xiaomi POCO X3 NFC',
+    'Xiaomi POCO X4 GT','Xiaomi POCO X4 Pro 5G',
+    'Xiaomi POCO X5','Xiaomi POCO X5 Pro 5G',
+    'Xiaomi POCO X6','Xiaomi POCO X6 Pro',
+    'Xiaomi POCO F3','Xiaomi POCO F4','Xiaomi POCO F5','Xiaomi POCO F5 Pro',
+
+    /* ── Xiaomi Mi / 12 / 13 / 14 ── */
+    'Xiaomi 12','Xiaomi 12 Pro','Xiaomi 12T','Xiaomi 12T Pro',
+    'Xiaomi 13','Xiaomi 13 Pro','Xiaomi 13T','Xiaomi 13T Pro',
+    'Xiaomi 14','Xiaomi 14 Pro','Xiaomi 14 Ultra',
+
+    /* ── Oppo ── */
+    'Oppo A15','Oppo A15s','Oppo A17','Oppo A17k',
+    'Oppo A37','Oppo A53','Oppo A54','Oppo A54s',
+    'Oppo A55','Oppo A57','Oppo A57s',
+    'Oppo A74','Oppo A74 5G','Oppo A76',
+    'Oppo A78','Oppo A78 5G','Oppo A96',
+    'Oppo A98 5G',
+    'Oppo Reno 4','Oppo Reno 4 Pro',
+    'Oppo Reno 5','Oppo Reno 5 Pro',
+    'Oppo Reno 6','Oppo Reno 6 Pro',
+    'Oppo Reno 7','Oppo Reno 7 Pro',
+    'Oppo Reno 8','Oppo Reno 8 Pro','Oppo Reno 8T',
+    'Oppo Reno 10','Oppo Reno 10 Pro','Oppo Reno 10 Pro+',
+    'Oppo Find X5','Oppo Find X5 Pro','Oppo Find X6 Pro',
+
+    /* ── Vivo ── */
+    'Vivo Y12','Vivo Y15','Vivo Y17','Vivo Y20','Vivo Y21',
+    'Vivo Y22','Vivo Y22s','Vivo Y27','Vivo Y27s',
+    'Vivo Y31','Vivo Y33s','Vivo Y35','Vivo Y36',
+    'Vivo Y52','Vivo Y53s','Vivo Y55','Vivo Y56 5G',
+    'Vivo V21','Vivo V23','Vivo V25','Vivo V27',
+    'Vivo X80','Vivo X90','Vivo X90 Pro',
+
+    /* ── Realme ── */
+    'Realme 5','Realme 5 Pro','Realme 6','Realme 7','Realme 7i',
+    'Realme 8','Realme 8 Pro','Realme 8i',
+    'Realme 9','Realme 9 Pro','Realme 9 Pro+','Realme 9i',
+    'Realme 10','Realme 10 Pro','Realme 10 Pro+',
+    'Realme 11','Realme 11 Pro','Realme 11 Pro+',
+    'Realme C11','Realme C15','Realme C20','Realme C21','Realme C21Y',
+    'Realme C25','Realme C25s','Realme C31','Realme C33','Realme C35',
+    'Realme C51','Realme C53','Realme C55',
+    'Realme GT','Realme GT Neo 3','Realme GT 2 Pro',
+
+    /* ── Huawei ── */
+    'Huawei Y6','Huawei Y6p','Huawei Y7a','Huawei Y9a',
+    'Huawei Nova 5T','Huawei Nova 7i','Huawei Nova 9',
+    'Huawei P30','Huawei P30 Pro','Huawei P40','Huawei P40 Pro',
+    'Huawei Mate 40 Pro',
+
+    /* ── OnePlus ── */
+    'OnePlus 9','OnePlus 9 Pro','OnePlus 9R',
+    'OnePlus 10 Pro','OnePlus 10T',
+    'OnePlus 11','OnePlus 11R',
+    'OnePlus Nord','OnePlus Nord 2','OnePlus Nord 2T',
+    'OnePlus Nord CE 2','OnePlus Nord CE 2 Lite','OnePlus Nord CE 3','OnePlus Nord CE 3 Lite',
+
+    /* ── ASUS ROG / Zenfone ── */
+    'ASUS ROG Phone 5','ASUS ROG Phone 5s','ASUS ROG Phone 6','ASUS ROG Phone 6D','ASUS ROG Phone 7','ASUS ROG Phone 7 Ultimate','ASUS ROG Phone 8',
+    'ASUS Zenfone 9','ASUS Zenfone 10',
+
+    /* ── Google Pixel ── */
+    'Google Pixel 6','Google Pixel 6 Pro','Google Pixel 6a',
+    'Google Pixel 7','Google Pixel 7 Pro','Google Pixel 7a',
+    'Google Pixel 8','Google Pixel 8 Pro',
+
+    /* ── Tecno / Infinix / itel (phổ biến VN) ── */
+    'Tecno Spark 8C','Tecno Spark 9','Tecno Spark 10','Tecno Spark 10 Pro',
+    'Tecno Camon 19','Tecno Camon 20','Tecno Pova 4','Tecno Pova 5',
+    'Infinix Hot 20','Infinix Hot 20i','Infinix Hot 30','Infinix Hot 30i',
+    'Infinix Note 12','Infinix Note 30',
+    'itel A60','itel A70','itel P55',
 ];
-let acSelected=-1;
+
+let acSelected = -1;
+
 function onSensInput(val) {
-    const list=document.getElementById('acList'); acSelected=-1;
-    if(!val.trim()){list.style.display='none';return;}
-    const q=val.toLowerCase();
-    const matches=DEVICE_LIST.filter(d=>d.toLowerCase().includes(q)).slice(0,8);
-    if(!matches.length){list.style.display='none';return;}
-    list.innerHTML=matches.map((d,i)=>{
-        const hl=d.replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>');
+    const list = document.getElementById('acList');
+    acSelected = -1;
+    if (!val.trim()) { list.style.display = 'none'; return; }
+    const q = val.toLowerCase();
+    const matches = DEVICE_LIST.filter(d => d.toLowerCase().includes(q)).slice(0, 10);
+    if (!matches.length) { list.style.display = 'none'; return; }
+    list.innerHTML = matches.map((d, i) => {
+        const hl = d.replace(new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi'), '<mark>$1</mark>');
         return `<div class="autocomplete-item" onmousedown="selectDevice('${esc(d)}')" data-idx="${i}">${hl}</div>`;
     }).join('');
-    list.style.display='block';
-}
-function onSensKey(e) {
-    const list=document.getElementById('acList');
-    const items=list.querySelectorAll('.autocomplete-item');
-    if(!items.length)return;
-    if(e.key==='ArrowDown'){e.preventDefault();acSelected=Math.min(acSelected+1,items.length-1);items.forEach((el,i)=>el.classList.toggle('active',i===acSelected));}
-    else if(e.key==='ArrowUp'){e.preventDefault();acSelected=Math.max(acSelected-1,0);items.forEach((el,i)=>el.classList.toggle('active',i===acSelected));}
-    else if(e.key==='Enter'&&acSelected>=0){e.preventDefault();selectDevice(items[acSelected].textContent);}
-    else if(e.key==='Escape'){list.style.display='none';}
-}
-function selectDevice(name) {
-    document.getElementById('sensDeviceInput').value=name;
-    document.getElementById('acList').style.display='none';
-    acSelected=-1;
-}
-document.addEventListener('click', e=>{
-    if(!e.target.closest('.sens-search-wrap'))document.getElementById('acList').style.display='none';
-});
-function getDeviceClass(name) {
-    const n=name.toLowerCase();
-    if(/iphone 1[3-9]|iphone (x[rs]|11|12|13|14|15) pro|s2[1-4]|rog phone|oneplus 1[0-9]|find x|pixel [6-9]/.test(n))return'flagship';
-    if(/iphone (x|xr|8|11|12 mini|12|13 mini)|redmi note 1[0-9]|galaxy a[5-9]\d|poco x|reno [6-9]|realme [7-9]/.test(n))return'midrange';
-    return'budget';
-}
-function generateSens() {
-    const inp=document.getElementById('sensDeviceInput').value.trim();
-    if(!inp){alert('Vui lòng nhập tên máy!');return;}
-    document.getElementById('acList').style.display='none';
-    document.getElementById('sensResult').style.display='none';
-    document.getElementById('sensThinking').style.display='flex';
-    setTimeout(()=>{
-        document.getElementById('sensThinking').style.display='none';
-        const cls=getDeviceClass(inp);
-        const ranges={
-            flagship:{g:[85,110],ads:[60,80],z3:[45,65],z6:[30,50],gyro:[150,185]},
-            midrange:{g:[100,130],ads:[70,95],z3:[55,75],z6:[38,58],gyro:[130,165]},
-            budget:{g:[115,150],ads:[80,110],z3:[65,90],z6:[45,70],gyro:[110,145]},
-        };
-        const r=ranges[cls];
-        function rnd(a,b){return Math.round(a+Math.random()*(b-a));}
-        const vals=[rnd(...r.g),rnd(...r.ads),rnd(...r.z3),rnd(...r.z6),rnd(...r.gyro)];
-        document.getElementById('sensDeviceName').textContent=inp;
-        ['sv0','sv1','sv2','sv3','sv4'].forEach((id,i)=>{document.getElementById(id).textContent=vals[i];});
-        ['sb0','sb1','sb2','sb3','sb4'].forEach((id,i)=>{
-            const el=document.getElementById(id); el.style.width='0%';
-            setTimeout(()=>{el.style.width=Math.round(vals[i]/200*100)+'%';},50+i*80);
-        });
-        document.getElementById('sensResult').style.display='block';
-    },1800);
+    list.style.display = 'block';
 }
 
-/* ================================================================
-   TOGGLE CONFIG
-   ================================================================ */
+function onSensKey(e) {
+    const list = document.getElementById('acList');
+    const items = list.querySelectorAll('.autocomplete-item');
+    if (!items.length) return;
+    if (e.key === 'ArrowDown') { e.preventDefault(); acSelected = Math.min(acSelected + 1, items.length - 1); items.forEach((el, i) => el.classList.toggle('active', i === acSelected)); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); acSelected = Math.max(acSelected - 1, 0); items.forEach((el, i) => el.classList.toggle('active', i === acSelected)); }
+    else if (e.key === 'Enter' && acSelected >= 0) { e.preventDefault(); selectDevice(items[acSelected].textContent); }
+    else if (e.key === 'Escape') { list.style.display = 'none'; }
+}
+
+function selectDevice(name) {
+    document.getElementById('sensDeviceInput').value = name;
+    document.getElementById('acList').style.display = 'none';
+    acSelected = -1;
+}
+
+document.addEventListener('click', e => {
+    if (!e.target.closest('.sens-search-wrap')) document.getElementById('acList').style.display = 'none';
+});
+
+/* ════════════════════════════════════════════════════════════
+   getDeviceProfile — Trả về profile chi tiết cho từng máy
+   
+   LOGIC:
+   - iOS (iPhone/iPad): nhạy thấp, min 50 cho mọi mục
+   - Android flagship: nhạy trung bình (chip mạnh, màn hình tốt)
+   - Android midrange: nhạy trung bình-cao
+   - Android budget: nhạy cao (cần bù phần cứng kém hơn)
+   - Gaming phone (ROG, Black Shark): nhạy trung bình-thấp (đã tối ưu sẵn)
+   ════════════════════════════════════════════════════════════ */
+function getDeviceProfile(name) {
+    const n = name.toLowerCase();
+
+    /* ── iOS ── */
+    const isIOS = /iphone|ipad/.test(n);
+    if (isIOS) {
+        const isOldiPhone = /iphone (6|7|8|se|x[^s]|xs|xr)/.test(n);
+        const isNewiPhone = /iphone 1[2-6]/.test(n);
+        const isIpad = /ipad/.test(n);
+        if (isIpad) {
+            return { platform:'ios', tier:'ipad', label:'iPad',
+                g:[65,80], ads:[50,65], z3:[50,60], z6:[50,57],
+                gyro:[80,100], cam:[60,75] };
+        }
+        if (isNewiPhone) {
+            return { platform:'ios', tier:'ios_new', label:'iPhone mới',
+                g:[58,72], ads:[50,63], z3:[50,60], z6:[50,56],
+                gyro:[75,95], cam:[55,70] };
+        }
+        // iPhone cũ (6,7,8,X,XR,XS,SE)
+        return { platform:'ios', tier:'ios_old', label:'iPhone cũ',
+            g:[62,78], ads:[52,67], z3:[50,62], z6:[50,58],
+            gyro:[78,100], cam:[58,74] };
+    }
+
+    /* ── Gaming ── */
+    const isGaming = /rog phone|black shark|redmagic|nubia red/.test(n);
+    if (isGaming) {
+        return { platform:'android', tier:'gaming', label:'Gaming Phone',
+            g:[75,90], ads:[60,75], z3:[52,68], z6:[50,60],
+            gyro:[110,140], cam:[70,88] };
+    }
+
+    /* ── Android Flagship ── */
+    const isFlagship = /galaxy s2[0-4](?! fe| a| m)|galaxy s22 ultra|galaxy s23 ultra|galaxy s24 ultra|pixel [6-8] pro|oneplus 9 pro|oneplus 10 pro|oneplus 11$|find x[56]|xiaomi 1[234] pro|xiaomi 14 ultra|reno 10 pro\+|oppo find|asus zenfone 1[0-9]/.test(n);
+    if (isFlagship) {
+        return { platform:'android', tier:'flagship', label:'Android Flagship',
+            g:[90,115], ads:[72,90], z3:[60,78], z6:[52,65],
+            gyro:[120,155], cam:[82,102] };
+    }
+
+    /* ── Android High-Midrange ── */
+    const isHighMid = /poco [fx]\d|poco x[3-6]|redmi note 1[0-3] pro|galaxy a5[34] 5g|galaxy a73|realme gt|realme [89] pro|oneplus nord 2|vivo v2[3-7]|galaxy s2[0-4] fe|xiaomi 12t|xiaomi 13t|reno [6-9] pro/.test(n);
+    if (isHighMid) {
+        return { platform:'android', tier:'highmid', label:'Android Mid-High',
+            g:[110,135], ads:[88,108], z3:[74,92], z6:[60,76],
+            gyro:[138,168], cam:[100,122] };
+    }
+
+    /* ── Android Midrange ── */
+    const isMid = /redmi note [89]|redmi note 10[^s]|redmi note 11[^s p]|galaxy a[34][0-9]|galaxy m[34][0-9]|oppo reno [4-9]|vivo v2[12]|realme [6-9][^i]|realme 10[^+]|oneplus nord ce|poco m[4-6]/.test(n);
+    if (isMid) {
+        return { platform:'android', tier:'midrange', label:'Android Midrange',
+            g:[118,145], ads:[95,118], z3:[80,100], z6:[65,82],
+            gyro:[145,178], cam:[108,130] };
+    }
+
+    /* ── Android Budget & mặc định ── */
+    return { platform:'android', tier:'budget', label:'Android Budget',
+        g:[130,162], ads:[108,132], z3:[90,112], z6:[72,92],
+        gyro:[155,190], cam:[118,145] };
+}
+
+function rnd(a, b) { return Math.round(a + Math.random() * (b - a)); }
+
+function generateSens() {
+    const inp = document.getElementById('sensDeviceInput').value.trim();
+    if (!inp) { alert('Vui lòng nhập tên máy!'); return; }
+    document.getElementById('acList').style.display = 'none';
+    document.getElementById('sensResult').style.display = 'none';
+    document.getElementById('sensThinking').style.display = 'flex';
+
+    setTimeout(() => {
+        document.getElementById('sensThinking').style.display = 'none';
+
+        const profile = getDeviceProfile(inp);
+        const { g, ads, z3, z6, gyro, cam } = profile;
+
+        /* Tạo 6 giá trị, đảm bảo tất cả >= 50 và <= 200 */
+        const clamp = (v) => Math.max(50, Math.min(200, v));
+        const vals = [
+            clamp(rnd(...g)),    // sv0: General
+            clamp(rnd(...ads)),  // sv1: ADS
+            clamp(rnd(...z3)),   // sv2: 3x
+            clamp(rnd(...z6)),   // sv3: 6x
+            clamp(rnd(...gyro)), // sv4: Gyroscope
+            clamp(rnd(...cam)),  // sv5: Camera tự do
+        ];
+
+        document.getElementById('sensDeviceName').textContent = inp;
+
+        /* Hiển thị giá trị */
+        ['sv0','sv1','sv2','sv3','sv4','sv5'].forEach((id, i) => {
+            document.getElementById(id).textContent = vals[i];
+        });
+
+        /* Animate thanh progress */
+        ['sb0','sb1','sb2','sb3','sb4','sb5'].forEach((id, i) => {
+            const el = document.getElementById(id);
+            el.style.width = '0%';
+            setTimeout(() => {
+                el.style.width = Math.round(vals[i] / 200 * 100) + '%';
+            }, 50 + i * 90);
+        });
+
+        document.getElementById('sensResult').style.display = 'block';
+    }, 1800);
+}
+
+/* ── TOGGLE CONFIG ── */
 const TCFG = {
     theme:{color:'#c8a0ff',icon:'🌙',offIcon:'☀️',lines:['[THEME] Khởi tạo engine chủ đề...','[GPU]   Tải shader bảng màu tối: depth_blur=3.2px','[CSS]   Áp dụng biến --bg=#020408 --panel=#0d1220','[LAYER] Thiết lập nebula opacity=0.35 blend=screen','[FONT]  antialiasing=lcd subpixel=off hinting=auto','[SYNC]  GPU vsync=true refresh=144hz framebuffer=swap','[CACHE] Ghi theme → key="nminh_dark_v4" scope=session','[DONE]  Chủ đề tối đã được áp dụng thành công ✓']},
     relax:{color:'#7fffb0',icon:'🍃',offIcon:'⚡',lines:['[INIT]  Khởi động module Nhẹ Tâm...','[NEURO] Điều chỉnh sóng não: freq=0.5Hz amplitude=low','[ALERT] Tắt thông báo ưu tiên: queue=clear mode=silent','[SYNC]  Đồng bộ hơi thở: inhale=4s hold=4s exhale=6s','[BIO]   Chặn cortisol threshold=auto HRV_sensor=active','[AUDIO] Tải âm thanh: rain+pink_noise vol=28%','[LIGHT] Bộ lọc ánh sáng xanh: temp=3200K strength=80%','[DONE]  Chế độ Nhẹ Tâm đã kích hoạt thành công ✓']},
@@ -1922,75 +1962,74 @@ const TCFG = {
     vibration:{color:'#ff80c0',icon:'📳',offIcon:'🔔',lines:['[INIT]  Khởi động module Fix Rung...','[HAL]   Kết nối HAL haptic: driver=ff_memless override=on','[MOTOR] Tắt motor rung: duty_cycle=0% carrier=200Hz','[FF]    Chặn force feedback: rumble=off periodic=off','[PAD]   Tắt rung tay cầm: left=0x00 right=0x00 trim=0','[TOUCH] Vô hiệu hóa phản hồi cảm ứng: amplitude=0','[SYS]   Ghi đè pattern rung hệ thống: pattern=null','[DONE]  Fix Rung đã áp dụng thành công ✓']},
     dpi:{color:'#80d8ff',icon:'🖱️',offIcon:'🖥️',lines:['[INIT]  Khởi động DPI Engine...','[DRV]   Tải driver: libinput backend=evdev mode=raw','[PTR]   Tốc độ con trỏ: scale=1.0x accel_profile=flat','[DPI1]  Stage 1 → 800dpi  sens=1.000 LED=#ff0000','[DPI2]  Stage 2 → 1200dpi sens=1.000 LED=#00ff00','[DPI3]  Stage 3 → 1600dpi sens=1.000 LED=#0000ff','[DPI4]  Stage 4 → 3200dpi sens=1.000 LED=#ffffff','[DONE]  DPI đã bật và cấu hình thành công ✓']},
 };
-let effRun=false;
-function handleToggle(el,name,type){if(effRun)return;el.classList.toggle('on');showCodeModal(name,el.classList.contains('on'),type);}
-function showCodeModal(name,isOn,type){
-    effRun=true;
-    const cfg=TCFG[type]||TCFG.optimize;
-    const ov=document.createElement('div'); ov.className='moverlay';
-    const bx=document.createElement('div'); bx.className='mbox';
-    const hd=document.createElement('div'); hd.className='mhdr';
-    hd.innerHTML=`<span class="mtic">${isOn?cfg.icon:cfg.offIcon}</span><span class="mtxt">Đang ${isOn?'bật':'tắt'}: ${name}</span><span class="mbdg ${isOn?'bon':'boff'}">${isOn?'● BẬT':'○ TẮT'}</span>`;
-    const ca=document.createElement('div'); ca.className='mca';
-    const ci=document.createElement('div'); ci.className='mci';
-    ci.style.color=cfg.color; ci.style.transform='translateY(100%)'; ci.style.transition='none';
-    ci.textContent=cfg.lines.map((l,i)=>`[+${String(i*200).padStart(4,'0')}ms] ${l}`).join('\n');
+
+let effRun = false;
+function handleToggle(el, name, type) { if (effRun) return; el.classList.toggle('on'); showCodeModal(name, el.classList.contains('on'), type); }
+function showCodeModal(name, isOn, type) {
+    effRun = true;
+    const cfg = TCFG[type] || TCFG.optimize;
+    const ov = document.createElement('div'); ov.className = 'moverlay';
+    const bx = document.createElement('div'); bx.className = 'mbox';
+    const hd = document.createElement('div'); hd.className = 'mhdr';
+    hd.innerHTML = `<span class="mtic">${isOn?cfg.icon:cfg.offIcon}</span><span class="mtxt">Đang ${isOn?'bật':'tắt'}: ${name}</span><span class="mbdg ${isOn?'bon':'boff'}">${isOn?'● BẬT':'○ TẮT'}</span>`;
+    const ca = document.createElement('div'); ca.className = 'mca';
+    const ci = document.createElement('div'); ci.className = 'mci';
+    ci.style.color = cfg.color; ci.style.transform = 'translateY(100%)'; ci.style.transition = 'none';
+    ci.textContent = cfg.lines.map((l, i) => `[+${String(i*200).padStart(4,'0')}ms] ${l}`).join('\n');
     ca.appendChild(ci);
-    const ft=document.createElement('div'); ft.className='mftr';
-    ft.innerHTML=`<span class="fic">${isOn?'✅':'❌'}</span><span class="fmsg" style="color:${isOn?'var(--green)':'#ff6b6b'}">${isOn?'Bật thành công!':'Đã tắt!'} — ${name}</span>`;
+    const ft = document.createElement('div'); ft.className = 'mftr';
+    ft.innerHTML = `<span class="fic">${isOn?'✅':'❌'}</span><span class="fmsg" style="color:${isOn?'var(--green)':'#ff6b6b'}">${isOn?'Bật thành công!':'Đã tắt!'} — ${name}</span>`;
     bx.appendChild(hd); bx.appendChild(ca); bx.appendChild(ft); ov.appendChild(bx); document.body.appendChild(ov);
-    requestAnimationFrame(()=>requestAnimationFrame(()=>{
-        const ey=Math.min(0,(ca.clientHeight||200)-ci.scrollHeight-20);
-        ci.style.transition='transform 2s linear'; ci.style.transform=`translateY(${ey}px)`;
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+        const ey = Math.min(0, (ca.clientHeight||200) - ci.scrollHeight - 20);
+        ci.style.transition = 'transform 2s linear'; ci.style.transform = `translateY(${ey}px)`;
     }));
-    setTimeout(()=>ft.classList.add('show'),2050);
-    setTimeout(()=>{ov.style.transition='opacity .35s ease';ov.style.opacity='0';setTimeout(()=>{ov.remove();effRun=false;},350);},3500);
+    setTimeout(() => ft.classList.add('show'), 2050);
+    setTimeout(() => { ov.style.transition='opacity .35s ease'; ov.style.opacity='0'; setTimeout(()=>{ov.remove();effRun=false;},350); }, 3500);
 }
 
-/* ================================================================
-   GALAXY / SNOW / PETALS
-   ================================================================ */
-const gC=document.getElementById('galaxy'), gX=gC.getContext('2d');
-let gW, gH, stars=[];
-function resizeAll(){
-    gW=gC.width=window.innerWidth; gH=gC.height=window.innerHeight;
-    document.getElementById('snow').width=gW; document.getElementById('snow').height=gH;
-    pC.width=gW; pC.height=gH;
+/* ── GALAXY / SNOW / PETALS ── */
+const gC = document.getElementById('galaxy'), gX = gC.getContext('2d');
+let gW, gH, stars = [];
+function resizeAll() {
+    gW = gC.width = window.innerWidth; gH = gC.height = window.innerHeight;
+    document.getElementById('snow').width = gW; document.getElementById('snow').height = gH;
+    pC.width = gW; pC.height = gH;
 }
-window.addEventListener('resize',()=>{resizeAll();mkStars(220);});
-function mkStars(n){
-    stars=[];
-    for(let i=0;i<n;i++)stars.push({x:Math.random()*gW,y:Math.random()*gH,r:Math.random()*1.2+.2,op:Math.random()*.8+.2,ts:Math.random()*.02+.005,to:Math.random()*Math.PI*2,c:['#fff','#adf','#ffe','#ccf'][~~(Math.random()*4)]});
+window.addEventListener('resize', () => { resizeAll(); mkStars(220); });
+function mkStars(n) {
+    stars = [];
+    for (let i = 0; i < n; i++) stars.push({ x:Math.random()*gW, y:Math.random()*gH, r:Math.random()*1.2+.2, op:Math.random()*.8+.2, ts:Math.random()*.02+.005, to:Math.random()*Math.PI*2, c:['#fff','#adf','#ffe','#ccf'][~~(Math.random()*4)] });
 }
-let gT=0;
-function drawGalaxy(){
-    gX.clearRect(0,0,gW,gH); gT+=.016;
-    stars.forEach(s=>{const tw=.5+.5*Math.sin(gT*s.ts*60+s.to);gX.globalAlpha=s.op*tw;gX.fillStyle=s.c;gX.beginPath();gX.arc(s.x,s.y,s.r,0,Math.PI*2);gX.fill();});
-    gX.globalAlpha=1; requestAnimationFrame(drawGalaxy);
+let gT = 0;
+function drawGalaxy() {
+    gX.clearRect(0, 0, gW, gH); gT += .016;
+    stars.forEach(s => { const tw = .5+.5*Math.sin(gT*s.ts*60+s.to); gX.globalAlpha=s.op*tw; gX.fillStyle=s.c; gX.beginPath(); gX.arc(s.x,s.y,s.r,0,Math.PI*2); gX.fill(); });
+    gX.globalAlpha = 1; requestAnimationFrame(drawGalaxy);
 }
-const sC=document.getElementById('snow'), sX=sC.getContext('2d');
-let flakes=[];
-function mkSnow(){flakes=[];for(let i=0;i<40;i++)flakes.push({x:Math.random()*gW,y:Math.random()*gH,r:Math.random()*1.4+.4,sp:Math.random()*.4+.2,d:Math.random()*10,op:Math.random()*.25+.1});}
-function drawSnow(){
-    sX.clearRect(0,0,gW,gH); sX.fillStyle='#fff';
-    flakes.forEach(f=>{sX.globalAlpha=f.op;sX.beginPath();sX.arc(f.x,f.y,f.r,0,Math.PI*2);sX.fill();f.y+=f.sp;f.x+=Math.sin(f.d)*.2;f.d+=.01;if(f.y>gH){f.y=-5;f.x=Math.random()*gW;}if(f.x>gW)f.x=0;if(f.x<0)f.x=gW;});
-    sX.globalAlpha=1; requestAnimationFrame(drawSnow);
+const sC = document.getElementById('snow'), sX = sC.getContext('2d');
+let flakes = [];
+function mkSnow() { flakes=[]; for(let i=0;i<40;i++) flakes.push({x:Math.random()*gW,y:Math.random()*gH,r:Math.random()*1.4+.4,sp:Math.random()*.4+.2,d:Math.random()*10,op:Math.random()*.25+.1}); }
+function drawSnow() {
+    sX.clearRect(0, 0, gW, gH); sX.fillStyle = '#fff';
+    flakes.forEach(f => { sX.globalAlpha=f.op; sX.beginPath(); sX.arc(f.x,f.y,f.r,0,Math.PI*2); sX.fill(); f.y+=f.sp; f.x+=Math.sin(f.d)*.2; f.d+=.01; if(f.y>gH){f.y=-5;f.x=Math.random()*gW;} if(f.x>gW)f.x=0; if(f.x<0)f.x=gW; });
+    sX.globalAlpha = 1; requestAnimationFrame(drawSnow);
 }
-const pC=document.getElementById('petals'), pX=pC.getContext('2d');
-let petals=[];
-const PC=['rgba(255,182,193,.7)','rgba(255,153,168,.6)','rgba(255,200,210,.65)','rgba(255,220,228,.55)'];
-function mkP(){return{x:Math.random()*gW,y:-20,s:Math.random()*6+4,sy:Math.random()*1+.4,sx:Math.random()*.6-.3,r:Math.random()*Math.PI*2,rs:(Math.random()-.5)*.035,sw:Math.random()*2+1,so:Math.random()*Math.PI*2,c:PC[~~(Math.random()*PC.length)],op:Math.random()*.5+.35};}
-function initPetals(n){petals=[];for(let i=0;i<n;i++){const p=mkP();p.y=Math.random()*gH;petals.push(p);}}
-let pT=0;
-function drawPetals(){
-    pX.clearRect(0,0,gW,gH); pT++;
-    if(pT%20===0&&petals.length<45)petals.push(mkP());
-    petals.forEach((p,i)=>{
+const pC = document.getElementById('petals'), pX = pC.getContext('2d');
+let petals = [];
+const PC = ['rgba(255,182,193,.7)','rgba(255,153,168,.6)','rgba(255,200,210,.65)','rgba(255,220,228,.55)'];
+function mkP() { return { x:Math.random()*gW, y:-20, s:Math.random()*6+4, sy:Math.random()*1+.4, sx:Math.random()*.6-.3, r:Math.random()*Math.PI*2, rs:(Math.random()-.5)*.035, sw:Math.random()*2+1, so:Math.random()*Math.PI*2, c:PC[~~(Math.random()*PC.length)], op:Math.random()*.5+.35 }; }
+function initPetals(n) { petals=[]; for(let i=0;i<n;i++){const p=mkP();p.y=Math.random()*gH;petals.push(p);} }
+let pT = 0;
+function drawPetals() {
+    pX.clearRect(0, 0, gW, gH); pT++;
+    if (pT % 20 === 0 && petals.length < 45) petals.push(mkP());
+    petals.forEach((p, i) => {
         p.y+=p.sy; p.x+=p.sx+Math.sin(pT*.015+p.so)*p.sw*.035; p.r+=p.rs;
         pX.save(); pX.translate(p.x,p.y); pX.rotate(p.r); pX.globalAlpha=p.op; pX.fillStyle=p.c;
-        for(let k=0;k<5;k++){pX.save();pX.rotate((k/5)*Math.PI*2);pX.beginPath();pX.ellipse(0,-p.s*.55,p.s*.3,p.s*.65,0,0,Math.PI*2);pX.fill();pX.restore();}
+        for (let k=0;k<5;k++){pX.save();pX.rotate((k/5)*Math.PI*2);pX.beginPath();pX.ellipse(0,-p.s*.55,p.s*.3,p.s*.65,0,0,Math.PI*2);pX.fill();pX.restore();}
         pX.restore();
-        if(p.y>gH+20||p.x<-30||p.x>gW+30)petals[i]=mkP();
+        if(p.y>gH+20||p.x<-30||p.x>gW+30) petals[i]=mkP();
     });
     requestAnimationFrame(drawPetals);
 }
@@ -1999,42 +2038,41 @@ resizeAll(); mkStars(220); mkSnow(); initPetals(18);
 drawGalaxy(); drawSnow(); drawPetals();
 
 /* INTRO */
-window.addEventListener('load', ()=>{
-    setTimeout(()=>{
-        const intro=document.getElementById('intro'), app=document.getElementById('app');
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        const intro = document.getElementById('intro'), app = document.getElementById('app');
         intro.classList.add('hide'); app.classList.add('show');
-        setTimeout(()=>{intro.style.display='none';},900);
-    },3400);
+        setTimeout(() => { intro.style.display = 'none'; }, 900);
+    }, 3400);
 });
 
-(function buildFx(){
-    const orbit=document.getElementById('ringOrbit'), R=130;
-    for(let i=0;i<5;i++){
-        const t=document.createElement('div'); t.className='irt';
-        const a=(i/5)*Math.PI*2-Math.PI/2;
-        t.style.left=(130+R*Math.cos(a))+'px'; t.style.top=(130+R*Math.sin(a))+'px';
-        t.style.animationDelay=(.3+i*.32)+'s'; orbit.appendChild(t);
+(function buildFx() {
+    const orbit = document.getElementById('ringOrbit'), R = 130;
+    for (let i = 0; i < 5; i++) {
+        const t = document.createElement('div'); t.className = 'irt';
+        const a = (i/5)*Math.PI*2 - Math.PI/2;
+        t.style.left = (130+R*Math.cos(a))+'px'; t.style.top = (130+R*Math.sin(a))+'px';
+        t.style.animationDelay = (.3+i*.32)+'s'; orbit.appendChild(t);
     }
-    const cw=document.querySelector('.icw');
-    for(let i=0;i<8;i++){
-        const s=document.createElement('div'); s.className='csp';
-        const a=(i/8)*Math.PI*2;
+    const cw = document.querySelector('.icw');
+    for (let i = 0; i < 8; i++) {
+        const s = document.createElement('div'); s.className = 'csp';
+        const a = (i/8)*Math.PI*2;
         s.style.left='50%'; s.style.top='50%';
-        s.style.setProperty('--dx',(Math.cos(a)*34)+'px'); s.style.setProperty('--dy',(Math.sin(a)*34)+'px');
-        s.style.animation='sparkOut .55s ease-out '+(.45+Math.random()*.1)+'s forwards';
-        s.style.transform='translate(-50%,-50%)'; cw.appendChild(s);
+        s.style.setProperty('--dx', (Math.cos(a)*34)+'px'); s.style.setProperty('--dy', (Math.sin(a)*34)+'px');
+        s.style.animation = 'sparkOut .55s ease-out '+(.45+Math.random()*.1)+'s forwards';
+        s.style.transform = 'translate(-50%,-50%)'; cw.appendChild(s);
     }
 })();
 
 /* KEYBOARD */
-document.addEventListener('keypress', e=>{
-    if(e.key!=='Enter')return;
-    if(document.getElementById('adminLoginModal').style.display==='flex'){verifyAdmin();return;}
-    if(document.getElementById('page2').classList.contains('active'))checkKey();
-    if(document.getElementById('pageSens').classList.contains('active'))generateSens();
+document.addEventListener('keypress', e => {
+    if (e.key !== 'Enter') return;
+    if (document.getElementById('adminLoginModal').style.display === 'flex') { verifyAdmin(); return; }
+    if (document.getElementById('page2').classList.contains('active')) checkKey();
+    if (document.getElementById('pageSens').classList.contains('active')) generateSens();
 });
 
-// Khởi tạo sync status
 updateSyncStatus(_FB_CONFIGURED);
 </script>
 </body>
