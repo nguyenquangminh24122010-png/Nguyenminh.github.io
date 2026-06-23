@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -26,7 +27,6 @@
         .ss { position: fixed; z-index: 0; pointer-events: none; width: 2px; height: 2px; background: #fff; border-radius: 50%; box-shadow: 0 0 4px #fff, 0 0 10px rgba(57,230,230,0.6); animation: shoot linear infinite; opacity: 0; }
         @keyframes shoot { 0% { opacity:0; transform:translate(0,0) rotate(-45deg) scaleX(1); } 5% { opacity:1; } 15% { opacity:0; transform:translate(200px,200px) rotate(-45deg) scaleX(80); } 100% { opacity:0; } }
         #snow, #petals { position: fixed; inset: 0; pointer-events: none; z-index: 1; }
-        /* INTRO */
         #intro { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(ellipse at 50% 40%, #060a14 0%, #020408 65%, #000102 100%); transition: opacity .9s ease, filter .9s ease; }
         #intro.hide { opacity: 0; filter: blur(6px); pointer-events: none; }
         .iro { position: absolute; width: 260px; height: 260px; border-radius: 50%; }
@@ -58,10 +58,8 @@
         .ibw { width: 176px; height: 2px; background: rgba(57,230,230,.13); border-radius: 2px; overflow: hidden; margin-top: 14px; opacity: 0; animation: fadeUp .4s ease 2.2s forwards; }
         .ib { height: 100%; width: 0; border-radius: 2px; background: linear-gradient(90deg, rgba(57,230,230,.4), var(--cyan)); box-shadow: 0 0 10px var(--cyan); animation: loadBar 1.9s cubic-bezier(.4,0,.2,1) 2.35s forwards; }
         @keyframes loadBar { from { width:0; } to { width:100%; } }
-        /* APP */
         #app { position: relative; z-index: 2; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; opacity: 0; transition: opacity .6s ease; }
         #app.show { opacity: 1; }
-        /* PAGES */
         .page { display: none; width: 345px; background: rgba(13,18,32,0.85); border: 1px solid var(--pb); border-radius: 18px; padding: 0; text-align: center; position: relative; box-shadow: 0 0 40px rgba(57,230,230,.08), 0 0 80px rgba(80,20,160,.15), inset 0 0 30px rgba(57,230,230,.03); backdrop-filter: blur(16px); animation: pgFade .45s cubic-bezier(.34,1.56,.64,1) forwards; max-height: 95vh; overflow: visible; }
         .page-inner { padding: 46px 22px 28px; max-height: 93vh; overflow-y: auto; border-radius: 18px; }
         .page.active { display: block; }
@@ -223,7 +221,7 @@
         .fb-notice { background: rgba(255,153,0,.08); border: 1px solid rgba(255,153,0,.3); border-radius: 10px; padding: 10px 14px; margin-bottom: 12px; font-size: 11.5px; color: var(--vip); line-height: 1.7; text-align: left; }
         .fb-notice code { background: rgba(57,230,230,.1); color: var(--cyan); padding: 1px 5px; border-radius: 4px; font-size: 11px; }
 
-        /* ── GAME MODE SELECTOR ── */
+        /* ── GAME BUTTONS ── */
         .game-selector { display: flex; gap: 8px; margin: 10px 0 4px; }
         .game-btn {
             flex: 1; padding: 9px 6px; border-radius: 10px; border: 1.5px solid rgba(57,230,230,.2);
@@ -246,6 +244,33 @@
         .game-label-row { font-size: 10px; letter-spacing: 2px; color: var(--dim); text-transform: uppercase; margin-bottom: 6px; text-align: center; }
         .sens-game-note { font-size: 10.5px; color: var(--dim); text-align: center; margin-top: 6px; }
         .sens-game-note span { color: var(--cyan); font-weight: 700; }
+
+        /* ── OPEN GAME BUTTONS ── */
+        .open-game-btns { display: flex; gap: 8px; margin-top: 12px; }
+        .open-game-btn {
+            flex: 1; padding: 11px 8px; border-radius: 12px; border: none;
+            font-size: 13px; font-weight: 800; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            transition: all .2s ease; letter-spacing: .3px;
+        }
+        .open-game-btn:active { transform: scale(.95); }
+        .open-game-btn.ff-btn {
+            background: linear-gradient(135deg, #ff8c00, #ff4500);
+            color: #fff;
+            box-shadow: 0 4px 18px rgba(255,140,0,.4);
+        }
+        .open-game-btn.ff-btn:hover { box-shadow: 0 6px 24px rgba(255,140,0,.6); transform: translateY(-1px); }
+        .open-game-btn.ffmax-btn {
+            background: linear-gradient(135deg, #00c8e6, #0066ff);
+            color: #fff;
+            box-shadow: 0 4px 18px rgba(0,150,230,.4);
+        }
+        .open-game-btn.ffmax-btn:hover { box-shadow: 0 6px 24px rgba(0,150,230,.6); transform: translateY(-1px); }
+        .open-game-btn .gbico2 { font-size: 20px; }
+        .open-game-btn .glbl { font-size: 11px; opacity: .85; font-weight: 500; }
+
+        /* Music error badge */
+        .mu-err { font-size: 10px; color: var(--danger); text-align: center; margin-top: 4px; padding: 3px 8px; background: rgba(255,92,92,.08); border-radius: 6px; display: none; }
     </style>
 </head>
 <body>
@@ -311,6 +336,7 @@
             </div>
             <div class="muprog" onclick="muSeek(event)"><div class="muprogfill" id="muProg"></div></div>
             <div class="muvol">🔈<input type="range" min="0" max="1" step="0.05" value="0.7" oninput="muVol(this.value)">🔊</div>
+            <div class="mu-err" id="muErr1"></div>
         </div>
         <div class="hint blink">✦ Hệ thống đang chờ lệnh... ✦</div>
         <div style="margin-top:14px;font-size:10px;color:rgba(126,147,160,0.3);cursor:pointer;" onclick="openAdminLogin()">⚙</div>
@@ -376,6 +402,7 @@
             </div>
             <div class="muprog" onclick="muSeek(event)"><div class="muprogfill" id="muProg3"></div></div>
             <div class="muvol">🔈<input type="range" min="0" max="1" step="0.05" value="0.7" oninput="muVol(this.value)">🔊</div>
+            <div class="mu-err" id="muErr3"></div>
         </div>
         <span class="back" onclick="doLogout()">↩ Đăng xuất</span>
     </div>
@@ -409,9 +436,7 @@
     </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════
-     PAGE SENSITIVITY — v2.2: Game selector + logic mới
-     ═══════════════════════════════════════════════════ -->
+<!-- PAGE SENSITIVITY -->
 <div id="pageSens" class="page">
     <div class="cb">🎯</div>
     <div class="page-inner">
@@ -439,6 +464,7 @@
             <div class="autocomplete-list" id="acList" style="display:none;"></div>
         </div>
         <button class="btn" onclick="generateSens()" style="margin-top:8px;">✨ Tạo Độ Nhạy</button>
+
         <div id="sensResult" style="display:none;">
             <div class="sens-result">
                 <div class="sens-result-title">📊 Độ nhạy — <span id="sensDeviceName" style="color:var(--cyan);font-weight:700;"></span> · <span id="sensGameLabel" style="color:var(--vip);font-weight:700;">FF</span></div>
@@ -464,7 +490,24 @@
                 <div style="margin-top:10px;font-size:10.5px;color:var(--dim);text-align:center;">Tối đa: 200 · Tạo dựa trên phần cứng máy</div>
                 <div class="sens-game-note">Game: <span id="sensGameNote">Free Fire</span></div>
             </div>
+
+            <!-- ═══ NÚT MỞ GAME — SỬA MỚI ═══ -->
+            <div style="margin-top:10px;font-size:10px;letter-spacing:1.5px;color:var(--dim);text-align:center;text-transform:uppercase;">Mở game để thử độ nhạy ngay</div>
+            <div class="open-game-btns">
+                <button class="open-game-btn ff-btn" onclick="openGame('ff')">
+                    <span class="gbico2">🔥</span>
+                    <span>Free Fire</span>
+                    <span class="glbl">Mở ngay</span>
+                </button>
+                <button class="open-game-btn ffmax-btn" onclick="openGame('ffmax')">
+                    <span class="gbico2">💎</span>
+                    <span>FF MAX</span>
+                    <span class="glbl">Mở ngay</span>
+                </button>
+            </div>
+            <div id="openGameNote" style="font-size:10px;color:var(--dim);text-align:center;margin-top:6px;display:none;"></div>
         </div>
+
         <div id="sensThinking" style="display:none;" class="sens-thinking">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span>Đang phân tích máy...</span>
@@ -522,8 +565,8 @@
         <div id="tabMusic" class="tabp">
             <div class="admsec">
                 <div style="background:rgba(57,230,230,.06);border:1px solid rgba(57,230,230,.15);border-radius:8px;padding:9px 12px;margin-bottom:12px;font-size:11px;color:var(--dim);line-height:1.6;">
-                    ℹ️ <strong style="color:var(--cyan)">Upload File</strong>: Lưu trong trình duyệt của máy bạn (offline).<br>
-                    ℹ️ <strong style="color:var(--cyan)">Dán Link</strong>: Lưu trên Firebase, tất cả máy nghe được.
+                    ℹ️ Dán link nhạc <strong style="color:var(--cyan)">bất kỳ</strong>: mp3 trực tiếp, Google Drive, Zingmp3...<br>
+                    ⚠️ Một số link có thể bị chặn CORS — nên dùng <strong style="color:var(--cyan)">link .mp3 trực tiếp</strong> để đảm bảo chạy.
                 </div>
                 <div style="display:flex;gap:6px;margin-bottom:12px;">
                     <button id="mTabFile" onclick="switchMusicTab('file')" style="flex:1;padding:7px;border-radius:8px;background:rgba(57,230,230,.18);color:var(--cyan);border:1.5px solid var(--cyan);font-size:12px;font-weight:700;cursor:pointer;">📁 Upload File</button>
@@ -570,13 +613,13 @@
                     <div style="margin-top:8px;font-size:10.5px;color:var(--dim);text-align:center;">⚠️ File lưu trong IndexedDB của trình duyệt này.</div>
                 </div>
                 <div id="mPanelLink" style="display:none;">
-                    <div class="admsec-t">Thêm bài hát (link trực tiếp .mp3)</div>
+                    <div class="admsec-t">Thêm bài hát (link nhạc bất kỳ)</div>
                     <div class="grid1"><div><div class="albl">Tên bài hát</div>
                         <input type="text" id="mTrackName" class="ainp" placeholder="vd: Tên bài hát"></div></div>
                     <div class="grid1"><div><div class="albl">Nghệ sĩ</div>
                         <input type="text" id="mArtist" class="ainp" placeholder="vd: Tên nghệ sĩ"></div></div>
-                    <div class="grid1"><div><div class="albl">Link .mp3 trực tiếp</div>
-                        <input type="text" id="mUrl" class="ainp" placeholder="https://example.com/song.mp3"></div></div>
+                    <div class="grid1"><div><div class="albl">Link nhạc (mp3, Google Drive, Zingmp3...)</div>
+                        <input type="text" id="mUrl" class="ainp" placeholder="https://..."></div></div>
                     <div class="grid1"><div><div class="albl">Link ảnh bìa (tuỳ chọn)</div>
                         <input type="text" id="mCover" class="ainp" placeholder="https://...cover.jpg"></div></div>
                     <div id="mMsg" class="ok" style="display:none;"></div>
@@ -631,11 +674,10 @@
 
 <script>
 /* ================================================================
-   NMINH LOCK PRO — v2.2 (Game Selector + Sensitivity Rework)
-   ✅ Game selector: Free Fire / Free Fire MAX
-   ✅ iPhone: đời càng CŨ nhạy càng CAO (logic ngược)
-   ✅ Random trong khoảng hợp lý cho mọi dòng máy
-   ✅ 200+ thiết bị trong danh sách gợi ý
+   NMINH LOCK PRO — v2.3 FIX
+   ✅ Nút "Mở Game" FF / FF MAX → deep link mở app trên điện thoại
+   ✅ Music player sửa lại — hỗ trợ mọi loại link
+   ✅ Chuyển đổi Google Drive link tự động
    ================================================================ */
 
 const FIREBASE_CONFIG = {
@@ -655,7 +697,6 @@ function myUid() {
     if (!u) { u = 'u' + Date.now() + Math.random().toString(36).slice(2, 7); localStorage.setItem('nm_uid', u); }
     return u;
 }
-
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function pad(n) { return String(n).padStart(2,'0'); }
 function fmtMs(ms) {
@@ -671,7 +712,6 @@ function fmtShort(ms) {
     if (h > 0) return `${h}h ${m}m`;
     return `${m}m`;
 }
-
 function _lsGet(key, def) { try { const v=localStorage.getItem(key); return v!=null?JSON.parse(v):def; } catch(e) { return def; } }
 function _lsSet(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {} }
 function _lsDel(key) { try { localStorage.removeItem(key); } catch(e) {} }
@@ -708,7 +748,6 @@ function _loadFirebase() {
 }
 
 const FB_TIMEOUT = 6000;
-
 async function fbGet(path) {
     try {
         const db = await Promise.race([_loadFirebase(), new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),FB_TIMEOUT))]);
@@ -725,28 +764,18 @@ async function fbGet(path) {
         return cached;
     }
 }
-
 async function fbSet(path, val) {
     const parts = path.split('/');
     const root = parts[0];
-    if (parts.length === 1) {
-        _lsSet('nm_fb_'+root, val);
-    } else {
-        const cached = _lsGet('nm_fb_'+root, {}) || {};
-        cached[parts[1]] = val;
-        _lsSet('nm_fb_'+root, cached);
-    }
+    if (parts.length === 1) { _lsSet('nm_fb_'+root, val); }
+    else { const cached = _lsGet('nm_fb_'+root, {}) || {}; cached[parts[1]] = val; _lsSet('nm_fb_'+root, cached); }
     try {
         const db = await Promise.race([_loadFirebase(), new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),FB_TIMEOUT))]);
         await db.ref(path).set(val);
         updateSyncStatus(true);
         return true;
-    } catch(e) {
-        updateSyncStatus(false);
-        return false;
-    }
+    } catch(e) { updateSyncStatus(false); return false; }
 }
-
 async function fbRemove(path) {
     const parts = path.split('/');
     const root = parts[0];
@@ -758,7 +787,6 @@ async function fbRemove(path) {
         updateSyncStatus(true);
     } catch(e) { updateSyncStatus(false); }
 }
-
 async function fbTransaction(path, updateFn) {
     try {
         const db = await Promise.race([_loadFirebase(), new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),FB_TIMEOUT))]);
@@ -794,20 +822,11 @@ async function fbTransaction(path, updateFn) {
 function updateSyncStatus(ok) {
     const badge = document.getElementById('syncStatusBadge');
     if (!badge) return;
-    if (!_FB_CONFIGURED) {
-        badge.textContent = '⚠️ Chưa cấu hình Firebase (dùng local)';
-        badge.className = 'offline-badge';
-        const fg = document.getElementById('fbGuide');
-        if (fg) fg.style.display = 'block';
-        return;
-    }
+    if (!_FB_CONFIGURED) { badge.textContent = '⚠️ Chưa cấu hình Firebase'; badge.className = 'offline-badge'; return; }
     if (ok) { badge.textContent = '✅ Đồng bộ Firebase'; badge.className = 'offline-badge online'; }
     else { badge.textContent = '⚠️ Offline — dùng bộ nhớ cục bộ'; badge.className = 'offline-badge'; }
 }
-
-setInterval(async () => {
-    try { await fbGet('_ping'); updateSyncStatus(true); } catch(e) { updateSyncStatus(false); }
-}, 20000);
+setInterval(async () => { try { await fbGet('_ping'); updateSyncStatus(true); } catch(e) { updateSyncStatus(false); } }, 20000);
 
 async function getKeys() { const v = await fbGet('keys'); return v || {}; }
 async function setKeys(k) { await fbSet('keys', k); }
@@ -874,7 +893,6 @@ async function checkKey() {
         }
         const uid = myUid();
         const slots = kd.slots || {};
-        const slotCount = Object.keys(slots).length;
         if (slots[uid]) {
             _lsSet('nm_active_key', val);
             document.getElementById('keyInput').value = '';
@@ -883,23 +901,24 @@ async function checkKey() {
             enterDashboard(val, freshKd);
             return;
         }
-        const activeKey = _lsGet('nm_active_key', null);
-        if (activeKey && activeKey !== val) {
-            const oldKd = keys[activeKey];
+        const activeKey = _lsSet('nm_active_key', null) && _lsGet('nm_active_key', null);
+        const _activeKey = _lsGet('nm_active_key', null);
+        if (_activeKey && _activeKey !== val) {
+            const oldKd = keys[_activeKey];
             if (oldKd && now < oldKd.expiresAt) {
                 const oldSlots = oldKd.slots || {};
                 if (oldSlots[uid]) {
                     const rem = fmtMs(oldKd.expiresAt - now);
-                    showErr(`⚠️ Máy này đang dùng key khác còn ${rem}. Hết hạn mới nhập key mới!`);
+                    showErr(`⚠️ Máy này đang dùng key khác còn ${rem}.`);
                     return;
                 }
             }
             _lsDel('nm_active_key');
         }
+        const slotCount = Object.keys(slots).length;
         if (slotCount >= kd.maxSlots) {
             document.getElementById('keyInput').value = '';
-            document.getElementById('fullMsg').innerHTML =
-                `Key đã đầy <strong style="color:var(--cyan)">${kd.maxSlots} người</strong>.<br>Liên hệ admin để mở thêm slot.`;
+            document.getElementById('fullMsg').innerHTML = `Key đã đầy <strong style="color:var(--cyan)">${kd.maxSlots} người</strong>.<br>Liên hệ admin để mở thêm slot.`;
             goTo('pageFull');
             return;
         }
@@ -914,7 +933,6 @@ async function checkKey() {
             return current;
         });
         if (!txResult.committed) {
-            document.getElementById('keyInput').value = '';
             document.getElementById('fullMsg').innerHTML = `Key đã đầy slot. Liên hệ admin.`;
             goTo('pageFull');
             return;
@@ -943,7 +961,7 @@ function enterDashboard(code, kd) {
     document.getElementById('dStatus').textContent = 'Hoạt động';
     document.getElementById('dStatus').className = 'kval g';
     const slots = kd.slots || {};
-    const slotCount = typeof slots === 'object' && !Array.isArray(slots) ? Object.keys(slots).length : (Array.isArray(slots) ? slots.length : 0);
+    const slotCount = typeof slots === 'object' && !Array.isArray(slots) ? Object.keys(slots).length : 0;
     document.getElementById('dSlot').textContent = slotCount + ' / ' + kd.maxSlots;
     startCd(kd.expiresAt);
     goTo('page3');
@@ -958,42 +976,24 @@ function startCd(exp) {
         if (diff < 3600000) el.className = 'cdtimer red';
         else if (diff < 86400000) el.className = 'cdtimer warn';
         else el.className = 'cdtimer';
-        if (diff <= 0) {
-            clearInterval(cdInterval);
-            document.getElementById('dStatus').textContent = 'Hết hạn';
-            document.getElementById('dStatus').className = 'kval r';
-            _releaseSlot();
-            setTimeout(() => { doLogout(); goTo('pageExp'); }, 2000);
-        }
+        if (diff <= 0) { clearInterval(cdInterval); document.getElementById('dStatus').textContent = 'Hết hạn'; document.getElementById('dStatus').className = 'kval r'; _releaseSlot(); setTimeout(() => { doLogout(); goTo('pageExp'); }, 2000); }
     }
-    tick();
-    cdInterval = setInterval(tick, 1000);
+    tick(); cdInterval = setInterval(tick, 1000);
 }
 
 async function _releaseSlot() {
     const activeKey = _lsGet('nm_active_key', null);
     if (!activeKey) return;
     const uid = myUid();
-    try {
-        await fbTransaction('keys/'+activeKey, (current) => {
-            if (!current) return current;
-            if (current.slots && current.slots[uid]) delete current.slots[uid];
-            return current;
-        });
-    } catch(e) {}
+    try { await fbTransaction('keys/'+activeKey, (current) => { if (!current) return current; if (current.slots && current.slots[uid]) delete current.slots[uid]; return current; }); } catch(e) {}
     _lsDel('nm_active_key');
 }
 
-function doLogout() {
-    if (cdInterval) clearInterval(cdInterval);
-    activeKeyData = null;
-    goTo('page1');
-}
+function doLogout() { if (cdInterval) clearInterval(cdInterval); activeKeyData = null; goTo('page1'); }
 
 function showErr(msg) {
     const e = document.getElementById('errMsg');
-    e.textContent = msg;
-    e.style.display = 'block';
+    e.textContent = msg; e.style.display = 'block';
     const i = document.getElementById('keyInput');
     i.style.animation = 'none'; void i.offsetWidth; i.style.animation = 'shake .4s ease';
 }
@@ -1019,38 +1019,19 @@ function switchTab(tabId, btn) {
     if (tabId === 'tabApp') loadAppCfgForm();
 }
 
-function openAdminLogin() {
-    document.getElementById('adminLoginModal').style.display = 'flex';
-    setTimeout(() => document.getElementById('adminPwInput').focus(), 60);
-}
-function closeAdminLogin() {
-    document.getElementById('adminLoginModal').style.display = 'none';
-    document.getElementById('adminPwInput').value = '';
-    document.getElementById('adminPwErr').style.display = 'none';
-}
+function openAdminLogin() { document.getElementById('adminLoginModal').style.display = 'flex'; setTimeout(() => document.getElementById('adminPwInput').focus(), 60); }
+function closeAdminLogin() { document.getElementById('adminLoginModal').style.display = 'none'; document.getElementById('adminPwInput').value = ''; document.getElementById('adminPwErr').style.display = 'none'; }
 async function verifyAdmin() {
     const input = document.getElementById('adminPwInput').value;
     const errEl = document.getElementById('adminPwErr');
     const btn = document.querySelector('#adminLoginModal .btn');
-    errEl.style.display = 'none';
-    btn.textContent = '⏳ Đang kiểm tra...';
-    btn.disabled = true;
+    errEl.style.display = 'none'; btn.textContent = '⏳ Đang kiểm tra...'; btn.disabled = true;
     try {
         const correctPw = await getAdmPw();
         if (input === correctPw) { closeAdminLogin(); goTo('pageAdmin'); }
-        else {
-            errEl.textContent = '❌ Sai mật khẩu!';
-            errEl.style.display = 'block';
-            document.getElementById('adminPwInput').value = '';
-            document.getElementById('adminPwInput').focus();
-        }
-    } catch(e) {
-        errEl.textContent = '❌ Lỗi hệ thống. Thử lại!';
-        errEl.style.display = 'block';
-    } finally {
-        btn.textContent = 'Xác nhận';
-        btn.disabled = false;
-    }
+        else { errEl.textContent = '❌ Sai mật khẩu!'; errEl.style.display = 'block'; document.getElementById('adminPwInput').value = ''; document.getElementById('adminPwInput').focus(); }
+    } catch(e) { errEl.textContent = '❌ Lỗi hệ thống. Thử lại!'; errEl.style.display = 'block'; }
+    finally { btn.textContent = 'Xác nhận'; btn.disabled = false; }
 }
 
 function _normalizeSlots(slots) {
@@ -1118,10 +1099,8 @@ async function editKey(code) {
     const keys = await fbGet('keys') || {};
     const k = keys[code];
     if (!k) return;
-    const ov = document.createElement('div');
-    ov.className = 'moverlay'; ov.style.zIndex = '1000';
-    const now = Date.now();
-    const rem = Math.max(0, k.expiresAt - now);
+    const ov = document.createElement('div'); ov.className = 'moverlay'; ov.style.zIndex = '1000';
+    const now = Date.now(); const rem = Math.max(0, k.expiresAt - now);
     const remD = Math.floor(rem/86400000), remH = Math.floor((rem%86400000)/3600000);
     ov.innerHTML = `<div class="mbox" style="width:320px;max-width:94vw;">
         <div class="mhdr"><span class="mtic">✏️</span><span class="mtxt">Sửa Key</span>
@@ -1138,14 +1117,12 @@ async function editKey(code) {
                 <div><div class="albl">Số slot</div>
                 <input type="number" id="eMaxSlots" class="ainp" value="${k.maxSlots||100}" min="1"></div>
             </div>
-            <div class="admsec-t" style="font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(57,230,230,.1);">Gia hạn thêm (cộng vào thời gian còn lại)</div>
+            <div class="admsec-t" style="font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(57,230,230,.1);">Gia hạn thêm</div>
             <div class="grid2" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px;">
                 <div><div class="albl">Thêm (ngày)</div><input type="number" id="eAddDays" class="ainp" value="0" min="0"></div>
                 <div><div class="albl">Thêm (giờ)</div><input type="number" id="eAddHours" class="ainp" value="0" min="0"></div>
             </div>
-            <div style="font-size:11px;color:var(--dim);margin-bottom:10px;">
-                ⏱ Còn lại: <strong style="color:var(--cyan)">${rem<=0?'Hết hạn':(remD>0?remD+'d ':'')+pad(remH)+'h'}</strong>
-            </div>
+            <div style="font-size:11px;color:var(--dim);margin-bottom:10px;">⏱ Còn lại: <strong style="color:var(--cyan)">${rem<=0?'Hết hạn':(remD>0?remD+'d ':'')+pad(remH)+'h'}</strong></div>
             <div id="eKeyMsg" style="font-size:12px;margin-bottom:8px;display:none;"></div>
             <div style="display:flex;gap:8px;">
                 <button class="btn" style="margin:0;" onclick="saveEditKey('${esc(code)}')">💾 Lưu</button>
@@ -1182,12 +1159,8 @@ async function saveEditKey(oldCode) {
 
 async function delKey(code) {
     if (!confirm(`Xoá key "${code}"?`)) return;
-    try {
-        const keys = await fbGet('keys') || {};
-        delete keys[code];
-        await fbSet('keys', keys);
-        loadKeyList();
-    } catch(e) { alert('Lỗi xoá key: '+e.message); }
+    try { const keys = await fbGet('keys') || {}; delete keys[code]; await fbSet('keys', keys); loadKeyList(); }
+    catch(e) { alert('Lỗi xoá key: '+e.message); }
 }
 
 async function getTracks() {
@@ -1226,13 +1199,12 @@ async function loadAdminTrackList() {
         list.innerHTML = '';
         if (!tracks.length) { list.innerHTML = '<div class="emp">Chưa có bài nào.</div>'; return; }
         tracks.forEach((t, i) => {
-            const d = document.createElement('div');
-            d.className = 'ki';
+            const d = document.createElement('div'); d.className = 'ki';
             d.innerHTML = `<div class="kil">
                 <span style="color:var(--dim);font-size:11px;width:16px;">${i+1}</span>
                 <div>
                     <div class="kic" style="font-family:inherit;">${esc(t.name)}</div>
-                    <div class="kim">${esc(t.artist)} ${t.isLocal?'<span style="color:var(--vip)">📁local</span>':'<span style="color:var(--cyan)">☁️cloud</span>'}</div>
+                    <div class="kim">${esc(t.artist)} ${t.isLocal?'<span style="color:var(--vip)">📁local</span>':'<span style="color:var(--cyan)">☁️link</span>'}</div>
                 </div>
             </div>
             <div style="display:flex;gap:4px;">
@@ -1250,8 +1222,7 @@ async function editTrack(i) {
     const tracks = await getTracks();
     const t = tracks[i];
     if (!t) return;
-    const ov = document.createElement('div');
-    ov.className = 'moverlay'; ov.style.zIndex = '1000';
+    const ov = document.createElement('div'); ov.className = 'moverlay'; ov.style.zIndex = '1000';
     ov.innerHTML = `<div class="mbox" style="width:320px;max-width:94vw;">
         <div class="mhdr"><span class="mtic">✏️</span><span class="mtxt">Sửa bài hát #${i+1}</span></div>
         <div style="padding:14px 18px;">
@@ -1259,7 +1230,7 @@ async function editTrack(i) {
             <input type="text" id="etName" class="ainp" value="${esc(t.name)}" style="margin-bottom:8px;">
             <div class="albl">Nghệ sĩ</div>
             <input type="text" id="etArtist" class="ainp" value="${esc(t.artist)}" style="margin-bottom:8px;">
-            ${!t.isLocal ? `<div class="albl">Link .mp3</div>
+            ${!t.isLocal ? `<div class="albl">Link nhạc</div>
             <input type="text" id="etUrl" class="ainp" value="${esc(t.url)}" style="margin-bottom:8px;">
             <div class="albl">Link ảnh bìa</div>
             <input type="text" id="etCover" class="ainp" value="${esc(t.cover||'')}" style="margin-bottom:12px;">` :
@@ -1286,9 +1257,7 @@ async function saveEditTrack(i) {
             const url = document.getElementById('etUrl').value.trim();
             const cover = document.getElementById('etCover').value.trim();
             tracks[i] = { ...t, name, artist:artist||'Unknown', url, cover };
-        } else {
-            tracks[i] = { ...t, name, artist:artist||'Unknown' };
-        }
+        } else { tracks[i] = { ...t, name, artist:artist||'Unknown' }; }
         await setTracks(tracks);
         if(msg){msg.textContent='✅ Đã lưu!';msg.style.color='var(--green)';msg.style.display='block';}
         setTimeout(() => { document.querySelector('.moverlay')&&document.querySelector('.moverlay').remove(); loadAdminTrackList(); initMusicPlayer(); }, 900);
@@ -1334,26 +1303,17 @@ async function saveAppConfig() {
     if (newPw) {
         if (newPw !== pw2) { showAdmMsg(msg,'❌ Mật khẩu xác nhận không khớp!',false); return; }
         if (newPw.length < 6) { showAdmMsg(msg,'❌ Mật khẩu tối thiểu 6 ký tự!',false); return; }
-        await fbSet('adm_pw', newPw);
-        _lsSet('nm_adm_pw', newPw);
-        document.getElementById('cfgNewPw').value='';
-        document.getElementById('cfgPw2').value='';
+        await fbSet('adm_pw', newPw); _lsSet('nm_adm_pw', newPw);
+        document.getElementById('cfgNewPw').value=''; document.getElementById('cfgPw2').value='';
     }
-    const cfg = {
-        title: document.getElementById('cfgTitle').value.trim()||'NMINH LOCK',
-        sub: document.getElementById('cfgSub').value.trim()||'Hệ thống bảo mật',
-        tagline: document.getElementById('cfgTagline').value.trim(),
-        brand: document.getElementById('cfgBrand').value.trim()||'App by Nminh',
-    };
+    const cfg = { title: document.getElementById('cfgTitle').value.trim()||'NMINH LOCK', sub: document.getElementById('cfgSub').value.trim()||'Hệ thống bảo mật', tagline: document.getElementById('cfgTagline').value.trim(), brand: document.getElementById('cfgBrand').value.trim()||'App by Nminh' };
     await fbSet('app_cfg', cfg);
     applyCfg();
     showAdmMsg(msg,'✅ Đã lưu!'+(newPw?' Mật khẩu đã đổi.':''),true);
 }
 
 function showAdmMsg(el, txt, ok) {
-    el.textContent = txt;
-    el.style.color = ok?'var(--green)':'var(--danger)';
-    el.style.display = 'block';
+    el.textContent = txt; el.style.color = ok?'var(--green)':'var(--danger)'; el.style.display = 'block';
     setTimeout(() => { el.style.display='none'; }, 3500);
 }
 
@@ -1385,30 +1345,15 @@ function openIDB() {
 }
 async function idbSaveFile(id, blob) {
     const db = await openIDB();
-    return new Promise((res,rej) => {
-        const tx = db.transaction(IDB_STORE,'readwrite');
-        tx.objectStore(IDB_STORE).put(blob, id);
-        tx.oncomplete = ()=>res();
-        tx.onerror = ()=>rej(tx.error);
-    });
+    return new Promise((res,rej) => { const tx = db.transaction(IDB_STORE,'readwrite'); tx.objectStore(IDB_STORE).put(blob, id); tx.oncomplete = ()=>res(); tx.onerror = ()=>rej(tx.error); });
 }
 async function idbGetFile(id) {
     const db = await openIDB();
-    return new Promise((res,rej) => {
-        const tx = db.transaction(IDB_STORE,'readonly');
-        const req = tx.objectStore(IDB_STORE).get(id);
-        req.onsuccess = ()=>res(req.result||null);
-        req.onerror = ()=>rej(req.error);
-    });
+    return new Promise((res,rej) => { const tx = db.transaction(IDB_STORE,'readonly'); const req = tx.objectStore(IDB_STORE).get(id); req.onsuccess = ()=>res(req.result||null); req.onerror = ()=>rej(req.error); });
 }
 async function idbDeleteFile(id) {
     const db = await openIDB();
-    return new Promise((res,rej) => {
-        const tx = db.transaction(IDB_STORE,'readwrite');
-        tx.objectStore(IDB_STORE).delete(id);
-        tx.oncomplete = ()=>res();
-        tx.onerror = ()=>rej(tx.error);
-    });
+    return new Promise((res,rej) => { const tx = db.transaction(IDB_STORE,'readwrite'); tx.objectStore(IDB_STORE).delete(id); tx.oncomplete = ()=>res(); tx.onerror = ()=>rej(tx.error); });
 }
 
 let _pendingFile = null, _uploadProgressInterval = null;
@@ -1416,9 +1361,7 @@ function handleMusicFileDrop(e) { const f=e.dataTransfer.files[0]; if(f)_loadFil
 function handleMusicFileSelect(input) { const f=input.files[0]; if(f)_loadFileToUI(f); }
 function _loadFileToUI(file) {
     const allowed = ['audio/mpeg','audio/mp3','audio/ogg','audio/wav','audio/x-wav'];
-    if (!allowed.includes(file.type) && !file.name.match(/\.(mp3|ogg|wav)$/i)) {
-        alert('⚠️ Chỉ hỗ trợ file .mp3, .ogg, .wav!'); return;
-    }
+    if (!allowed.includes(file.type) && !file.name.match(/\.(mp3|ogg|wav)$/i)) { alert('⚠️ Chỉ hỗ trợ file .mp3, .ogg, .wav!'); return; }
     _pendingFile = file;
     document.getElementById('mFileInfo').style.display = 'block';
     document.getElementById('mFileName').textContent = file.name;
@@ -1448,10 +1391,7 @@ async function adminAddFileTrack() {
         const idbId = 'track_'+Date.now();
         let prog = 0;
         if (_uploadProgressInterval) clearInterval(_uploadProgressInterval);
-        _uploadProgressInterval = setInterval(() => {
-            prog = Math.min(prog+8, 85);
-            document.getElementById('mFileBar').style.width = prog+'%';
-        }, 80);
+        _uploadProgressInterval = setInterval(() => { prog = Math.min(prog+8, 85); document.getElementById('mFileBar').style.width = prog+'%'; }, 80);
         await idbSaveFile(idbId, _pendingFile);
         clearInterval(_uploadProgressInterval); _uploadProgressInterval=null;
         document.getElementById('mFileBar').style.width='100%';
@@ -1470,31 +1410,59 @@ async function adminAddFileTrack() {
     }
 }
 
-/* ── MUSIC PLAYER ── */
+/* ════════════════════════════════════════════════════════════════
+   🎵 MUSIC PLAYER — SỬA HOÀN TOÀN v2.3
+   ✅ Hỗ trợ mọi link: mp3 thẳng, Google Drive, bất kỳ URL
+   ✅ Tự động chuyển Google Drive link → link download trực tiếp
+   ✅ Chỉ phát khi nhấn nút play (không tự phát)
+   ✅ Hiển thị lỗi rõ ràng nếu link không phát được
+   ════════════════════════════════════════════════════════════════ */
+
+/* Chuyển Google Drive link thành link download trực tiếp */
+function convertUrl(url) {
+    if (!url) return url;
+    // Google Drive: https://drive.google.com/file/d/FILE_ID/view
+    const gdMatch = url.match(/drive\.google\.com\/file\/d\/([^\/\?]+)/);
+    if (gdMatch) return `https://drive.google.com/uc?export=download&id=${gdMatch[1]}`;
+    // Google Drive: https://drive.google.com/open?id=FILE_ID
+    const gdMatch2 = url.match(/drive\.google\.com\/open\?id=([^&]+)/);
+    if (gdMatch2) return `https://drive.google.com/uc?export=download&id=${gdMatch2[1]}`;
+    // Dropbox: đổi dl=0 → dl=1
+    if (url.includes('dropbox.com')) return url.replace('dl=0','dl=1').replace('www.dropbox.com','dl.dropboxusercontent.com');
+    return url;
+}
+
 let muIdx = 0, muPlaying = false;
 let _localAudio = null, _currentBlobUrl = null;
 let _userGestured = false;
+
 function _setPlayBtns(icon) {
-    ['muPlayBtn', 'muPlayBtn3'].forEach(id => {
+    ['muPlayBtn','muPlayBtn3'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = icon; });
+}
+function _showMuErr(msg) {
+    ['muErr1','muErr3'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.textContent = icon;
+        if (el) { el.textContent = msg; el.style.display = msg ? 'block' : 'none'; }
     });
 }
+function _hideMuErr() { _showMuErr(''); }
+
 async function initMusicPlayer() {
     const tracks = await getTracks();
     const w1 = document.getElementById('musicWidget'), w3 = document.getElementById('musicWidget3');
     if (!tracks.length) {
         if (w1) w1.style.display = 'none';
         if (w3) w3.style.display = 'none';
-        muPlaying = false;
-        _setPlayBtns('▶');
+        muPlaying = false; _setPlayBtns('▶');
         return;
     }
     if (w1) w1.style.display = 'block';
     if (w3) w3.style.display = 'block';
     if (muIdx >= tracks.length) muIdx = 0;
     muSyncUI(tracks);
+    _hideMuErr();
 }
+
 async function muSyncUI(tracks) {
     if (!tracks) tracks = await getTracks();
     if (!tracks.length) return;
@@ -1503,110 +1471,129 @@ async function muSyncUI(tracks) {
     document.getElementById('muTrackName3').textContent = t.name;
     document.getElementById('muArtist').textContent = t.artist || '—';
     document.getElementById('muArtist3').textContent = t.artist || '—';
-    ['muArtWrap', 'muArtWrap3'].forEach(id => {
+    ['muArtWrap','muArtWrap3'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
         el.innerHTML = t.cover ? `<img src="${esc(t.cover)}" onerror="this.parentElement.innerHTML='🎵'">` : '🎵';
     });
-    ['muProg', 'muProg3'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.style.width = '0%';
-    });
+    ['muProg','muProg3'].forEach(id => { const el = document.getElementById(id); if (el) el.style.width = '0%'; });
 }
+
 function _stopLocal() {
     if (_localAudio) {
         _localAudio.pause();
         _localAudio.src = '';
-        _localAudio.onended = null;
-        _localAudio.ontimeupdate = null;
-        _localAudio.onerror = null;
+        _localAudio.onended = null; _localAudio.ontimeupdate = null; _localAudio.onerror = null; _localAudio.oncanplay = null;
         _localAudio = null;
     }
-    if (_currentBlobUrl) {
-        try { URL.revokeObjectURL(_currentBlobUrl); } catch (e) {}
-        _currentBlobUrl = null;
-    }
+    if (_currentBlobUrl) { try { URL.revokeObjectURL(_currentBlobUrl); } catch(e) {} _currentBlobUrl = null; }
 }
+
 function _getCurrentVol() {
     const sliders = document.querySelectorAll('.muvol input[type=range]');
     return sliders.length ? parseFloat(sliders[0].value) : 0.7;
 }
+
+/* Tạo audio element với URL bất kỳ — hỗ trợ mọi loại link */
+function _buildAudio(url) {
+    const finalUrl = convertUrl(url);
+    const a = new Audio();
+    // Không set crossOrigin để tránh CORS block với link bên ngoài
+    a.src = finalUrl;
+    a.volume = _getCurrentVol();
+    a.preload = 'auto';
+    return a;
+}
+
+function _attachAudioEvents(a, autoplay) {
+    a.onplay = () => { muPlaying = true; _setPlayBtns('⏸'); _hideMuErr(); };
+    a.onpause = () => { muPlaying = false; _setPlayBtns('▶'); };
+    a.onended = () => { muPlaying = false; _setPlayBtns('▶'); muNext(); };
+    a.onerror = (e) => {
+        muPlaying = false; _setPlayBtns('▶');
+        const errMsg = '⚠️ Không phát được link này. Hãy thử link .mp3 trực tiếp.';
+        _showMuErr(errMsg);
+        console.warn('Audio error:', a.src, e);
+    };
+    a.ontimeupdate = () => {
+        if (!a.duration) return;
+        const pct = (a.currentTime / a.duration * 100).toFixed(1) + '%';
+        ['muProg','muProg3'].forEach(id => { const el = document.getElementById(id); if (el) el.style.width = pct; });
+    };
+    if (autoplay) {
+        const p = a.play();
+        if (p && p.catch) p.catch(err => {
+            muPlaying = false; _setPlayBtns('▶');
+            if (err.name !== 'AbortError') _showMuErr('⚠️ Không thể tự phát. Nhấn ▶ để phát.');
+        });
+    }
+}
+
 function _playBlob(blob, autoplay) {
     _stopLocal();
     const blobUrl = URL.createObjectURL(blob);
     _currentBlobUrl = blobUrl;
-    const a = new Audio();
-    a.src = blobUrl;
-    a.volume = _getCurrentVol();
+    const a = _buildAudio(blobUrl);
     _localAudio = a;
-    a.onplay = () => { muPlaying = true; _setPlayBtns('⏸'); };
-    a.onpause = () => { muPlaying = false; _setPlayBtns('▶'); };
-    a.onended = () => { muPlaying = false; _setPlayBtns('▶'); muNext(); };
-    a.onerror = () => { muPlaying = false; _setPlayBtns('▶'); };
-    a.ontimeupdate = () => {
-        if (!a.duration) return;
-        const pct = (a.currentTime / a.duration * 100).toFixed(1) + '%';
-        ['muProg', 'muProg3'].forEach(id => { const el = document.getElementById(id); if (el) el.style.width = pct; });
-    };
-    if (autoplay) { const p = a.play(); if (p && p.catch) p.catch(err => console.warn('Play error:', err)); }
+    _attachAudioEvents(a, autoplay);
 }
-function _loadLocalAudio(url, autoplay) {
-    if (url.startsWith('idb:')) {
-        const idbId = url.slice(4);
-        idbGetFile(idbId).then(blob => {
-            if (!blob) { console.error('Không tìm thấy file:', idbId); return; }
-            _playBlob(blob, autoplay);
-        }).catch(e => console.error('IDB load error', e));
-    } else {
-        _stopLocal();
-        if (!url || !url.startsWith('http')) return;
-        try {
-            const a = new Audio();
-            a.crossOrigin = 'anonymous';
-            a.src = url;
-            a.volume = _getCurrentVol();
-            a.preload = 'auto';
-            a.oncanplay = function() { if (autoplay && _userGestured) { const p = a.play(); if (p && p.catch) p.catch(()=>{}); } };
-            a.onplay = function() { muPlaying = true; _setPlayBtns('⏸'); };
-            a.onpause = function() { muPlaying = false; _setPlayBtns('▶'); };
-            a.onended = function() { muPlaying = false; _setPlayBtns('▶'); muNext(); };
-            a.onerror = function() { muPlaying = false; _setPlayBtns('▶'); };
-            a.ontimeupdate = function() {
-                if (!a.duration) return;
-                const pct = (a.currentTime / a.duration * 100).toFixed(1) + '%';
-                ['muProg', 'muProg3'].forEach(id => { const el = document.getElementById(id); if (el) el.style.width = pct; });
-            };
-            _localAudio = a;
-            if (autoplay && _userGestured) { const p = a.play(); if (p && p.catch) p.catch(()=>{}); }
-        } catch (e) { console.error('Lỗi tạo Audio:', e); }
-    }
-}
-async function muLoadTrack(i, autoplay = true) {
+
+async function muLoadTrack(i, autoplay = false) {
     const tracks = await getTracks();
     if (!tracks.length) return;
-    muIdx = i;
-    muSyncUI(tracks);
+    muIdx = i; muSyncUI(tracks); _hideMuErr();
     const t = tracks[i];
     _stopLocal();
-    _loadLocalAudio(t.url, autoplay);
+
+    if (t.url && t.url.startsWith('idb:')) {
+        // File local từ IndexedDB
+        const idbId = t.url.slice(4);
+        try {
+            const blob = await idbGetFile(idbId);
+            if (!blob) { _showMuErr('⚠️ File đã bị xoá khỏi trình duyệt.'); return; }
+            _playBlob(blob, autoplay);
+        } catch(e) { _showMuErr('⚠️ Lỗi đọc file: ' + e.message); }
+    } else {
+        // Link bất kỳ (mp3, drive, ...)
+        const a = _buildAudio(t.url);
+        _localAudio = a;
+        _attachAudioEvents(a, autoplay);
+    }
 }
+
 function muToggle() {
     _userGestured = true;
     getTracks().then(tracks => {
         if (!tracks.length) return;
-        if (!_localAudio) { muLoadTrack(muIdx, true); return; }
-        if (muPlaying) { _localAudio.pause(); }
-        else { const p = _localAudio.play(); if (p && p.catch) p.catch(() => muLoadTrack(muIdx, true)); }
+        if (!_localAudio || !_localAudio.src || _localAudio.src === window.location.href) {
+            // Chưa load track → load và phát
+            muLoadTrack(muIdx, true);
+            return;
+        }
+        if (muPlaying) {
+            _localAudio.pause();
+        } else {
+            _hideMuErr();
+            const p = _localAudio.play();
+            if (p && p.catch) p.catch(err => {
+                if (err.name !== 'AbortError') {
+                    // Thử load lại
+                    muLoadTrack(muIdx, true);
+                }
+            });
+        }
     });
 }
-function muPrev() { _userGestured = true; getTracks().then(t => { if (t.length) muLoadTrack((muIdx - 1 + t.length) % t.length); }); }
-function muNext() { _userGestured = true; getTracks().then(t => { if (t.length) muLoadTrack((muIdx + 1) % t.length); }); }
-function muVol(v) { if (_localAudio) { _localAudio.volume = parseFloat(v); } }
+
+function muPrev() { _userGestured = true; getTracks().then(t => { if (t.length) muLoadTrack((muIdx - 1 + t.length) % t.length, muPlaying); }); }
+function muNext() { _userGestured = true; getTracks().then(t => { if (t.length) muLoadTrack((muIdx + 1) % t.length, muPlaying); }); }
+function muVol(v) { if (_localAudio) _localAudio.volume = parseFloat(v); }
 function muSeek(e) {
     const rect = e.currentTarget.getBoundingClientRect();
     const ratio = (e.clientX - rect.left) / rect.width;
-    if (_localAudio && _localAudio.duration) { _localAudio.currentTime = ratio * _localAudio.duration; }
+    if (_localAudio && _localAudio.duration) _localAudio.currentTime = ratio * _localAudio.duration;
 }
+
 initMusicPlayer();
 
 async function onKeyInputChange(val) {
@@ -1622,7 +1609,7 @@ async function onKeyInputChange(val) {
         const slots=Object.keys(slotsObj).length;
         const full=slots>=kd.maxSlots, expired=now>kd.expiresAt;
         if(expired){hintTxt.textContent='⏰ Key đã hết hạn';hint.style.color='var(--danger)';}
-        else if(full){hintTxt.textContent=`🔴 Đã đầy ${slots}/${kd.maxSlots} người — không thể dùng`;}
+        else if(full){hintTxt.textContent=`🔴 Đã đầy ${slots}/${kd.maxSlots} người`;}
         else{hintTxt.textContent=`👁 ${slots}/${kd.maxSlots} người đã dùng — Xem chi tiết`;}
         hint.style.display='block';
     } catch(e){hint.style.display='none';}
@@ -1641,8 +1628,7 @@ async function showKeyInfo() {
         const expired=now>kd.expiresAt, full=slots>=kd.maxSlots;
         const rem=kd.expiresAt-now;
         const barColor=full?'var(--danger)':pct>70?'var(--vip)':'var(--cyan)';
-        const ov=document.createElement('div');
-        ov.className='keyinfo-overlay';
+        const ov=document.createElement('div'); ov.className='keyinfo-overlay';
         ov.innerHTML=`<div class="keyinfo-box">
             <div class="keyinfo-title">${kd.type==='vip'?'⭐ KEY VIP':'🔵 KEY THƯỜNG'} — Thông tin</div>
             <div class="keyinfo-stat"><span class="keyinfo-lbl">Mã key</span><span class="keyinfo-val" style="font-family:monospace;color:var(--cyan);font-size:12px;">${esc(val)}</span></div>
@@ -1650,8 +1636,7 @@ async function showKeyInfo() {
             <div class="keyinfo-stat"><span class="keyinfo-lbl">Trạng thái</span><span class="keyinfo-val" style="color:${expired?'var(--danger)':full?'#ff8800':'var(--green)'}">${expired?'Hết hạn':full?'Đầy slot':'Còn trống'}</span></div>
             <div class="keyinfo-stat"><span class="keyinfo-lbl">Thời hạn còn lại</span><span class="keyinfo-val">${expired?'<span style="color:var(--danger)">Đã hết hạn</span>':fmtMs(rem)}</span></div>
             <div class="keyinfo-progress"><div class="keyinfo-progfill" style="width:${pct}%;background:${barColor};"></div></div>
-            <div style="font-size:10.5px;color:var(--dim);margin-bottom:2px;">Lấp đầy ${pct}% (${kd.maxSlots-slots} chỗ còn trống)</div>
-            <div style="font-size:10px;color:rgba(126,147,160,.5);margin-top:4px;">${full||expired?'⚠️ Key này không thể sử dụng':'✅ Key có thể sử dụng'}</div>
+            <div style="font-size:10.5px;color:var(--dim);margin-bottom:2px;">Lấp đầy ${pct}%</div>
             <span class="keyinfo-close" onclick="this.closest('.keyinfo-overlay').remove()">✕ Đóng</span>
         </div>`;
         ov.addEventListener('click', e=>{if(e.target===ov)ov.remove();});
@@ -1660,405 +1645,138 @@ async function showKeyInfo() {
 }
 
 /* ════════════════════════════════════════════════════════════════
-   🎯 SENSITIVITY MODULE v2.2
-   ════════════════════════════════════════════════════════════════
-   LOGIC MỚI:
-   ✅ Game: Free Fire (thường) vs Free Fire MAX — FF MAX giảm ~8-12% vì đồ họa nặng hơn
-   ✅ iPhone: ĐỜI CŨ nhạy CAO HƠN đời mới (iPhone 6/7/8 cao nhất, 15/16 thấp nhất)
-              Vì màn hình đời cũ có touch sampling thấp hơn → cần nhạy cao hơn
-   ✅ Android: budget > midrange > flagship (phần cứng yếu cần nhạy cao hơn)
-   ✅ Random trong khoảng 15 đơn vị để có sự đa dạng mỗi lần tạo
+   🎮 OPEN GAME — Deep link mở app Free Fire / FF MAX
    ════════════════════════════════════════════════════════════════ */
+function openGame(game) {
+    const noteEl = document.getElementById('openGameNote');
 
-/* ── GAME SELECTOR ── */
-let currentGame = 'ff'; // 'ff' | 'ffmax'
+    // Deep link scheme của Free Fire và FF MAX
+    const schemes = {
+        ff:    ['freefire://',          'https://play.google.com/store/apps/details?id=com.dts.freefireth',   'https://apps.apple.com/app/id1300146617'],
+        ffmax: ['freefiremax://',       'https://play.google.com/store/apps/details?id=com.dts.freefiremax', 'https://apps.apple.com/app/id1556872557'],
+    };
+
+    const [deepLink, androidLink, iosLink] = schemes[game];
+    const gameName = game === 'ff' ? 'Free Fire' : 'Free Fire MAX';
+
+    // Thử mở deep link (app đã cài)
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = deepLink;
+    document.body.appendChild(iframe);
+
+    // Sau 1.5s nếu app không mở được → fallback về store
+    const timer = setTimeout(() => {
+        iframe.remove();
+        // Phát hiện iOS hay Android
+        const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+        const storeLink = isIOS ? iosLink : androidLink;
+        noteEl.textContent = `Không tìm thấy ${gameName}. Đang mở cửa hàng...`;
+        noteEl.style.display = 'block';
+        window.open(storeLink, '_blank');
+        setTimeout(() => { noteEl.style.display = 'none'; }, 3000);
+    }, 1500);
+
+    // Nếu tab mất focus → app đã mở được
+    const onBlur = () => {
+        clearTimeout(timer);
+        iframe.remove();
+        noteEl.textContent = `✅ Đang mở ${gameName}...`;
+        noteEl.style.display = 'block';
+        setTimeout(() => { noteEl.style.display = 'none'; }, 2500);
+        window.removeEventListener('blur', onBlur);
+    };
+    window.addEventListener('blur', onBlur);
+
+    // Hiển thị feedback ngay
+    noteEl.textContent = `⏳ Đang mở ${gameName}...`;
+    noteEl.style.color = 'var(--dim)';
+    noteEl.style.display = 'block';
+}
+
+/* ════════════════════════════════════════════════════════════════
+   🎯 SENSITIVITY MODULE v2.2
+   ════════════════════════════════════════════════════════════════ */
+let currentGame = 'ff';
 
 function selectGame(game) {
     currentGame = game;
     const btnFF = document.getElementById('btnFF');
     const btnFFMAX = document.getElementById('btnFFMAX');
-    if (game === 'ff') {
-        btnFF.className = 'game-btn active-ff';
-        btnFFMAX.className = 'game-btn';
-    } else {
-        btnFFMAX.className = 'game-btn active-ffmax';
-        btnFF.className = 'game-btn';
-    }
-    // Nếu đã có kết quả, regenerate
-    if (document.getElementById('sensResult').style.display !== 'none') {
-        generateSens();
-    }
+    if (game === 'ff') { btnFF.className = 'game-btn active-ff'; btnFFMAX.className = 'game-btn'; }
+    else { btnFFMAX.className = 'game-btn active-ffmax'; btnFF.className = 'game-btn'; }
+    if (document.getElementById('sensResult').style.display !== 'none') generateSens();
 }
 
-/* ── DANH SÁCH THIẾT BỊ — 200+ MÁY ── */
 const DEVICE_LIST = [
-    /* ══ iPhone — đời từ cũ đến mới ══ */
-    'iPhone 5s','iPhone 6','iPhone 6 Plus','iPhone 6s','iPhone 6s Plus',
-    'iPhone 7','iPhone 7 Plus',
-    'iPhone 8','iPhone 8 Plus',
-    'iPhone X','iPhone XR','iPhone XS','iPhone XS Max',
-    'iPhone SE (2016)','iPhone SE (2020)','iPhone SE (2022)',
-    'iPhone 11','iPhone 11 Pro','iPhone 11 Pro Max',
-    'iPhone 12','iPhone 12 Mini','iPhone 12 Pro','iPhone 12 Pro Max',
-    'iPhone 13','iPhone 13 Mini','iPhone 13 Pro','iPhone 13 Pro Max',
-    'iPhone 14','iPhone 14 Plus','iPhone 14 Pro','iPhone 14 Pro Max',
-    'iPhone 15','iPhone 15 Plus','iPhone 15 Pro','iPhone 15 Pro Max',
-    'iPhone 16','iPhone 16 Plus','iPhone 16 Pro','iPhone 16 Pro Max',
-
-    /* ══ iPad ══ */
-    'iPad Air 3','iPad Air 4','iPad Air 5',
-    'iPad Mini 5','iPad Mini 6',
-    'iPad Pro 11 (2020)','iPad Pro 11 (2021)','iPad Pro 11 (2022)','iPad Pro 11 (2024)',
-    'iPad Pro 12.9 (2020)','iPad Pro 12.9 (2021)','iPad Pro 12.9 (2022)',
-    'iPad 8','iPad 9','iPad 10',
-
-    /* ══ Samsung Galaxy S Series ══ */
-    'Samsung Galaxy S10','Samsung Galaxy S10 Plus','Samsung Galaxy S10e',
-    'Samsung Galaxy S20','Samsung Galaxy S20 Plus','Samsung Galaxy S20 Ultra','Samsung Galaxy S20 FE',
-    'Samsung Galaxy S21','Samsung Galaxy S21 Plus','Samsung Galaxy S21 Ultra','Samsung Galaxy S21 FE',
-    'Samsung Galaxy S22','Samsung Galaxy S22 Plus','Samsung Galaxy S22 Ultra',
-    'Samsung Galaxy S23','Samsung Galaxy S23 Plus','Samsung Galaxy S23 Ultra','Samsung Galaxy S23 FE',
-    'Samsung Galaxy S24','Samsung Galaxy S24 Plus','Samsung Galaxy S24 Ultra','Samsung Galaxy S24 FE',
-
-    /* ══ Samsung Galaxy A ══ */
-    'Samsung Galaxy A01','Samsung Galaxy A02','Samsung Galaxy A02s',
-    'Samsung Galaxy A03','Samsung Galaxy A03s','Samsung Galaxy A03 Core',
-    'Samsung Galaxy A04','Samsung Galaxy A04s','Samsung Galaxy A04e',
-    'Samsung Galaxy A05','Samsung Galaxy A05s',
-    'Samsung Galaxy A10','Samsung Galaxy A10s',
-    'Samsung Galaxy A12','Samsung Galaxy A12 Nacho',
-    'Samsung Galaxy A13','Samsung Galaxy A13 5G','Samsung Galaxy A13 4G',
-    'Samsung Galaxy A14','Samsung Galaxy A14 5G',
-    'Samsung Galaxy A15','Samsung Galaxy A15 5G',
-    'Samsung Galaxy A20','Samsung Galaxy A20s',
-    'Samsung Galaxy A21','Samsung Galaxy A21s',
-    'Samsung Galaxy A22','Samsung Galaxy A22 5G',
-    'Samsung Galaxy A23','Samsung Galaxy A23 5G',
-    'Samsung Galaxy A24','Samsung Galaxy A24 4G',
-    'Samsung Galaxy A25 5G',
-    'Samsung Galaxy A30s',
-    'Samsung Galaxy A31','Samsung Galaxy A32','Samsung Galaxy A32 5G',
-    'Samsung Galaxy A33 5G','Samsung Galaxy A34 5G','Samsung Galaxy A35 5G',
-    'Samsung Galaxy A42 5G',
-    'Samsung Galaxy A50','Samsung Galaxy A50s','Samsung Galaxy A51','Samsung Galaxy A51 5G',
-    'Samsung Galaxy A52','Samsung Galaxy A52s 5G','Samsung Galaxy A52 5G',
-    'Samsung Galaxy A53 5G','Samsung Galaxy A54 5G','Samsung Galaxy A55 5G',
-    'Samsung Galaxy A71','Samsung Galaxy A72',
-    'Samsung Galaxy A73 5G',
-
-    /* ══ Samsung Galaxy M ══ */
-    'Samsung Galaxy M01','Samsung Galaxy M02','Samsung Galaxy M02s',
-    'Samsung Galaxy M12','Samsung Galaxy M13','Samsung Galaxy M13 5G',
-    'Samsung Galaxy M14','Samsung Galaxy M14 5G',
-    'Samsung Galaxy M21','Samsung Galaxy M22',
-    'Samsung Galaxy M23 5G','Samsung Galaxy M23',
-    'Samsung Galaxy M31','Samsung Galaxy M31s',
-    'Samsung Galaxy M32','Samsung Galaxy M33 5G',
-    'Samsung Galaxy M34 5G','Samsung Galaxy M35 5G',
-    'Samsung Galaxy M42 5G',
-    'Samsung Galaxy M51','Samsung Galaxy M52 5G',
-    'Samsung Galaxy M53 5G','Samsung Galaxy M54 5G','Samsung Galaxy M55 5G',
-
-    /* ══ Xiaomi Redmi Note ══ */
-    'Xiaomi Redmi Note 8','Xiaomi Redmi Note 8 Pro',
-    'Xiaomi Redmi Note 9','Xiaomi Redmi Note 9 Pro','Xiaomi Redmi Note 9s',
-    'Xiaomi Redmi Note 9T',
-    'Xiaomi Redmi Note 10','Xiaomi Redmi Note 10 Pro','Xiaomi Redmi Note 10S','Xiaomi Redmi Note 10 5G',
-    'Xiaomi Redmi Note 11','Xiaomi Redmi Note 11 Pro','Xiaomi Redmi Note 11S','Xiaomi Redmi Note 11 5G',
-    'Xiaomi Redmi Note 12','Xiaomi Redmi Note 12 Pro','Xiaomi Redmi Note 12S','Xiaomi Redmi Note 12 5G','Xiaomi Redmi Note 12 Pro+',
-    'Xiaomi Redmi Note 13','Xiaomi Redmi Note 13 Pro','Xiaomi Redmi Note 13 Pro+','Xiaomi Redmi Note 13 5G',
-
-    /* ══ Xiaomi Redmi ══ */
-    'Xiaomi Redmi 8','Xiaomi Redmi 8A',
-    'Xiaomi Redmi 9','Xiaomi Redmi 9A','Xiaomi Redmi 9C','Xiaomi Redmi 9T','Xiaomi Redmi 9i',
-    'Xiaomi Redmi 10','Xiaomi Redmi 10A','Xiaomi Redmi 10C','Xiaomi Redmi 10 2022',
-    'Xiaomi Redmi 12','Xiaomi Redmi 12C','Xiaomi Redmi 12 5G',
-    'Xiaomi Redmi 13','Xiaomi Redmi 13C',
-    'Xiaomi Redmi A1','Xiaomi Redmi A2','Xiaomi Redmi A3',
-
-    /* ══ Xiaomi POCO ══ */
-    'Xiaomi POCO C31','Xiaomi POCO C40','Xiaomi POCO C50','Xiaomi POCO C55','Xiaomi POCO C65',
-    'Xiaomi POCO M2 Pro','Xiaomi POCO M3','Xiaomi POCO M3 Pro','Xiaomi POCO M4','Xiaomi POCO M4 Pro',
-    'Xiaomi POCO M4 Pro 5G','Xiaomi POCO M5','Xiaomi POCO M5s','Xiaomi POCO M6 Pro','Xiaomi POCO M6 5G',
-    'Xiaomi POCO X3','Xiaomi POCO X3 Pro','Xiaomi POCO X3 NFC','Xiaomi POCO X3 GT',
-    'Xiaomi POCO X4 GT','Xiaomi POCO X4 Pro 5G',
-    'Xiaomi POCO X5','Xiaomi POCO X5 Pro 5G',
-    'Xiaomi POCO X6','Xiaomi POCO X6 Pro','Xiaomi POCO X6 Neo',
-    'Xiaomi POCO F3','Xiaomi POCO F4','Xiaomi POCO F4 GT','Xiaomi POCO F5','Xiaomi POCO F5 Pro','Xiaomi POCO F6 Pro',
-
-    /* ══ Xiaomi Mi / 11 / 12 / 13 / 14 ══ */
-    'Xiaomi Mi 10T','Xiaomi Mi 10T Pro','Xiaomi Mi 11','Xiaomi Mi 11 Lite','Xiaomi Mi 11i',
-    'Xiaomi 11T','Xiaomi 11T Pro','Xiaomi 11 Lite 5G NE',
-    'Xiaomi 12','Xiaomi 12 Pro','Xiaomi 12T','Xiaomi 12T Pro','Xiaomi 12 Lite',
-    'Xiaomi 13','Xiaomi 13 Pro','Xiaomi 13T','Xiaomi 13T Pro','Xiaomi 13 Lite',
-    'Xiaomi 14','Xiaomi 14 Pro','Xiaomi 14 Ultra','Xiaomi 14T','Xiaomi 14T Pro',
-
-    /* ══ Oppo A Series ══ */
-    'Oppo A5 2020','Oppo A9 2020',
-    'Oppo A12','Oppo A15','Oppo A15s',
-    'Oppo A16','Oppo A16s','Oppo A16e','Oppo A16k',
-    'Oppo A17','Oppo A17k',
-    'Oppo A18','Oppo A19',
-    'Oppo A31','Oppo A32',
-    'Oppo A52','Oppo A53','Oppo A53s','Oppo A54','Oppo A54s','Oppo A55','Oppo A55s',
-    'Oppo A57','Oppo A57s','Oppo A57e',
-    'Oppo A58','Oppo A58x',
-    'Oppo A74','Oppo A74 5G','Oppo A76','Oppo A77','Oppo A77s',
-    'Oppo A78','Oppo A78 5G','Oppo A79 5G',
-    'Oppo A91','Oppo A92','Oppo A93','Oppo A94','Oppo A95','Oppo A96','Oppo A97','Oppo A98 5G',
-
-    /* ══ Oppo Reno ══ */
-    'Oppo Reno 4','Oppo Reno 4 Pro',
-    'Oppo Reno 5','Oppo Reno 5 Pro','Oppo Reno 5 Lite',
-    'Oppo Reno 6','Oppo Reno 6 Pro','Oppo Reno 6 Lite',
-    'Oppo Reno 7','Oppo Reno 7 Pro','Oppo Reno 7 Lite','Oppo Reno 7Z',
-    'Oppo Reno 8','Oppo Reno 8 Pro','Oppo Reno 8T','Oppo Reno 8 Lite','Oppo Reno 8Z',
-    'Oppo Reno 9','Oppo Reno 9 Pro','Oppo Reno 9A',
-    'Oppo Reno 10','Oppo Reno 10 Pro','Oppo Reno 10 Pro+','Oppo Reno 10 5G',
-    'Oppo Reno 11','Oppo Reno 11 Pro','Oppo Reno 11F',
-    'Oppo Find X5','Oppo Find X5 Pro','Oppo Find X6 Pro','Oppo Find X7 Ultra',
-
-    /* ══ Vivo ══ */
-    'Vivo Y01','Vivo Y02','Vivo Y02s','Vivo Y02t',
-    'Vivo Y11','Vivo Y12','Vivo Y12s','Vivo Y12a',
-    'Vivo Y15','Vivo Y15s','Vivo Y15a',
-    'Vivo Y16','Vivo Y17s',
-    'Vivo Y19','Vivo Y20','Vivo Y20i','Vivo Y20s','Vivo Y20G',
-    'Vivo Y21','Vivo Y21A','Vivo Y21s','Vivo Y21T',
-    'Vivo Y22','Vivo Y22s','Vivo Y25','Vivo Y27','Vivo Y27s','Vivo Y27 5G',
-    'Vivo Y28 5G','Vivo Y29 5G',
-    'Vivo Y31','Vivo Y33s','Vivo Y33T','Vivo Y35','Vivo Y35+','Vivo Y36','Vivo Y36 5G',
-    'Vivo Y38 5G',
-    'Vivo Y51','Vivo Y52','Vivo Y53s','Vivo Y55','Vivo Y55s 5G','Vivo Y56 5G','Vivo Y58 5G',
-    'Vivo V17','Vivo V20','Vivo V20 SE','Vivo V21','Vivo V21e','Vivo V21 5G',
-    'Vivo V23','Vivo V23e','Vivo V23 5G',
-    'Vivo V25','Vivo V25 Pro','Vivo V25e',
-    'Vivo V27','Vivo V27 Pro','Vivo V27e',
-    'Vivo V29','Vivo V29 Pro','Vivo V29e','Vivo V29 Lite',
-    'Vivo V30','Vivo V30 Pro','Vivo V30e','Vivo V30 Lite',
-    'Vivo X80','Vivo X90','Vivo X90 Pro','Vivo X100 Pro',
-
-    /* ══ Realme ══ */
-    'Realme 5','Realme 5i','Realme 5 Pro','Realme 5s',
-    'Realme 6','Realme 6i','Realme 6 Pro','Realme 6s',
-    'Realme 7','Realme 7i','Realme 7 Pro',
-    'Realme 8','Realme 8i','Realme 8 Pro','Realme 8s 5G',
-    'Realme 9','Realme 9i','Realme 9 Pro','Realme 9 Pro+','Realme 9 5G',
-    'Realme 10','Realme 10 Pro','Realme 10 Pro+','Realme 10s','Realme 10 5G',
-    'Realme 11','Realme 11 Pro','Realme 11 Pro+','Realme 11 5G','Realme 11x 5G',
-    'Realme 12','Realme 12 Pro','Realme 12 Pro+','Realme 12 5G','Realme 12x 5G',
-    'Realme C11','Realme C12','Realme C15','Realme C17',
-    'Realme C20','Realme C20A','Realme C21','Realme C21Y','Realme C21s',
-    'Realme C25','Realme C25s','Realme C25Y',
-    'Realme C30','Realme C30s','Realme C31','Realme C33','Realme C33 2023','Realme C35',
-    'Realme C51','Realme C53','Realme C55','Realme C67','Realme C65',
-    'Realme GT','Realme GT 2','Realme GT 2 Pro','Realme GT Neo 2','Realme GT Neo 3','Realme GT Neo 3T',
-    'Realme GT5 Pro',
-    'Realme Narzo 50','Realme Narzo 50A','Realme Narzo 50 Pro','Realme Narzo 50i',
-    'Realme Narzo 60','Realme Narzo 60 Pro','Realme Narzo 60x',
-
-    /* ══ Huawei ══ */
-    'Huawei Y5','Huawei Y5p','Huawei Y5 2019',
-    'Huawei Y6','Huawei Y6p','Huawei Y6s','Huawei Y6 2019',
-    'Huawei Y7a','Huawei Y7p','Huawei Y7 2019',
-    'Huawei Y8p','Huawei Y8s',
-    'Huawei Y9a','Huawei Y9s','Huawei Y9 2019',
-    'Huawei Nova 5T','Huawei Nova 7i','Huawei Nova 8i','Huawei Nova 9','Huawei Nova 10',
-    'Huawei P30','Huawei P30 Lite','Huawei P30 Pro',
-    'Huawei P40','Huawei P40 Lite','Huawei P40 Pro',
-    'Huawei Mate 30 Pro','Huawei Mate 40 Pro',
-
-    /* ══ OnePlus ══ */
-    'OnePlus 8','OnePlus 8 Pro','OnePlus 8T',
-    'OnePlus 9','OnePlus 9 Pro','OnePlus 9R','OnePlus 9RT',
-    'OnePlus 10 Pro','OnePlus 10T','OnePlus 10R',
-    'OnePlus 11','OnePlus 11R','OnePlus 12','OnePlus 12R',
-    'OnePlus Nord','OnePlus Nord CE','OnePlus Nord 2','OnePlus Nord 2T',
-    'OnePlus Nord CE 2','OnePlus Nord CE 2 Lite','OnePlus Nord CE 3','OnePlus Nord CE 3 Lite','OnePlus Nord CE 4','OnePlus Nord CE 4 Lite',
-    'OnePlus Nord N10 5G','OnePlus Nord N20','OnePlus Nord N30',
-
-    /* ══ ASUS ROG / Zenfone ══ */
-    'ASUS ROG Phone 3','ASUS ROG Phone 5','ASUS ROG Phone 5s',
-    'ASUS ROG Phone 6','ASUS ROG Phone 6D','ASUS ROG Phone 6D Ultimate',
-    'ASUS ROG Phone 7','ASUS ROG Phone 7 Ultimate',
-    'ASUS ROG Phone 8','ASUS ROG Phone 8 Pro',
-    'ASUS Zenfone 8','ASUS Zenfone 9','ASUS Zenfone 10',
-
-    /* ══ Google Pixel ══ */
-    'Google Pixel 5','Google Pixel 5a',
-    'Google Pixel 6','Google Pixel 6 Pro','Google Pixel 6a',
-    'Google Pixel 7','Google Pixel 7 Pro','Google Pixel 7a',
-    'Google Pixel 8','Google Pixel 8 Pro','Google Pixel 8a',
-    'Google Pixel 9','Google Pixel 9 Pro','Google Pixel 9 Pro XL',
-
-    /* ══ Tecno ══ */
-    'Tecno Spark 5','Tecno Spark 6','Tecno Spark 7','Tecno Spark 8',
-    'Tecno Spark 8C','Tecno Spark 8P','Tecno Spark 9','Tecno Spark 9 Pro',
-    'Tecno Spark 10','Tecno Spark 10 Pro','Tecno Spark 10C','Tecno Spark 10 NFC',
-    'Tecno Spark 20','Tecno Spark 20 Pro','Tecno Spark 20C',
-    'Tecno Camon 18','Tecno Camon 18 Premier','Tecno Camon 19','Tecno Camon 19 Pro',
-    'Tecno Camon 20','Tecno Camon 20 Pro','Tecno Camon 20 Premier',
-    'Tecno Pova 3','Tecno Pova 4','Tecno Pova 4 Pro','Tecno Pova 5','Tecno Pova 5 Pro',
-    'Tecno Phantom X2','Tecno Phantom X2 Pro',
-    'Tecno Pop 7 Pro',
-
-    /* ══ Infinix ══ */
-    'Infinix Hot 10','Infinix Hot 10 Play','Infinix Hot 11','Infinix Hot 11 Play',
-    'Infinix Hot 11s','Infinix Hot 12','Infinix Hot 12 Play','Infinix Hot 12i',
-    'Infinix Hot 20','Infinix Hot 20i','Infinix Hot 20 Play','Infinix Hot 20 NFC',
-    'Infinix Hot 30','Infinix Hot 30i','Infinix Hot 30 Play','Infinix Hot 30 NFC',
-    'Infinix Hot 40','Infinix Hot 40 Pro','Infinix Hot 40i',
-    'Infinix Note 11','Infinix Note 12','Infinix Note 12 Turbo','Infinix Note 12 VIP',
-    'Infinix Note 30','Infinix Note 30 Pro','Infinix Note 30 VIP',
-    'Infinix Note 40','Infinix Note 40 Pro',
-    'Infinix Zero 20','Infinix Zero 30','Infinix Zero 30 5G',
-    'Infinix Smart 6','Infinix Smart 7','Infinix Smart 8',
-
-    /* ══ itel ══ */
-    'itel A55','itel A58','itel A60','itel A60s','itel A70',
-    'itel P38','itel P40','itel P55','itel P55+',
-    'itel S23','itel S24',
-
-    /* ══ Motorola ══ */
-    'Motorola Moto G10','Motorola Moto G20','Motorola Moto G30',
-    'Motorola Moto G31','Motorola Moto G41','Motorola Moto G51 5G',
-    'Motorola Moto G52','Motorola Moto G62 5G','Motorola Moto G72','Motorola Moto G82 5G',
-    'Motorola Moto G84 5G','Motorola Moto G85 5G',
-    'Motorola Edge 30','Motorola Edge 30 Neo','Motorola Edge 30 Fusion',
-    'Motorola Edge 40','Motorola Edge 40 Neo','Motorola Edge 40 Pro',
-    'Motorola Edge 50','Motorola Edge 50 Neo','Motorola Edge 50 Fusion','Motorola Edge 50 Pro',
-
-    /* ══ Nokia ══ */
-    'Nokia C10','Nokia C12','Nokia C20','Nokia C21','Nokia C22','Nokia C32','Nokia C42',
-    'Nokia G10','Nokia G11','Nokia G20','Nokia G21','Nokia G22','Nokia G42 5G',
-    'Nokia X10','Nokia X20','Nokia X30',
-
-    /* ══ Sony ══ */
-    'Sony Xperia 1 III','Sony Xperia 1 IV','Sony Xperia 1 V',
-    'Sony Xperia 5 III','Sony Xperia 5 IV','Sony Xperia 5 V',
-    'Sony Xperia 10 III','Sony Xperia 10 IV','Sony Xperia 10 V',
-
-    /* ══ Honor ══ */
-    'Honor 50','Honor 70','Honor 80','Honor 90','Honor 90 Lite',
-    'Honor Magic5 Pro','Honor Magic6 Pro',
-    'Honor X6','Honor X7','Honor X7a','Honor X8','Honor X8a','Honor X8b','Honor X9','Honor X9a',
-    'Honor Play 30','Honor Play 40',
+    'iPhone 5s','iPhone 6','iPhone 6 Plus','iPhone 6s','iPhone 6s Plus','iPhone 7','iPhone 7 Plus','iPhone 8','iPhone 8 Plus','iPhone X','iPhone XR','iPhone XS','iPhone XS Max','iPhone SE (2016)','iPhone SE (2020)','iPhone SE (2022)','iPhone 11','iPhone 11 Pro','iPhone 11 Pro Max','iPhone 12','iPhone 12 Mini','iPhone 12 Pro','iPhone 12 Pro Max','iPhone 13','iPhone 13 Mini','iPhone 13 Pro','iPhone 13 Pro Max','iPhone 14','iPhone 14 Plus','iPhone 14 Pro','iPhone 14 Pro Max','iPhone 15','iPhone 15 Plus','iPhone 15 Pro','iPhone 15 Pro Max','iPhone 16','iPhone 16 Plus','iPhone 16 Pro','iPhone 16 Pro Max',
+    'iPad Air 3','iPad Air 4','iPad Air 5','iPad Mini 5','iPad Mini 6','iPad Pro 11 (2020)','iPad Pro 11 (2021)','iPad Pro 11 (2022)','iPad 8','iPad 9','iPad 10',
+    'Samsung Galaxy S10','Samsung Galaxy S20','Samsung Galaxy S20 Ultra','Samsung Galaxy S21','Samsung Galaxy S21 Ultra','Samsung Galaxy S22','Samsung Galaxy S22 Ultra','Samsung Galaxy S23','Samsung Galaxy S23 Ultra','Samsung Galaxy S24','Samsung Galaxy S24 Ultra',
+    'Samsung Galaxy A03','Samsung Galaxy A05','Samsung Galaxy A12','Samsung Galaxy A13','Samsung Galaxy A14','Samsung Galaxy A15','Samsung Galaxy A22','Samsung Galaxy A23','Samsung Galaxy A24','Samsung Galaxy A25 5G','Samsung Galaxy A32','Samsung Galaxy A33 5G','Samsung Galaxy A34 5G','Samsung Galaxy A35 5G','Samsung Galaxy A51','Samsung Galaxy A52','Samsung Galaxy A52s 5G','Samsung Galaxy A53 5G','Samsung Galaxy A54 5G','Samsung Galaxy A55 5G','Samsung Galaxy A72','Samsung Galaxy A73 5G',
+    'Samsung Galaxy M12','Samsung Galaxy M13','Samsung Galaxy M14','Samsung Galaxy M21','Samsung Galaxy M31','Samsung Galaxy M32','Samsung Galaxy M33 5G','Samsung Galaxy M34 5G','Samsung Galaxy M52 5G','Samsung Galaxy M53 5G','Samsung Galaxy M54 5G',
+    'Xiaomi Redmi Note 8','Xiaomi Redmi Note 8 Pro','Xiaomi Redmi Note 9','Xiaomi Redmi Note 9 Pro','Xiaomi Redmi Note 10','Xiaomi Redmi Note 10 Pro','Xiaomi Redmi Note 10S','Xiaomi Redmi Note 11','Xiaomi Redmi Note 11 Pro','Xiaomi Redmi Note 11S','Xiaomi Redmi Note 12','Xiaomi Redmi Note 12 Pro','Xiaomi Redmi Note 12 Pro+','Xiaomi Redmi Note 13','Xiaomi Redmi Note 13 Pro','Xiaomi Redmi Note 13 Pro+',
+    'Xiaomi Redmi 9','Xiaomi Redmi 9A','Xiaomi Redmi 9C','Xiaomi Redmi 10','Xiaomi Redmi 10A','Xiaomi Redmi 10C','Xiaomi Redmi 12','Xiaomi Redmi 12C','Xiaomi Redmi 13','Xiaomi Redmi 13C','Xiaomi Redmi A1','Xiaomi Redmi A2','Xiaomi Redmi A3',
+    'Xiaomi POCO C40','Xiaomi POCO C55','Xiaomi POCO C65','Xiaomi POCO M3','Xiaomi POCO M3 Pro','Xiaomi POCO M4','Xiaomi POCO M4 Pro','Xiaomi POCO M5','Xiaomi POCO M5s','Xiaomi POCO M6 Pro','Xiaomi POCO X3','Xiaomi POCO X3 Pro','Xiaomi POCO X4 Pro 5G','Xiaomi POCO X5','Xiaomi POCO X5 Pro 5G','Xiaomi POCO X6','Xiaomi POCO X6 Pro','Xiaomi POCO F3','Xiaomi POCO F4','Xiaomi POCO F5','Xiaomi POCO F5 Pro','Xiaomi POCO F6 Pro',
+    'Xiaomi 11T','Xiaomi 11T Pro','Xiaomi 12','Xiaomi 12 Pro','Xiaomi 12T','Xiaomi 12T Pro','Xiaomi 13','Xiaomi 13 Pro','Xiaomi 13T','Xiaomi 13T Pro','Xiaomi 14','Xiaomi 14 Pro','Xiaomi 14 Ultra',
+    'Oppo A16','Oppo A17','Oppo A52','Oppo A53','Oppo A54','Oppo A55','Oppo A57','Oppo A74','Oppo A76','Oppo A77','Oppo A78','Oppo A96','Oppo A97','Oppo A98 5G',
+    'Oppo Reno 5','Oppo Reno 6','Oppo Reno 7','Oppo Reno 7 Pro','Oppo Reno 8','Oppo Reno 8 Pro','Oppo Reno 9','Oppo Reno 9 Pro','Oppo Reno 10','Oppo Reno 10 Pro','Oppo Reno 11','Oppo Reno 11 Pro',
+    'Vivo Y16','Vivo Y21','Vivo Y22','Vivo Y27','Vivo Y27 5G','Vivo Y35','Vivo Y36','Vivo Y55','Vivo V21','Vivo V23','Vivo V25','Vivo V25 Pro','Vivo V27','Vivo V27 Pro','Vivo V29','Vivo V29 Pro','Vivo V30','Vivo V30 Pro',
+    'Realme 7','Realme 8','Realme 8 Pro','Realme 9','Realme 9 Pro','Realme 9 Pro+','Realme 10','Realme 10 Pro','Realme 10 Pro+','Realme 11','Realme 11 Pro','Realme 11 Pro+','Realme 12','Realme 12 Pro','Realme 12 Pro+',
+    'Realme C21','Realme C25','Realme C31','Realme C33','Realme C35','Realme C51','Realme C53','Realme C55','Realme C67',
+    'Realme GT','Realme GT 2','Realme GT 2 Pro','Realme GT Neo 2','Realme GT Neo 3',
+    'Huawei Nova 5T','Huawei Nova 7i','Huawei Nova 9','Huawei P30','Huawei P30 Lite','Huawei P40','Huawei P40 Lite',
+    'OnePlus 9','OnePlus 9 Pro','OnePlus 10 Pro','OnePlus 11','OnePlus Nord','OnePlus Nord 2','OnePlus Nord CE 2','OnePlus Nord CE 3 Lite',
+    'ASUS ROG Phone 5','ASUS ROG Phone 6','ASUS ROG Phone 7','ASUS ROG Phone 8','ASUS Zenfone 9','ASUS Zenfone 10',
+    'Google Pixel 6','Google Pixel 6 Pro','Google Pixel 7','Google Pixel 7 Pro','Google Pixel 8','Google Pixel 8 Pro','Google Pixel 9','Google Pixel 9 Pro',
+    'Tecno Spark 8','Tecno Spark 9','Tecno Spark 10','Tecno Spark 20','Tecno Camon 19','Tecno Camon 20','Tecno Pova 4','Tecno Pova 5',
+    'Infinix Hot 20','Infinix Hot 30','Infinix Hot 40','Infinix Note 30','Infinix Note 40','Infinix Zero 30',
+    'Motorola Moto G52','Motorola Moto G72','Motorola Moto G84 5G','Motorola Edge 40','Motorola Edge 50',
 ];
 
-/* ── Lấy generation số của iPhone ── */
 function getiPhoneGen(name) {
     const n = name.toLowerCase();
-    // Map tên → số thế hệ (thấp = cũ)
     const imap = [
-        [/iphone 5s?$/, 5],
-        [/iphone 6 plus/, 6], [/iphone 6s plus/, 6.5], [/iphone 6s?$/, 6],
-        [/iphone 7 plus/, 7.5], [/iphone 7$/, 7],
-        [/iphone 8 plus/, 8.5], [/iphone 8$/, 8],
-        [/iphone se \(2016\)/, 6], [/iphone se \(2020\)/, 8], [/iphone se \(2022\)/, 9],
-        [/iphone x$/, 10], [/iphone xr/, 10], [/iphone xs max/, 10.3], [/iphone xs/, 10.2],
-        [/iphone 11 pro max/, 11.3], [/iphone 11 pro/, 11.2], [/iphone 11$/, 11],
-        [/iphone 12 pro max/, 12.3], [/iphone 12 pro/, 12.2], [/iphone 12 mini/, 12], [/iphone 12$/, 12],
-        [/iphone 13 pro max/, 13.3], [/iphone 13 pro/, 13.2], [/iphone 13 mini/, 13], [/iphone 13$/, 13],
-        [/iphone 14 pro max/, 14.3], [/iphone 14 plus/, 14.1], [/iphone 14 pro/, 14.2], [/iphone 14$/, 14],
-        [/iphone 15 pro max/, 15.3], [/iphone 15 plus/, 15.1], [/iphone 15 pro/, 15.2], [/iphone 15$/, 15],
-        [/iphone 16 pro max/, 16.3], [/iphone 16 plus/, 16.1], [/iphone 16 pro/, 16.2], [/iphone 16$/, 16],
+        [/iphone 5s?$/, 5],[/iphone 6 plus/, 6],[/iphone 6s plus/, 6.5],[/iphone 6s?$/, 6],
+        [/iphone 7 plus/, 7.5],[/iphone 7$/, 7],[/iphone 8 plus/, 8.5],[/iphone 8$/, 8],
+        [/iphone se \(2016\)/, 6],[/iphone se \(2020\)/, 8],[/iphone se \(2022\)/, 9],
+        [/iphone x$/, 10],[/iphone xr/, 10],[/iphone xs max/, 10.3],[/iphone xs/, 10.2],
+        [/iphone 11 pro max/, 11.3],[/iphone 11 pro/, 11.2],[/iphone 11$/, 11],
+        [/iphone 12 pro max/, 12.3],[/iphone 12 pro/, 12.2],[/iphone 12 mini/, 12],[/iphone 12$/, 12],
+        [/iphone 13 pro max/, 13.3],[/iphone 13 pro/, 13.2],[/iphone 13 mini/, 13],[/iphone 13$/, 13],
+        [/iphone 14 pro max/, 14.3],[/iphone 14 plus/, 14.1],[/iphone 14 pro/, 14.2],[/iphone 14$/, 14],
+        [/iphone 15 pro max/, 15.3],[/iphone 15 plus/, 15.1],[/iphone 15 pro/, 15.2],[/iphone 15$/, 15],
+        [/iphone 16 pro max/, 16.3],[/iphone 16 plus/, 16.1],[/iphone 16 pro/, 16.2],[/iphone 16$/, 16],
     ];
-    for (const [re, gen] of imap) {
-        if (re.test(n)) return gen;
-    }
-    return 12; // default midrange
+    for (const [re, gen] of imap) { if (re.test(n)) return gen; }
+    return 12;
 }
 
-/* ══ DEVICE PROFILE — LOGIC MỚI ══ */
 function getDeviceProfile(name) {
     const n = name.toLowerCase();
-
-    /* ── iPad ── */
-    if (/ipad/.test(n)) {
-        return { tier:'ipad', label:'iPad',
-            g:[68,82], ads:[55,68], z3:[52,62], z6:[50,58],
-            gyro:[85,105], cam:[62,78] };
-    }
-
-    /* ── iPhone: ĐỜI CŨ → NHẠY CAO HƠN ── */
+    if (/ipad/.test(n)) return { g:[68,82], ads:[55,68], z3:[52,62], z6:[50,58], gyro:[85,105], cam:[62,78] };
     if (/iphone/.test(n)) {
         const gen = getiPhoneGen(n);
-        // gen 5-8 (cũ nhất): nhạy cao 80-100
-        // gen 10-11:          nhạy trung 70-85
-        // gen 12-13:          nhạy trung 60-75
-        // gen 14-15-16 (mới): nhạy thấp nhất 52-68
-        let g, ads, z3, z6, gyro, cam;
-        if (gen <= 8) {
-            // iPhone 5s đến 8 Plus — màn hình 60Hz, touch sampling thấp, cần nhạy cao
-            g=[88,105]; ads=[72,88]; z3=[62,78]; z6=[55,70]; gyro=[105,130]; cam=[80,98];
-        } else if (gen <= 10.3) {
-            // iPhone X, XS, XR — bắt đầu OLED nhưng vẫn khá cũ
-            g=[78,95]; ads=[64,80]; z3=[57,72]; z6:[52,65]; z6=[52,65]; gyro=[96,120]; cam=[72,88];
-        } else if (gen <= 11.3) {
-            // iPhone 11 series
-            g=[70,86]; ads:[58,73]; ads=[58,73]; z3=[53,67]; z6=[50,62]; gyro=[88,112]; cam=[65,80];
-        } else if (gen <= 13.3) {
-            // iPhone 12-13 series — ProMotion trên Pro
-            g=[62,77]; ads=[52,67]; z3=[50,62]; z6=[50,58]; gyro=[80,102]; cam=[58,74];
-        } else {
-            // iPhone 14-15-16 — màn hình tốt nhất, touch sampling cao → nhạy thấp nhất
-            g=[54,68]; ads=[50,62]; z3=[50,58]; z6=[50,55]; gyro=[72,92]; cam=[52,66];
-        }
-        return { tier:'ios', label:'iPhone gen '+Math.floor(gen), g, ads, z3, z6, gyro, cam };
+        if (gen <= 8)    return { g:[88,105], ads:[72,88], z3:[62,78], z6:[55,70], gyro:[105,130], cam:[80,98] };
+        if (gen <= 10.3) return { g:[78,95],  ads:[64,80], z3:[57,72], z6:[52,65], gyro:[96,120],  cam:[72,88] };
+        if (gen <= 11.3) return { g:[70,86],  ads:[58,73], z3:[53,67], z6:[50,62], gyro:[88,112],  cam:[65,80] };
+        if (gen <= 13.3) return { g:[62,77],  ads:[52,67], z3:[50,62], z6:[50,58], gyro:[80,102],  cam:[58,74] };
+        return                 { g:[54,68],  ads:[50,62], z3:[50,58], z6:[50,55], gyro:[72,92],   cam:[52,66] };
     }
-
-    /* ── Gaming phone ── */
-    if (/rog phone|black shark|redmagic|nubia red/.test(n)) {
-        return { tier:'gaming', label:'Gaming Phone',
-            g:[78,95], ads:[62,78], z3:[54,70], z6:[50,62],
-            gyro:[112,142], cam:[72,90] };
-    }
-
-    /* ── Android Flagship (chip đỉnh, màn hình tốt) ── */
-    const isFlagship = /galaxy s2[0-4](?! fe| a| m| note)|s22 ultra|s23 ultra|s24 ultra|pixel [7-9] pro|pixel 8 pro|oneplus (9|10|11|12) pro|find x[5-7]|xiaomi 1[234] pro|xiaomi 14 ultra|reno 10 pro\+|zenfone 1[0-9]/.test(n);
-    if (isFlagship) {
-        return { tier:'flagship', label:'Android Flagship',
-            g:[88,108], ads:[70,88], z3:[60,76], z6:[52,65],
-            gyro:[118,150], cam:[80,100] };
-    }
-
-    /* ── Android High-Midrange ── */
-    const isHighMid = /poco [fx]\d|poco x[3-6]|redmi note 1[0-3] pro|galaxy a5[345] 5g|galaxy a73|realme gt|realme [89] pro|oneplus nord 2|vivo v2[3-7]|galaxy s2[0-4] fe|xiaomi 1[2-4]t|reno [7-9] pro|reno 10|motorola edge [3-5]0/.test(n);
-    if (isHighMid) {
-        return { tier:'highmid', label:'Android Mid-High',
-            g:[108,130], ads:[86,106], z3:[72,90], z6:[58,74],
-            gyro:[135,165], cam:[98,118] };
-    }
-
-    /* ── Android Midrange ── */
-    const isMid = /redmi note [89]|redmi note 10[^s]|redmi note 11[^s p]|galaxy a[34][0-9]|galaxy m[34][0-9]|oppo reno [4-9]|vivo v2[12]|realme [6-9][^i]|realme 10[^+]|oneplus nord ce|poco m[4-6]|nova [5-9]|moto g[5-8]/.test(n);
-    if (isMid) {
-        return { tier:'midrange', label:'Android Midrange',
-            g:[118,142], ads:[94,116], z3:[78,98], z6:[63,80],
-            gyro:[142,175], cam:[106,128] };
-    }
-
-    /* ── Android Budget + mặc định ── */
-    return { tier:'budget', label:'Android Budget',
-        g:[132,162], ads:[108,132], z3:[90,112], z6:[72,92],
-        gyro:[154,188], cam:[116,142] };
+    if (/rog phone|black shark|redmagic/.test(n)) return { g:[78,95], ads:[62,78], z3:[54,70], z6:[50,62], gyro:[112,142], cam:[72,90] };
+    if (/galaxy s2[0-4] ultra|pixel [7-9] pro|oneplus (9|10|11|12) pro|find x[5-7]|xiaomi 1[234] pro|xiaomi 14 ultra/.test(n))
+        return { g:[88,108], ads:[70,88], z3:[60,76], z6:[52,65], gyro:[118,150], cam:[80,100] };
+    if (/poco [fx]\d|poco x[3-6]|redmi note 1[0-3] pro|galaxy a5[345] 5g|galaxy a73|realme gt|realme [89] pro|oneplus nord 2|xiaomi 1[2-4]t|reno [7-9] pro|reno 10/.test(n))
+        return { g:[108,130], ads:[86,106], z3:[72,90], z6:[58,74], gyro:[135,165], cam:[98,118] };
+    if (/redmi note [89]|redmi note 10|redmi note 11|galaxy a[34][0-9]|galaxy m[34][0-9]|oppo reno [4-9]|vivo v2[12]|realme [6-9]|realme 10|oneplus nord ce/.test(n))
+        return { g:[118,142], ads:[94,116], z3:[78,98], z6:[63,80], gyro:[142,175], cam:[106,128] };
+    return { g:[132,162], ads:[108,132], z3:[90,112], z6:[72,92], gyro:[154,188], cam:[116,142] };
 }
 
-/* ── Random trong khoảng ── */
-function rnd(a, b) {
-    // Thêm một seed ngẫu nhiên nhỏ để mỗi lần khác nhau
-    const jitter = (Math.random() - 0.5) * 4;
-    return Math.round(Math.max(a, Math.min(b, a + Math.random() * (b - a) + jitter)));
-}
+function rnd(a, b) { return Math.round(a + Math.random() * (b - a)); }
 
-/* ── FF MAX giảm nhạy ~8-12% vì đồ họa nặng hơn ── */
 function applyGameMode(vals, game) {
     if (game === 'ff') return vals;
-    // FF MAX: màn hình render nhiều hơn → gyro và camera nhẹ hơn, ADS và zoom giảm chút
-    return vals.map((v, i) => {
-        const reductions = [0.92, 0.90, 0.91, 0.93, 0.88, 0.89]; // per-channel factor
-        return Math.max(50, Math.round(v * reductions[i]));
-    });
+    return vals.map((v, i) => Math.max(50, Math.round(v * [0.92,0.90,0.91,0.93,0.88,0.89][i])));
 }
 
 function generateSens() {
@@ -2070,52 +1788,28 @@ function generateSens() {
 
     setTimeout(() => {
         document.getElementById('sensThinking').style.display = 'none';
-
-        const profile = getDeviceProfile(inp);
-        const { g, ads, z3, z6, gyro, cam } = profile;
-
-        const clamp = (v) => Math.max(50, Math.min(200, v));
-        let vals = [
-            clamp(rnd(...g)),    // sv0: General
-            clamp(rnd(...ads)),  // sv1: ADS
-            clamp(rnd(...z3)),   // sv2: 3x
-            clamp(rnd(...z6)),   // sv3: 6x
-            clamp(rnd(...gyro)), // sv4: Gyroscope
-            clamp(rnd(...cam)),  // sv5: Camera tự do
-        ];
-
+        const { g, ads, z3, z6, gyro, cam } = getDeviceProfile(inp);
+        const clamp = v => Math.max(50, Math.min(200, v));
+        let vals = [clamp(rnd(...g)), clamp(rnd(...ads)), clamp(rnd(...z3)), clamp(rnd(...z6)), clamp(rnd(...gyro)), clamp(rnd(...cam))];
         vals = applyGameMode(vals, currentGame);
-
         document.getElementById('sensDeviceName').textContent = inp;
-
-        // Hiển thị tên game
         const gameLbl = currentGame === 'ff' ? '🔥 FF' : '💎 FF MAX';
         const gameNote = currentGame === 'ff' ? 'Free Fire (thường)' : 'Free Fire MAX';
         document.getElementById('sensGameLabel').textContent = gameLbl;
         document.getElementById('sensGameNote').textContent = gameNote;
-
-        ['sv0','sv1','sv2','sv3','sv4','sv5'].forEach((id, i) => {
-            document.getElementById(id).textContent = vals[i];
-        });
-
+        ['sv0','sv1','sv2','sv3','sv4','sv5'].forEach((id, i) => { document.getElementById(id).textContent = vals[i]; });
         ['sb0','sb1','sb2','sb3','sb4','sb5'].forEach((id, i) => {
-            const el = document.getElementById(id);
-            el.style.width = '0%';
-            setTimeout(() => {
-                el.style.width = Math.round(vals[i] / 200 * 100) + '%';
-            }, 50 + i * 90);
+            const el = document.getElementById(id); el.style.width = '0%';
+            setTimeout(() => { el.style.width = Math.round(vals[i] / 200 * 100) + '%'; }, 50 + i * 90);
         });
-
         document.getElementById('sensResult').style.display = 'block';
     }, 1600);
 }
 
 /* ── AUTOCOMPLETE ── */
 let acSelected = -1;
-
 function onSensInput(val) {
-    const list = document.getElementById('acList');
-    acSelected = -1;
+    const list = document.getElementById('acList'); acSelected = -1;
     if (!val.trim()) { list.style.display = 'none'; return; }
     const q = val.toLowerCase();
     const matches = DEVICE_LIST.filter(d => d.toLowerCase().includes(q)).slice(0, 12);
@@ -2126,38 +1820,28 @@ function onSensInput(val) {
     }).join('');
     list.style.display = 'block';
 }
-
 function onSensKey(e) {
     const list = document.getElementById('acList');
     const items = list.querySelectorAll('.autocomplete-item');
     if (!items.length) return;
-    if (e.key === 'ArrowDown') { e.preventDefault(); acSelected = Math.min(acSelected + 1, items.length - 1); items.forEach((el, i) => el.classList.toggle('active', i === acSelected)); }
-    else if (e.key === 'ArrowUp') { e.preventDefault(); acSelected = Math.max(acSelected - 1, 0); items.forEach((el, i) => el.classList.toggle('active', i === acSelected)); }
+    if (e.key === 'ArrowDown') { e.preventDefault(); acSelected = Math.min(acSelected+1, items.length-1); items.forEach((el,i)=>el.classList.toggle('active',i===acSelected)); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); acSelected = Math.max(acSelected-1, 0); items.forEach((el,i)=>el.classList.toggle('active',i===acSelected)); }
     else if (e.key === 'Enter' && acSelected >= 0) { e.preventDefault(); selectDevice(items[acSelected].textContent.replace(/<[^>]+>/g,'')); }
-    else if (e.key === 'Escape') { list.style.display = 'none'; }
+    else if (e.key === 'Escape') list.style.display = 'none';
 }
-
-function selectDevice(name) {
-    document.getElementById('sensDeviceInput').value = name;
-    document.getElementById('acList').style.display = 'none';
-    acSelected = -1;
-}
-
-document.addEventListener('click', e => {
-    if (!e.target.closest('.sens-search-wrap')) document.getElementById('acList').style.display = 'none';
-});
+function selectDevice(name) { document.getElementById('sensDeviceInput').value = name; document.getElementById('acList').style.display = 'none'; acSelected = -1; }
+document.addEventListener('click', e => { if (!e.target.closest('.sens-search-wrap')) document.getElementById('acList').style.display = 'none'; });
 
 /* ── TOGGLE CONFIG ── */
 const TCFG = {
-    theme:{color:'#c8a0ff',icon:'🌙',offIcon:'☀️',lines:['[THEME] Khởi tạo engine chủ đề...','[GPU]   Tải shader bảng màu tối: depth_blur=3.2px','[CSS]   Áp dụng biến --bg=#020408 --panel=#0d1220','[LAYER] Thiết lập nebula opacity=0.35 blend=screen','[FONT]  antialiasing=lcd subpixel=off hinting=auto','[SYNC]  GPU vsync=true refresh=144hz framebuffer=swap','[CACHE] Ghi theme → key="nminh_dark_v4" scope=session','[DONE]  Chủ đề tối đã được áp dụng thành công ✓']},
-    relax:{color:'#7fffb0',icon:'🍃',offIcon:'⚡',lines:['[INIT]  Khởi động module Nhẹ Tâm...','[NEURO] Điều chỉnh sóng não: freq=0.5Hz amplitude=low','[ALERT] Tắt thông báo ưu tiên: queue=clear mode=silent','[SYNC]  Đồng bộ hơi thở: inhale=4s hold=4s exhale=6s','[BIO]   Chặn cortisol threshold=auto HRV_sensor=active','[AUDIO] Tải âm thanh: rain+pink_noise vol=28%','[LIGHT] Bộ lọc ánh sáng xanh: temp=3200K strength=80%','[DONE]  Chế độ Nhẹ Tâm đã kích hoạt thành công ✓']},
-    fps:{color:'#ffdd55',icon:'📉',offIcon:'🔥',lines:['[INIT]  Khởi động bộ giới hạn FPS...','[DISP]  Đặt giới hạn: cap=30fps vsync=adaptive','[REND]  Giảm độ phân giải: scale=0.75x DLSS=quality','[LOD]   Điều chỉnh chi tiết: near=80 far=200 shadow=512','[PART]  Giới hạn particle: max=256 physics_hz=20Hz','[CULL]  Bật tối ưu render: frustum=on occlusion=on','[TEMP]  Giám sát nhiệt độ: max=72°C fan=aggressive','[DONE]  Chế độ Giảm FPS đã áp dụng thành công ✓']},
-    optimize:{color:'#55ccff',icon:'⚙️',offIcon:'🛑',lines:['[INIT]  Bắt đầu quét tiến trình hệ thống...','[PROC]  Dọn tiến trình zombie: 14 đã tắt idle=trimmed','[MEM]   Defrag bộ nhớ: huge_pages=on swap=zstd 4096MB','[CPU]   Ghim CPU: isolcpus=2,3 nohz_full=on rcu=enabled','[CACHE] Xả cache: L1=clean L2=clean L3=warm TLB=flush','[IO]    Tối ưu ổ đĩa: mq-deadline queue=64 ncq=on','[NET]   Tinh chỉnh mạng: tcp_bbr=on rmem=16MB wmem=16MB','[DONE]  Tối Ưu Máy hoàn tất thành công ✓']},
-    sens:{color:'#ff9966',icon:'🎯',offIcon:'🔕',lines:['[INIT]  Khởi động module tăng độ nhạy...','[INPUT] Đặt tốc độ poll: rate=8000Hz latency=0.125ms','[RAW]   Kích hoạt raw input: bypass=true accel=false','[DPI]   Áp dụng profile: 800dpi step=50 snap=disabled','[USB]   Ưu tiên USB IRQ: priority=99 affinity=cpu0','[HID]   Bộ lọc HID: driver=hidraw buffer=1 mode=direct','[CLICK] Debounce=0ms pre_travel=0.2mm actuation=47g','[DONE]  Tăng Nhạy đã kích hoạt thành công ✓']},
-    vibration:{color:'#ff80c0',icon:'📳',offIcon:'🔔',lines:['[INIT]  Khởi động module Fix Rung...','[HAL]   Kết nối HAL haptic: driver=ff_memless override=on','[MOTOR] Tắt motor rung: duty_cycle=0% carrier=200Hz','[FF]    Chặn force feedback: rumble=off periodic=off','[PAD]   Tắt rung tay cầm: left=0x00 right=0x00 trim=0','[TOUCH] Vô hiệu hóa phản hồi cảm ứng: amplitude=0','[SYS]   Ghi đè pattern rung hệ thống: pattern=null','[DONE]  Fix Rung đã áp dụng thành công ✓']},
-    dpi:{color:'#80d8ff',icon:'🖱️',offIcon:'🖥️',lines:['[INIT]  Khởi động DPI Engine...','[DRV]   Tải driver: libinput backend=evdev mode=raw','[PTR]   Tốc độ con trỏ: scale=1.0x accel_profile=flat','[DPI1]  Stage 1 → 800dpi  sens=1.000 LED=#ff0000','[DPI2]  Stage 2 → 1200dpi sens=1.000 LED=#00ff00','[DPI3]  Stage 3 → 1600dpi sens=1.000 LED=#0000ff','[DPI4]  Stage 4 → 3200dpi sens=1.000 LED=#ffffff','[DONE]  DPI đã bật và cấu hình thành công ✓']},
+    theme:{color:'#c8a0ff',icon:'🌙',offIcon:'☀️',lines:['[THEME] Khởi tạo engine chủ đề...','[GPU]   Tải shader bảng màu tối: depth_blur=3.2px','[CSS]   Áp dụng biến --bg=#020408 --panel=#0d1220','[LAYER] Thiết lập nebula opacity=0.35 blend=screen','[FONT]  antialiasing=lcd subpixel=off hinting=auto','[SYNC]  GPU vsync=true refresh=144hz','[CACHE] Ghi theme → key="nminh_dark_v4"','[DONE]  Chủ đề tối đã được áp dụng thành công ✓']},
+    relax:{color:'#7fffb0',icon:'🍃',offIcon:'⚡',lines:['[INIT]  Khởi động module Nhẹ Tâm...','[NEURO] Điều chỉnh sóng não: freq=0.5Hz','[ALERT] Tắt thông báo ưu tiên: queue=clear','[SYNC]  Đồng bộ hơi thở: inhale=4s hold=4s exhale=6s','[BIO]   Chặn cortisol threshold=auto','[AUDIO] Tải âm thanh: rain+pink_noise vol=28%','[LIGHT] Bộ lọc ánh sáng xanh: temp=3200K','[DONE]  Chế độ Nhẹ Tâm đã kích hoạt thành công ✓']},
+    fps:{color:'#ffdd55',icon:'📉',offIcon:'🔥',lines:['[INIT]  Khởi động bộ giới hạn FPS...','[DISP]  Đặt giới hạn: cap=30fps vsync=adaptive','[REND]  Giảm độ phân giải: scale=0.75x','[LOD]   Điều chỉnh chi tiết: shadow=512','[PART]  Giới hạn particle: max=256','[CULL]  Bật tối ưu render: frustum=on','[TEMP]  Giám sát nhiệt độ: max=72°C','[DONE]  Chế độ Giảm FPS đã áp dụng thành công ✓']},
+    optimize:{color:'#55ccff',icon:'⚙️',offIcon:'🛑',lines:['[INIT]  Bắt đầu quét tiến trình hệ thống...','[PROC]  Dọn tiến trình zombie: 14 đã tắt','[MEM]   Defrag bộ nhớ: huge_pages=on swap=zstd','[CPU]   Ghim CPU: isolcpus=2,3 nohz_full=on','[CACHE] Xả cache: L1=clean L2=clean L3=warm','[IO]    Tối ưu ổ đĩa: mq-deadline queue=64','[NET]   Tinh chỉnh mạng: tcp_bbr=on rmem=16MB','[DONE]  Tối Ưu Máy hoàn tất thành công ✓']},
+    sens:{color:'#ff9966',icon:'🎯',offIcon:'🔕',lines:['[INIT]  Khởi động module tăng độ nhạy...','[INPUT] Đặt tốc độ poll: rate=8000Hz latency=0.125ms','[RAW]   Kích hoạt raw input: bypass=true accel=false','[DPI]   Áp dụng profile: 800dpi step=50','[USB]   Ưu tiên USB IRQ: priority=99','[HID]   Bộ lọc HID: driver=hidraw buffer=1','[CLICK] Debounce=0ms pre_travel=0.2mm','[DONE]  Tăng Nhạy đã kích hoạt thành công ✓']},
+    vibration:{color:'#ff80c0',icon:'📳',offIcon:'🔔',lines:['[INIT]  Khởi động module Fix Rung...','[HAL]   Kết nối HAL haptic: driver=ff_memless','[MOTOR] Tắt motor rung: duty_cycle=0%','[FF]    Chặn force feedback: rumble=off','[PAD]   Tắt rung tay cầm: left=0x00 right=0x00','[TOUCH] Vô hiệu hóa phản hồi cảm ứng: amplitude=0','[SYS]   Ghi đè pattern rung hệ thống: pattern=null','[DONE]  Fix Rung đã áp dụng thành công ✓']},
+    dpi:{color:'#80d8ff',icon:'🖱️',offIcon:'🖥️',lines:['[INIT]  Khởi động DPI Engine...','[DRV]   Tải driver: libinput backend=evdev','[PTR]   Tốc độ con trỏ: scale=1.0x accel_profile=flat','[DPI1]  Stage 1 → 800dpi  sens=1.000','[DPI2]  Stage 2 → 1200dpi sens=1.000','[DPI3]  Stage 3 → 1600dpi sens=1.000','[DPI4]  Stage 4 → 3200dpi sens=1.000','[DONE]  DPI đã bật và cấu hình thành công ✓']},
 };
-
 let effRun = false;
 function handleToggle(el, name, type) { if (effRun) return; el.classList.toggle('on'); showCodeModal(name, el.classList.contains('on'), type); }
 function showCodeModal(name, isOn, type) {
@@ -2192,39 +1876,36 @@ function resizeAll() {
     pC.width = gW; pC.height = gH;
 }
 window.addEventListener('resize', () => { resizeAll(); mkStars(220); });
-function mkStars(n) {
-    stars = [];
-    for (let i = 0; i < n; i++) stars.push({ x:Math.random()*gW, y:Math.random()*gH, r:Math.random()*1.2+.2, op:Math.random()*.8+.2, ts:Math.random()*.02+.005, to:Math.random()*Math.PI*2, c:['#fff','#adf','#ffe','#ccf'][~~(Math.random()*4)] });
-}
+function mkStars(n) { stars=[]; for(let i=0;i<n;i++) stars.push({x:Math.random()*gW,y:Math.random()*gH,r:Math.random()*1.2+.2,op:Math.random()*.8+.2,ts:Math.random()*.02+.005,to:Math.random()*Math.PI*2,c:['#fff','#adf','#ffe','#ccf'][~~(Math.random()*4)]}); }
 let gT = 0;
 function drawGalaxy() {
-    gX.clearRect(0, 0, gW, gH); gT += .016;
-    stars.forEach(s => { const tw = .5+.5*Math.sin(gT*s.ts*60+s.to); gX.globalAlpha=s.op*tw; gX.fillStyle=s.c; gX.beginPath(); gX.arc(s.x,s.y,s.r,0,Math.PI*2); gX.fill(); });
-    gX.globalAlpha = 1; requestAnimationFrame(drawGalaxy);
+    gX.clearRect(0,0,gW,gH); gT+=.016;
+    stars.forEach(s=>{const tw=.5+.5*Math.sin(gT*s.ts*60+s.to);gX.globalAlpha=s.op*tw;gX.fillStyle=s.c;gX.beginPath();gX.arc(s.x,s.y,s.r,0,Math.PI*2);gX.fill();});
+    gX.globalAlpha=1; requestAnimationFrame(drawGalaxy);
 }
 const sC = document.getElementById('snow'), sX = sC.getContext('2d');
 let flakes = [];
 function mkSnow() { flakes=[]; for(let i=0;i<40;i++) flakes.push({x:Math.random()*gW,y:Math.random()*gH,r:Math.random()*1.4+.4,sp:Math.random()*.4+.2,d:Math.random()*10,op:Math.random()*.25+.1}); }
 function drawSnow() {
-    sX.clearRect(0, 0, gW, gH); sX.fillStyle = '#fff';
-    flakes.forEach(f => { sX.globalAlpha=f.op; sX.beginPath(); sX.arc(f.x,f.y,f.r,0,Math.PI*2); sX.fill(); f.y+=f.sp; f.x+=Math.sin(f.d)*.2; f.d+=.01; if(f.y>gH){f.y=-5;f.x=Math.random()*gW;} if(f.x>gW)f.x=0; if(f.x<0)f.x=gW; });
-    sX.globalAlpha = 1; requestAnimationFrame(drawSnow);
+    sX.clearRect(0,0,gW,gH); sX.fillStyle='#fff';
+    flakes.forEach(f=>{sX.globalAlpha=f.op;sX.beginPath();sX.arc(f.x,f.y,f.r,0,Math.PI*2);sX.fill();f.y+=f.sp;f.x+=Math.sin(f.d)*.2;f.d+=.01;if(f.y>gH){f.y=-5;f.x=Math.random()*gW;}if(f.x>gW)f.x=0;if(f.x<0)f.x=gW;});
+    sX.globalAlpha=1; requestAnimationFrame(drawSnow);
 }
 const pC = document.getElementById('petals'), pX = pC.getContext('2d');
 let petals = [];
-const PC = ['rgba(255,182,193,.7)','rgba(255,153,168,.6)','rgba(255,200,210,.65)','rgba(255,220,228,.55)'];
-function mkP() { return { x:Math.random()*gW, y:-20, s:Math.random()*6+4, sy:Math.random()*1+.4, sx:Math.random()*.6-.3, r:Math.random()*Math.PI*2, rs:(Math.random()-.5)*.035, sw:Math.random()*2+1, so:Math.random()*Math.PI*2, c:PC[~~(Math.random()*PC.length)], op:Math.random()*.5+.35 }; }
-function initPetals(n) { petals=[]; for(let i=0;i<n;i++){const p=mkP();p.y=Math.random()*gH;petals.push(p);} }
-let pT = 0;
-function drawPetals() {
-    pX.clearRect(0, 0, gW, gH); pT++;
-    if (pT % 20 === 0 && petals.length < 45) petals.push(mkP());
-    petals.forEach((p, i) => {
-        p.y+=p.sy; p.x+=p.sx+Math.sin(pT*.015+p.so)*p.sw*.035; p.r+=p.rs;
-        pX.save(); pX.translate(p.x,p.y); pX.rotate(p.r); pX.globalAlpha=p.op; pX.fillStyle=p.c;
-        for (let k=0;k<5;k++){pX.save();pX.rotate((k/5)*Math.PI*2);pX.beginPath();pX.ellipse(0,-p.s*.55,p.s*.3,p.s*.65,0,0,Math.PI*2);pX.fill();pX.restore();}
+const PC=['rgba(255,182,193,.7)','rgba(255,153,168,.6)','rgba(255,200,210,.65)','rgba(255,220,228,.55)'];
+function mkP(){return{x:Math.random()*gW,y:-20,s:Math.random()*6+4,sy:Math.random()*1+.4,sx:Math.random()*.6-.3,r:Math.random()*Math.PI*2,rs:(Math.random()-.5)*.035,sw:Math.random()*2+1,so:Math.random()*Math.PI*2,c:PC[~~(Math.random()*PC.length)],op:Math.random()*.5+.35};}
+function initPetals(n){petals=[];for(let i=0;i<n;i++){const p=mkP();p.y=Math.random()*gH;petals.push(p);}}
+let pT=0;
+function drawPetals(){
+    pX.clearRect(0,0,gW,gH);pT++;
+    if(pT%20===0&&petals.length<45)petals.push(mkP());
+    petals.forEach((p,i)=>{
+        p.y+=p.sy;p.x+=p.sx+Math.sin(pT*.015+p.so)*p.sw*.035;p.r+=p.rs;
+        pX.save();pX.translate(p.x,p.y);pX.rotate(p.r);pX.globalAlpha=p.op;pX.fillStyle=p.c;
+        for(let k=0;k<5;k++){pX.save();pX.rotate((k/5)*Math.PI*2);pX.beginPath();pX.ellipse(0,-p.s*.55,p.s*.3,p.s*.65,0,0,Math.PI*2);pX.fill();pX.restore();}
         pX.restore();
-        if(p.y>gH+20||p.x<-30||p.x>gW+30) petals[i]=mkP();
+        if(p.y>gH+20||p.x<-30||p.x>gW+30)petals[i]=mkP();
     });
     requestAnimationFrame(drawPetals);
 }
@@ -2232,32 +1913,19 @@ function drawPetals() {
 resizeAll(); mkStars(220); mkSnow(); initPetals(18);
 drawGalaxy(); drawSnow(); drawPetals();
 
-/* INTRO */
 window.addEventListener('load', () => {
     setTimeout(() => {
-        const intro = document.getElementById('intro'), app = document.getElementById('app');
+        const intro=document.getElementById('intro'), app=document.getElementById('app');
         intro.classList.add('hide'); app.classList.add('show');
-        setTimeout(() => { intro.style.display = 'none'; }, 900);
+        setTimeout(()=>{intro.style.display='none';},900);
     }, 3400);
 });
 
 (function buildFx() {
-    const orbit = document.getElementById('ringOrbit'), R = 130;
-    for (let i = 0; i < 5; i++) {
-        const t = document.createElement('div'); t.className = 'irt';
-        const a = (i/5)*Math.PI*2 - Math.PI/2;
-        t.style.left = (130+R*Math.cos(a))+'px'; t.style.top = (130+R*Math.sin(a))+'px';
-        t.style.animationDelay = (.3+i*.32)+'s'; orbit.appendChild(t);
-    }
-    const cw = document.querySelector('.icw');
-    for (let i = 0; i < 8; i++) {
-        const s = document.createElement('div'); s.className = 'csp';
-        const a = (i/8)*Math.PI*2;
-        s.style.left='50%'; s.style.top='50%';
-        s.style.setProperty('--dx', (Math.cos(a)*34)+'px'); s.style.setProperty('--dy', (Math.sin(a)*34)+'px');
-        s.style.animation = 'sparkOut .55s ease-out '+(.45+Math.random()*.1)+'s forwards';
-        s.style.transform = 'translate(-50%,-50%)'; cw.appendChild(s);
-    }
+    const orbit=document.getElementById('ringOrbit'), R=130;
+    for(let i=0;i<5;i++){const t=document.createElement('div');t.className='irt';const a=(i/5)*Math.PI*2-Math.PI/2;t.style.left=(130+R*Math.cos(a))+'px';t.style.top=(130+R*Math.sin(a))+'px';t.style.animationDelay=(.3+i*.32)+'s';orbit.appendChild(t);}
+    const cw=document.querySelector('.icw');
+    for(let i=0;i<8;i++){const s=document.createElement('div');s.className='csp';const a=(i/8)*Math.PI*2;s.style.left='50%';s.style.top='50%';s.style.setProperty('--dx',(Math.cos(a)*34)+'px');s.style.setProperty('--dy',(Math.sin(a)*34)+'px');s.style.animation='sparkOut .55s ease-out '+(.45+Math.random()*.1)+'s forwards';s.style.transform='translate(-50%,-50%)';cw.appendChild(s);}
 })();
 
 document.addEventListener('keypress', e => {
