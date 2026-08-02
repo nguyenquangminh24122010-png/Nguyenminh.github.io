@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
+<html lang="vi"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nminh Lock Pro</title>
@@ -268,23 +266,23 @@
 
         .mu-err { font-size: 10px; color: var(--danger); text-align: center; margin-top: 4px; padding: 3px 8px; background: rgba(255,92,92,.08); border-radius: 6px; display: none; }
     </style>
-</head>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script></head>
 <body>
-<canvas id="galaxy"></canvas>
+<canvas id="galaxy" width="414" height="673"></canvas>
 <div class="neb n1"></div><div class="neb n2"></div><div class="neb n3"></div>
 <div class="ss" style="top:10%;left:20%;animation-duration:6s;"></div>
 <div class="ss" style="top:30%;left:60%;animation-duration:8s;animation-delay:2.5s;"></div>
 <div class="ss" style="top:60%;left:10%;animation-duration:7s;animation-delay:5s;"></div>
 <div class="ss" style="top:5%;left:80%;animation-duration:5s;animation-delay:1.5s;"></div>
 <div class="ss" style="top:80%;left:50%;animation-duration:9s;animation-delay:4s;"></div>
-<canvas id="snow"></canvas>
-<canvas id="petals"></canvas>
+<canvas id="snow" width="414" height="673"></canvas>
+<canvas id="petals" width="414" height="673"></canvas>
 
 <div id="intro">
-    <div class="iro" id="ringOrbit"></div>
-    <div class="icw"><div class="ic">👑</div></div>
-    <div class="itw"><div class="it" id="introTitle">NMINH LOCK</div></div>
-    <div class="isub" id="introSub">Hệ thống bảo mật</div>
+    <div class="iro" id="ringOrbit"><div class="irt" style="left: 130px; top: 0px; animation-delay: 0.3s;"></div><div class="irt" style="left: 253.637347px; top: 89.827791px; animation-delay: 0.62s;"></div><div class="irt" style="left: 206.412083px; top: 235.172209px; animation-delay: 0.94s;"></div><div class="irt" style="left: 53.587917px; top: 235.172209px; animation-delay: 1.26s;"></div><div class="irt" style="left: 6.362653px; top: 89.827791px; animation-delay: 1.58s;"></div></div>
+    <div class="icw"><div class="ic">👑</div><div class="csp" style="left: 50%; top: 50%; --dx: 34px; --dy: 0px; animation: 0.55s ease-out 0.487803s forwards sparkOut; transform: translate(-50%, -50%);"></div><div class="csp" style="left: 50%; top: 50%; --dx: 24.041630560342618px; --dy: 24.041630560342615px; animation: 0.55s ease-out 0.486053s forwards sparkOut; transform: translate(-50%, -50%);"></div><div class="csp" style="left: 50%; top: 50%; --dx: 2.0818995585505003e-15px; --dy: 34px; animation: 0.55s ease-out 0.469353s forwards sparkOut; transform: translate(-50%, -50%);"></div><div class="csp" style="left: 50%; top: 50%; --dx: -24.041630560342615px; --dy: 24.041630560342618px; animation: 0.55s ease-out 0.468652s forwards sparkOut; transform: translate(-50%, -50%);"></div><div class="csp" style="left: 50%; top: 50%; --dx: -34px; --dy: 4.1637991171010006e-15px; animation: 0.55s ease-out 0.458402s forwards sparkOut; transform: translate(-50%, -50%);"></div><div class="csp" style="left: 50%; top: 50%; --dx: -24.04163056034262px; --dy: -24.041630560342615px; animation: 0.55s ease-out 0.466234s forwards sparkOut; transform: translate(-50%, -50%);"></div><div class="csp" style="left: 50%; top: 50%; --dx: -6.245698675651501e-15px; --dy: -34px; animation: 0.55s ease-out 0.509169s forwards sparkOut; transform: translate(-50%, -50%);"></div><div class="csp" style="left: 50%; top: 50%; --dx: 24.04163056034261px; --dy: -24.04163056034262px; animation: 0.55s ease-out 0.505302s forwards sparkOut; transform: translate(-50%, -50%);"></div></div>
+    <div class="itw"><div class="it" id="introTitle">AIMHEAD</div></div>
+    <div class="isub" id="introSub">hỗ trợ kéo tâm</div>
     <div class="ibw"><div class="ib"></div></div>
     <div class="istat">
         <span class="dot"></span>
@@ -301,17 +299,17 @@
 <div id="page1" class="page active">
     <div class="cb">👑</div>
     <div class="page-inner">
-        <div class="brand" id="brandText">App by Nminh</div>
+        <div class="brand" id="brandText">NGUYỄN MINH PRX</div>
         <div class="iw">
             <div class="ir"></div><div class="ir d"></div>
             <div class="ic2">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--cyan)">
-                    <rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+                    <rect x="4" y="11" width="16" height="9" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path>
                 </svg>
             </div>
         </div>
-        <h1 id="appTitle">Nminh Lock</h1>
-        <div class="tg" id="appTagline">Khóa truy cập an toàn cho thiết bị của bạn</div>
+        <h1 id="appTitle">AIMHEAD</h1>
+        <div class="tg" id="appTagline">👑nminhprx👑</div>
         <button class="btn" onclick="goTo('page2')">Bấm vào để kích hoạt</button>
         <div class="musec" id="musicWidget" style="display:none;">
             <div class="mutitle">🎵 Đang phát</div>
@@ -333,7 +331,7 @@
         </div>
         <div class="hint blink">✦ Hệ thống đang chờ lệnh... ✦</div>
         <div style="margin-top:14px;font-size:10px;color:rgba(126,147,160,0.3);cursor:pointer;" onclick="openAdminLogin()">⚡️⚡️</div>
-        <div style="margin-top:8px;"><span class="offline-badge" id="syncStatusBadge">⏳ Đang kết nối...</span></div>
+        <div style="margin-top:8px;"><span class="offline-badge online" id="syncStatusBadge">✅ Đồng bộ Firebase</span></div>
     </div>
 </div>
 
@@ -356,7 +354,7 @@
     <div class="cb">👑</div>
     <div class="page-inner">
         <div class="brand">Bảng điều khiển</div>
-        <h1 id="dashTitle">Nminh Lock</h1>
+        <h1 id="dashTitle">AIMHEAD</h1>
         <div id="userBadge" class="kbadge normal">✦ KEY THƯỜNG</div>
         <div class="kstrip">
             <div class="krow"><span class="klbl">Key</span><span class="kval" id="dKey">—</span></div>
@@ -404,7 +402,7 @@
     <div class="page-inner">
         <div class="brand">Thông báo</div>
         <div class="iw"><div class="ir"></div><div class="ir d"></div>
-            <div class="ic2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--danger)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+            <div class="ic2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--danger)"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg></div>
         </div>
         <h1 style="color:var(--danger)">Hết Slot</h1>
         <div class="tg" id="fullMsg">Key này đã đủ số người dùng.<br>Vui lòng liên hệ admin.</div>
@@ -417,7 +415,7 @@
     <div class="page-inner">
         <div class="brand">Thông báo</div>
         <div class="iw"><div class="ir"></div><div class="ir d"></div>
-            <div class="ic2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--vip)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div class="ic2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--vip)"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
         </div>
         <h1 style="color:var(--vip)">Key Hết Hạn</h1>
         <div class="tg">Key đã hết hạn sử dụng.<br>Đợi admin cấp key mới để tiếp tục.</div>
@@ -557,11 +555,7 @@
                 </div>
                 <div id="mPanelFile">
                     <div class="admsec-t">Upload file nhạc (.mp3, .ogg, .wav)</div>
-                    <div id="mDropZone" onclick="document.getElementById('mFileInput').click()"
-                        style="border:2px dashed rgba(57,230,230,.35);border-radius:10px;padding:18px 10px;text-align:center;cursor:pointer;margin-bottom:10px;transition:all .2s;background:rgba(57,230,230,.03);"
-                        ondragover="event.preventDefault();this.style.borderColor='var(--cyan)';this.style.background='rgba(57,230,230,.08)'"
-                        ondragleave="this.style.borderColor='rgba(57,230,230,.35)';this.style.background='rgba(57,230,230,.03)'"
-                        ondrop="event.preventDefault();this.style.borderColor='rgba(57,230,230,.35)';this.style.background='rgba(57,230,230,.03)';handleMusicFileDrop(event)">
+                    <div id="mDropZone" onclick="document.getElementById('mFileInput').click()" style="border:2px dashed rgba(57,230,230,.35);border-radius:10px;padding:18px 10px;text-align:center;cursor:pointer;margin-bottom:10px;transition:all .2s;background:rgba(57,230,230,.03);" ondragover="event.preventDefault();this.style.borderColor='var(--cyan)';this.style.background='rgba(57,230,230,.08)'" ondragleave="this.style.borderColor='rgba(57,230,230,.35)';this.style.background='rgba(57,230,230,.03)'" ondrop="event.preventDefault();this.style.borderColor='rgba(57,230,230,.35)';this.style.background='rgba(57,230,230,.03)';handleMusicFileDrop(event)">
                         <div style="font-size:26px;margin-bottom:6px;">🎵</div>
                         <div style="font-size:12.5px;color:var(--cyan);font-weight:700;">Nhấn hoặc kéo thả file nhạc vào đây</div>
                         <div style="font-size:10.5px;color:var(--dim);margin-top:4px;">Hỗ trợ: .mp3, .ogg, .wav</div>
@@ -616,7 +610,7 @@
         </div>
         <div id="tabApp" class="tabp">
             <div class="admsec">
-                <div class="admsec-t">Chỉnh tên & nội dung</div>
+                <div class="admsec-t">Chỉnh tên &amp; nội dung</div>
                 <div class="grid1"><div><div class="albl">Tiêu đề App</div>
                     <input type="text" id="cfgTitle" class="ainp" placeholder="NMINH LOCK"></div></div>
                 <div class="grid1"><div><div class="albl">Sub-title intro</div>
@@ -662,13 +656,13 @@
    ================================================================ */
 
 const FIREBASE_CONFIG = {
-    apiKey:            "AIzaSyAHqNEdDLet-ker_B7n4s5OhZnRyIv8SD8",
-    authDomain:        "aimhead-3548c.firebaseapp.com",
-    databaseURL:       "https://aimhead-3548c-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId:         "aimhead-3548c",
-    storageBucket:     "aimhead-3548c.firebasestorage.app",
-    messagingSenderId: "205987052158",
-    appId:             "1:205987052158:web:cf3c908d43a29cdd05f62f",
+    apiKey: "AIzaSyA6nJFr_2CO8vmuACpAw8WsX-_32wNyunM",
+    authDomain: "aimhead-9b876.firebaseapp.com",
+    databaseURL: "https://aimhead-9b876-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "aimhead-9b876",
+    storageBucket: "aimhead-9b876.firebasestorage.app",
+    messagingSenderId: "992885616888",
+    appId: "1:992885616888:web:d01f14b208f2e259424b0d"
 };
 
 const DEF_PW = "1";
@@ -2089,5 +2083,5 @@ document.addEventListener('keypress', e => {
 
 updateSyncStatus(_FB_CONFIGURED);
 </script>
-</body>
-</html>
+
+</body></html>
