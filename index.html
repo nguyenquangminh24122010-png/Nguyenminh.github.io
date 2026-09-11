@@ -225,13 +225,13 @@ body::after{
 /* input */
 .field-wrap{position:relative;width:100%;margin-bottom:14px}
 .field-wrap .fi{
-  position:absolute;left:15px;top:50%;transform:translateY(-50%);
+  position:absolute;right:15px;top:50%;transform:translateY(-50%);
   color:var(--red);font-size:14px;pointer-events:none;
-  transition:color .2s;
+  transition:color .2s;opacity:.7;
 }
 .cyber-in{
   width:100%;
-  padding:15px 15px 15px 46px;
+  padding:15px 44px 15px 16px;
   background:rgba(4,0,12,.9);
   border:1px solid rgba(255,23,68,.25);
   border-radius:var(--radius-sm);
@@ -245,7 +245,6 @@ body::after{
   border-color:var(--red);
   box-shadow:0 0 30px var(--red-glow),inset 0 0 12px rgba(255,23,68,.07);
 }
-.cyber-in:focus ~ .field-wrap .fi{color:#fff}
 
 /* primary button */
 .btn-prime{
@@ -713,9 +712,9 @@ input[type=range].sldr::-webkit-slider-thumb:active{box-shadow:0 0 24px var(--re
   background:none;border:1px solid transparent;pointer-events:none;
   transition:border-color .25s,box-shadow .25s;
 }
-.cyber-in:focus ~ .glow-ring{
-  border-color:rgba(255,23,68,.6);
-  box-shadow:0 0 0 3px rgba(255,23,68,.08);
+.cyber-in:focus + .glow-ring{
+  border-color:rgba(255,23,68,.55);
+  box-shadow:0 0 0 3px rgba(255,23,68,.07);
 }
 </style>
 </head>
@@ -772,12 +771,12 @@ input[type=range].sldr::-webkit-slider-thumb:active{box-shadow:0 0 24px var(--re
 
     <!-- input -->
     <div class="field-wrap">
-      <span class="fi"><i class="fa-solid fa-key"></i></span>
       <input type="text" id="keyIn" class="cyber-in"
         placeholder="NHẬP KEY VIP TẠI ĐÂY..."
         spellcheck="false" autocomplete="off"
         onkeydown="if(event.key==='Enter')doKey()">
       <div class="glow-ring"></div>
+      <span class="fi"><i class="fa-solid fa-key"></i></span>
     </div>
 
     <button class="btn-prime" onclick="doKey()">
