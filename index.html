@@ -1068,63 +1068,59 @@ function launchGame(type){
     spinnerTxt.textContent = 'ĐANG MỞ FREE FIRE...';
     addFeed('RUN','run','Mở Free Fire...');
     _doLaunch([
-      'freefire://com.dts.freefireth',
       'com.dts.freefireth://',
       'freefireth://',
-      'garena://freefire',
       'garenaff://',
-      'ff://',
       'garena://game/100067',
-      'garena://open/100067',
-      'garena://launch?appid=100067',
-      'garena://startapp?appid=100067',
-      'garena://run?appid=100067',
     ], 'Free Fire');
   } else {
     spinnerTxt.textContent = 'ĐANG MỞ FREE FIRE MAX...';
     addFeed('RUN','run','Mở Free Fire MAX...');
     _doLaunch([
-      'freefiremax://com.dts.freefiremax',
       'com.dts.freefiremax://',
       'freefiremax://',
-      'garena://freefiremax',
       'garenamax://',
-      'ffmax://',
       'garena://game/100734',
-      'garena://open/100734',
-      'garena://launch?appid=100734',
-      'garena://startapp?appid=100734',
-      'garena://run?appid=100734',
     ], 'Free Fire MAX');
   }
 }
 
 function _doLaunch(schemes, gameName){
-  // Fire từng scheme cách nhau 120ms
-  // iOS sẽ nhảy vào app ngay khi gặp scheme nó nhận ra
-  // Dùng <a>.click() — ít bị Safari block nhất
-  let i = 0;
-  const interval = setInterval(() => {
-    if(i >= schemes.length){ clearInterval(interval); return; }
+  // Chỉ fire scheme đầu tiên — nếu iOS nhận thì nhảy vào game luôn
+  // Không fire nhiều cái liên tiếp để tránh flash lỗi
+  try {
+    const a = document.createElement('a');
+    a.setAttribute('href', schemes[0]);
+    a.style.cssText = 'display:none;position:fixed;top:0;left:0;';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { try{ document.body.removeChild(a); }catch(e){} }, 100);
+  } catch(e){}
+
+  // Nếu 600ms vẫn còn ở trang này → thử scheme tiếp theo
+  let idx = 1;
+  const tryNext = setInterval(() => {
+    if(idx >= schemes.length){ clearInterval(tryNext); return; }
     try {
       const a = document.createElement('a');
-      a.setAttribute('href', schemes[i]);
+      a.setAttribute('href', schemes[idx]);
       a.style.cssText = 'display:none;position:fixed;top:0;left:0;';
       document.body.appendChild(a);
       a.click();
       setTimeout(() => { try{ document.body.removeChild(a); }catch(e){} }, 100);
     } catch(e){}
-    i++;
-  }, 120);
+    idx++;
+  }, 600);
 
   setTimeout(() => {
+    clearInterval(tryNext);
     document.getElementById('glSpinner').classList.remove('show');
     closeGameLaunch();
     showToast(`${gameName} đang mở!`, 'ok');
     addFeed('OK','ok',`${gameName} — launched ✓`);
     pushNotif(`Vào ${gameName}`, 'Game đã mở', 'on');
     flashScreen();
-  }, 2200);
+  }, 2000);
 }
 </script>
 </body>
