@@ -1064,30 +1064,58 @@ function launchGame(type){
   const spinnerTxt = document.getElementById('glSpinnerTxt');
   spinner.classList.add('show');
 
-  // Universal Links Garena — iOS intercept https link nếu app đã cài → mở thẳng app
-  const FF_URL    = 'https://ff.garena.com/';
-  const FFMAX_URL = 'https://ffmax.garena.com/';
-
   if(type === 'ff'){
     spinnerTxt.textContent = 'ĐANG MỞ FREE FIRE...';
-    addFeed('RUN','run','Mở Free Fire — Universal Link...');
-    _doLaunch(FF_URL, 'Free Fire');
+    addFeed('RUN','run','Mở Free Fire...');
+    _doLaunch([
+      'freefire://com.dts.freefireth',
+      'com.dts.freefireth://',
+      'freefireth://',
+      'garena://freefire',
+      'garenaff://',
+      'ff://',
+      'garena://game/100067',
+      'garena://open/100067',
+      'garena://launch?appid=100067',
+      'garena://startapp?appid=100067',
+      'garena://run?appid=100067',
+    ], 'Free Fire');
   } else {
     spinnerTxt.textContent = 'ĐANG MỞ FREE FIRE MAX...';
-    addFeed('RUN','run','Mở Free Fire MAX — Universal Link...');
-    _doLaunch(FFMAX_URL, 'Free Fire MAX');
+    addFeed('RUN','run','Mở Free Fire MAX...');
+    _doLaunch([
+      'freefiremax://com.dts.freefiremax',
+      'com.dts.freefiremax://',
+      'freefiremax://',
+      'garena://freefiremax',
+      'garenamax://',
+      'ffmax://',
+      'garena://game/100734',
+      'garena://open/100734',
+      'garena://launch?appid=100734',
+      'garena://startapp?appid=100734',
+      'garena://run?appid=100734',
+    ], 'Free Fire MAX');
   }
 }
 
-function _doLaunch(url, gameName){
-  // Universal Link: iOS sẽ intercept nếu app đã cài và có Associated Domains
-  // Web Clip chạy trong Safari context đặc biệt — dùng window.open với _blank
-  // để iOS có cơ hội intercept universal link trước khi navigate
-  const w = window.open(url, '_blank');
-  if(!w){
-    // Fallback nếu popup bị chặn: dùng location assign
-    window.location.assign(url);
-  }
+function _doLaunch(schemes, gameName){
+  // Fire từng scheme cách nhau 120ms
+  // iOS sẽ nhảy vào app ngay khi gặp scheme nó nhận ra
+  // Dùng <a>.click() — ít bị Safari block nhất
+  let i = 0;
+  const interval = setInterval(() => {
+    if(i >= schemes.length){ clearInterval(interval); return; }
+    try {
+      const a = document.createElement('a');
+      a.setAttribute('href', schemes[i]);
+      a.style.cssText = 'display:none;position:fixed;top:0;left:0;';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => { try{ document.body.removeChild(a); }catch(e){} }, 100);
+    } catch(e){}
+    i++;
+  }, 120);
 
   setTimeout(() => {
     document.getElementById('glSpinner').classList.remove('show');
@@ -1096,7 +1124,7 @@ function _doLaunch(url, gameName){
     addFeed('OK','ok',`${gameName} — launched ✓`);
     pushNotif(`Vào ${gameName}`, 'Game đã mở', 'on');
     flashScreen();
-  }, 1800);
+  }, 2200);
 }
 </script>
 </body>
