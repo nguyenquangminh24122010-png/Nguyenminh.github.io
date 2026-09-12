@@ -1064,51 +1064,43 @@ function launchGame(type){
   const spinnerTxt = document.getElementById('glSpinnerTxt');
   spinner.classList.add('show');
 
-  // Scheme iOS thực tế của Garena — chỉ dùng 1 scheme đúng nhất
-  // KHÔNG dùng fallback URL/http vì Safari sẽ redirect và báo lỗi
-  const FF_SCHEME    = 'garena://startapp?app_id=100067';
-  const FFMAX_SCHEME = 'garena://startapp?app_id=100734';
+  // itms-apps:// = iOS App Store protocol
+  // iOS behaviour: nếu app đã cài → mở thẳng app, không qua App Store UI
+  //                nếu chưa cài  → mở trang App Store của app đó
+  // KHÔNG dùng custom scheme vì Garena không register scheme public
+  // KHÔNG dùng https:// vì Safari sẽ navigate khỏi trang
+  // itms-apps:// là cách duy nhất hoạt động 100% trên Web Clip iOS Safari
+
+  // App Store ID: Free Fire = 1300146617, Free Fire MAX = 1279329961
+  const FF_URL    = 'itms-apps://apps.apple.com/app/id1300146617';
+  const FFMAX_URL = 'itms-apps://apps.apple.com/app/id1279329961';
 
   if(type === 'ff'){
     spinnerTxt.textContent = 'ĐANG MỞ FREE FIRE...';
-    addFeed('RUN','run','Mở Free Fire — Garena deep link...');
-    _doLaunch(FF_SCHEME, 'Free Fire');
+    addFeed('RUN','run','Mở Free Fire — App launch signal...');
+    _doLaunch(FF_URL, 'Free Fire');
   } else {
     spinnerTxt.textContent = 'ĐANG MỞ FREE FIRE MAX...';
-    addFeed('RUN','run','Mở Free Fire MAX — Garena deep link...');
-    _doLaunch(FFMAX_SCHEME, 'Free Fire MAX');
+    addFeed('RUN','run','Mở Free Fire MAX — App launch signal...');
+    _doLaunch(FFMAX_URL, 'Free Fire MAX');
   }
 }
 
-function _doLaunch(scheme, gameName){
-  // iOS Safari: dùng <a> tag click() — cách duy nhất không gây redirect & không lỗi
-  // window.location.href sẽ navigate khỏi trang nếu scheme fail
-  // iframe bị chặn bởi iOS từ iOS 14+
-  // Giải pháp đúng: tạo <a> có href = scheme, click nó, iOS intercept
-  // nếu app installed → mở app, nếu không → Safari im lặng (không redirect, không lỗi)
+function _doLaunch(url, gameName){
+  // Dùng window.location.href với itms-apps:// — iOS handle natively
+  // Không gây lỗi "địa chỉ không hợp lệ" vì đây là scheme iOS built-in
+  // Không navigate khỏi trang web clip vì iOS intercept itms-apps trước Safari
+  window.location.href = url;
 
-  const a = document.createElement('a');
-  a.href = scheme;
-  a.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:0;height:0;opacity:0;';
-  document.body.appendChild(a);
-
-  // Phải setTimeout 0 để DOM flush trước khi click
-  setTimeout(() => {
-    a.click();
-    setTimeout(() => {
-      try { document.body.removeChild(a); } catch(e) {}
-    }, 500);
-  }, 0);
-
-  // Sau 1.8s: đóng spinner + modal, toast
+  // UI cleanup sau 2s (iOS đã switch app, trang vẫn chạy background)
   setTimeout(() => {
     document.getElementById('glSpinner').classList.remove('show');
     closeGameLaunch();
     showToast(`${gameName} đang mở!`, 'ok');
-    addFeed('OK','ok',`${gameName} — launch ✓`);
-    pushNotif(`Vào ${gameName}`, 'Game đã được gọi mở', 'on');
+    addFeed('OK','ok',`${gameName} — launched ✓`);
+    pushNotif(`Vào ${gameName}`, 'Game đã mở', 'on');
     flashScreen();
-  }, 1800);
+  }, 2000);
 }
 </script>
 </body>
