@@ -1062,89 +1062,53 @@ function closeGameLaunch(){
 function launchGame(type){
   const spinner = document.getElementById('glSpinner');
   const spinnerTxt = document.getElementById('glSpinnerTxt');
-
-  // Hiện spinner
   spinner.classList.add('show');
+
+  // Scheme iOS thực tế của Garena — chỉ dùng 1 scheme đúng nhất
+  // KHÔNG dùng fallback URL/http vì Safari sẽ redirect và báo lỗi
+  const FF_SCHEME    = 'garena://startapp?app_id=100067';
+  const FFMAX_SCHEME = 'garena://startapp?app_id=100734';
 
   if(type === 'ff'){
     spinnerTxt.textContent = 'ĐANG MỞ FREE FIRE...';
-    addFeed('RUN','run','Mở Free Fire — deep link iOS...');
-    _doLaunch(
-      // iOS URL scheme chính thức của Garena Free Fire
-      'garena.mobilelegends://home',   // fallback 1
-      'freefire://',                    // fallback 2
-      'com.dts.freefireth://',          // fallback 3
-      'https://app.link/freefire',      // universal link fallback
-      'Free Fire'
-    );
+    addFeed('RUN','run','Mở Free Fire — Garena deep link...');
+    _doLaunch(FF_SCHEME, 'Free Fire');
   } else {
     spinnerTxt.textContent = 'ĐANG MỞ FREE FIRE MAX...';
-    addFeed('RUN','run','Mở Free Fire MAX — deep link iOS...');
-    _doLaunch(
-      'freefiremax://',                 // scheme 1
-      'com.dts.freefiremax://',         // scheme 2  
-      'garenafreefiremax://',           // scheme 3
-      'https://app.link/freefiremax',   // universal link fallback
-      'Free Fire MAX'
-    );
+    addFeed('RUN','run','Mở Free Fire MAX — Garena deep link...');
+    _doLaunch(FFMAX_SCHEME, 'Free Fire MAX');
   }
 }
 
-function _doLaunch(scheme1, scheme2, scheme3, universalLink, gameName){
-  // Attempt 1: scheme1
-  // Attempt 2 (fallback): scheme2 after 800ms
-  // Attempt 3 (fallback): scheme3 after 1400ms
-  // Nếu iOS không handle → universal link sau 2000ms
-  // Sau 2800ms: toast thành công + đóng modal
+function _doLaunch(scheme, gameName){
+  // iOS Safari: dùng <a> tag click() — cách duy nhất không gây redirect & không lỗi
+  // window.location.href sẽ navigate khỏi trang nếu scheme fail
+  // iframe bị chặn bởi iOS từ iOS 14+
+  // Giải pháp đúng: tạo <a> có href = scheme, click nó, iOS intercept
+  // nếu app installed → mở app, nếu không → Safari im lặng (không redirect, không lỗi)
 
-  const attempts = [scheme1, scheme2, scheme3];
-  let tried = 0;
+  const a = document.createElement('a');
+  a.href = scheme;
+  a.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:0;height:0;opacity:0;';
+  document.body.appendChild(a);
 
-  function tryScheme(){
-    if(tried < attempts.length){
-      const iframe = document.createElement('iframe');
-      iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0;';
-      iframe.src = attempts[tried];
-      document.body.appendChild(iframe);
-      setTimeout(()=>{ try{ document.body.removeChild(iframe); }catch(e){} },500);
-      tried++;
-    }
-  }
+  // Phải setTimeout 0 để DOM flush trước khi click
+  setTimeout(() => {
+    a.click();
+    setTimeout(() => {
+      try { document.body.removeChild(a); } catch(e) {}
+    }, 500);
+  }, 0);
 
-  // Fire attempts staggered
-  tryScheme();
-  setTimeout(tryScheme, 600);
-  setTimeout(tryScheme, 1100);
-
-  // Universal link attempt — window.location = iOS sẽ intercept nếu app installed
-  setTimeout(()=>{
-    // Thử window.location cho universal link (iOS Safari handles này tốt nhất)
-    try{
-      window.location.href = attempts[0];
-    }catch(e){}
-  }, 300);
-
-  // Sau 1.6s thử universal link thật
-  setTimeout(()=>{
-    try{
-      const a = document.createElement('a');
-      a.href = universalLink;
-      a.style.display = 'none';
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(()=>{ try{ document.body.removeChild(a); }catch(e){} },300);
-    }catch(e){}
-  }, 1600);
-
-  // Kết quả sau 2.4s
-  setTimeout(()=>{
+  // Sau 1.8s: đóng spinner + modal, toast
+  setTimeout(() => {
     document.getElementById('glSpinner').classList.remove('show');
     closeGameLaunch();
-    showToast(`${gameName} đang mở — chuyển game!`, 'ok');
-    addFeed('OK','ok',`${gameName} — launch signal sent ✓`);
-    pushNotif(`Vào ${gameName}`, 'Deep link đã gửi — game đang mở', 'on');
+    showToast(`${gameName} đang mở!`, 'ok');
+    addFeed('OK','ok',`${gameName} — launch ✓`);
+    pushNotif(`Vào ${gameName}`, 'Game đã được gọi mở', 'on');
     flashScreen();
-  }, 2400);
+  }, 1800);
 }
 </script>
 </body>
