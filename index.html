@@ -1064,35 +1064,31 @@ function launchGame(type){
   const spinnerTxt = document.getElementById('glSpinnerTxt');
   spinner.classList.add('show');
 
-  // itms-apps:// = iOS App Store protocol
-  // iOS behaviour: nếu app đã cài → mở thẳng app, không qua App Store UI
-  //                nếu chưa cài  → mở trang App Store của app đó
-  // KHÔNG dùng custom scheme vì Garena không register scheme public
-  // KHÔNG dùng https:// vì Safari sẽ navigate khỏi trang
-  // itms-apps:// là cách duy nhất hoạt động 100% trên Web Clip iOS Safari
-
-  // App Store ID: Free Fire = 1300146617, Free Fire MAX = 1279329961
-  const FF_URL    = 'itms-apps://apps.apple.com/app/id1300146617';
-  const FFMAX_URL = 'itms-apps://apps.apple.com/app/id1279329961';
+  // Universal Links Garena — iOS intercept https link nếu app đã cài → mở thẳng app
+  const FF_URL    = 'https://ff.garena.com/';
+  const FFMAX_URL = 'https://ffmax.garena.com/';
 
   if(type === 'ff'){
     spinnerTxt.textContent = 'ĐANG MỞ FREE FIRE...';
-    addFeed('RUN','run','Mở Free Fire — App launch signal...');
+    addFeed('RUN','run','Mở Free Fire — Universal Link...');
     _doLaunch(FF_URL, 'Free Fire');
   } else {
     spinnerTxt.textContent = 'ĐANG MỞ FREE FIRE MAX...';
-    addFeed('RUN','run','Mở Free Fire MAX — App launch signal...');
+    addFeed('RUN','run','Mở Free Fire MAX — Universal Link...');
     _doLaunch(FFMAX_URL, 'Free Fire MAX');
   }
 }
 
 function _doLaunch(url, gameName){
-  // Dùng window.location.href với itms-apps:// — iOS handle natively
-  // Không gây lỗi "địa chỉ không hợp lệ" vì đây là scheme iOS built-in
-  // Không navigate khỏi trang web clip vì iOS intercept itms-apps trước Safari
-  window.location.href = url;
+  // Universal Link: iOS sẽ intercept nếu app đã cài và có Associated Domains
+  // Web Clip chạy trong Safari context đặc biệt — dùng window.open với _blank
+  // để iOS có cơ hội intercept universal link trước khi navigate
+  const w = window.open(url, '_blank');
+  if(!w){
+    // Fallback nếu popup bị chặn: dùng location assign
+    window.location.assign(url);
+  }
 
-  // UI cleanup sau 2s (iOS đã switch app, trang vẫn chạy background)
   setTimeout(() => {
     document.getElementById('glSpinner').classList.remove('show');
     closeGameLaunch();
@@ -1100,7 +1096,7 @@ function _doLaunch(url, gameName){
     addFeed('OK','ok',`${gameName} — launched ✓`);
     pushNotif(`Vào ${gameName}`, 'Game đã mở', 'on');
     flashScreen();
-  }, 2000);
+  }, 1800);
 }
 </script>
 </body>
